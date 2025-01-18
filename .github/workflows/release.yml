@@ -1,0 +1,35 @@
+name: Create Custom ZIP for Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Rename folder and create custom ZIP
+        run: |
+          # Create a new directory with the desired folder name
+          mkdir "Looti"
+
+          # Copy all files from the current directory into the new folder
+          find . -maxdepth 1 ! -name .git ! -name .github -exec cp -r {} "Looti/" \;
+
+          # Zip the folder
+          zip -r "Looti.zip" "Looti"
+
+      - name: Upload custom ZIP as release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./Looti.zip
+          asset_name: Looti.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
