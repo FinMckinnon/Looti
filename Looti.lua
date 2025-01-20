@@ -72,16 +72,22 @@ frame:RegisterEvent("CHAT_MSG_LOOT")
 frame:RegisterEvent("CHAT_MSG_MONEY")
 frame:RegisterEvent("ADDON_LOADED")
 
-frame:SetScript("OnEvent", function(self, event, addonName, ...)
-    local message = ...
-    if event == "ADDON_LOADED" and addonName == "Looti" then
-        NotificationManager:SetShowNotificationFrame(false)
+frame:SetScript("OnEvent", function(self, event, ...)
+    print("SetScript triggered for event:", event)
+    if event == "ADDON_LOADED" then
+        local addonName = ...
+        if addonName == "Looti" then
+            NotificationManager:SetShowNotificationFrame(false)
+        end
     elseif event == "CHAT_MSG_LOOT" then
+        local message = ...
         handleLootMessage(notificationFrame, message)
     elseif event == "CHAT_MSG_MONEY" then
+        local message = ...
         handleMoneyMessage(notificationFrame, message)
     end
 end)
+
 
 
 

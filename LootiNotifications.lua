@@ -84,12 +84,17 @@ end
 
 local function handleLootMessage(frame, message)
     if LootiConfig.showLootNotifications then
+        print("message".. message)
         if message:find("You receive loot") or message:find("You have looted") then
             local itemLink = message:match("|c%x+|Hitem:.-|h|r")
             if itemLink then
+                print("Item Found")
                 local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemIcon = GetItemInfo(itemLink)
+                print("Item info obtained")
                 if itemName and itemIcon and itemRarity then
+                    print("Passed Check")
                     if itemRarity >= LootiConfig.notificationThreshold then
+                        print("Is rare enoguh")
                         local itemData = {itemName = itemName, itemIcon = itemIcon}
                         Looti_ShowNotification(frame, itemData, nil, itemRarity)
                     end
