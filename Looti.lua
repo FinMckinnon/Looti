@@ -73,7 +73,6 @@ frame:RegisterEvent("CHAT_MSG_MONEY")
 frame:RegisterEvent("ADDON_LOADED")
 
 frame:SetScript("OnEvent", function(self, event, ...)
-    print("SetScript triggered for event:", event)
     if event == "ADDON_LOADED" then
         local addonName = ...
         if addonName == "Looti" then
