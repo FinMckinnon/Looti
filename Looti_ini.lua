@@ -4,7 +4,9 @@ LootiConfig = LootiConfig or {
     notificationThreshold = 3,  -- Default threshold set to 3
     scrollDirection = "up",  -- Default to "up"
     displayBackground = true,  -- Default to true
-    displayDuration = 1
+    displayDuration = 1,
+    notificationFrameX = 0, 
+    notificationFrameY = 0
 }
 
 LootiNotificationSettings = LootiNotificationSettings or {

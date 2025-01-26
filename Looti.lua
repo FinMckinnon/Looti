@@ -1,7 +1,6 @@
 -- Create a draggable frame for moving loot notification area
 notificationFrame = CreateFrame("Frame", "notificationFrame", UIParent, "BackdropTemplate")
 notificationFrame:SetSize(LootiNotificationSettings.NOTI_FRAME_WIDTH, LootiNotificationSettings.NOTI_FRAME_HEIGHT)
-notificationFrame:SetPoint("CENTER", UIParent, "CENTER", 0, LootiNotificationSettings.BASE_Y)
 notificationFrame:SetClampedToScreen(true)
 notificationFrame:SetFrameStrata("BACKGROUND")
 notificationFrame:SetMovable(true)  
@@ -24,6 +23,20 @@ title:SetPoint("TOP", notificationFrame, "TOP", 0, -5)
 title:SetText("Loot Notifications")
 title:Hide()
 
+local function SaveFramePosition()
+    local point, _, _, x, y = notificationFrame:GetPoint()
+    LootiConfig.notificationFrameX = x
+    LootiConfig.notificationFrameY = y
+end
+
+local function LoadFramePosition()
+    if LootiConfig.notificationFrameX and LootiConfig.notificationFrameY then
+        notificationFrame:SetPoint("CENTER", UIParent, "CENTER", LootiConfig.notificationFrameX, LootiConfig.notificationFrameY)
+    else
+        notificationFrame:SetPoint("CENTER", UIParent, "CENTER", 0, LootiNotificationSettings.BASE_Y)
+    end
+end
+
 -- Make the notificationFrame draggable by clicking the title
 notificationFrame:SetScript("OnMouseDown", function(self, button)
     if button == "LeftButton" then
@@ -44,6 +57,7 @@ toggleButton.icon:SetAllPoints()
 toggleButton.icon:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 toggleButton:SetScript("OnClick", function(self)
     NotificationManager:SetShowNotificationFrame(false)
+    SaveFramePosition()
 end)
 toggleButton:Hide()
 
@@ -76,6 +90,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" then
         local addonName = ...
         if addonName == "Looti" then
+            LoadFramePosition()
             NotificationManager:SetShowNotificationFrame(false)
         end
     elseif event == "CHAT_MSG_LOOT" then
@@ -86,8 +101,3 @@ frame:SetScript("OnEvent", function(self, event, ...)
         handleMoneyMessage(notificationFrame, message)
     end
 end)
-
-
-
-
-
