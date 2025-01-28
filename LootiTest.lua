@@ -2,63 +2,34 @@
 function Looti_Test()
     -- List of test loot items (with varying rarities)
     local lootItems = {
-        { name = "Epic Sword", rarity = 4, icon = "Interface\\Icons\\INV_Sword_05", quantity = 1 },
-        { name = "Rare Shield", rarity = 3, icon = "Interface\\Icons\\INV_Shield_05", quantity = 1 },
-        { name = "Common Helmet", rarity = 2, icon = "Interface\\Icons\\INV_Helmet_01", quantity = 1 },
-        { name = "Poor Boots", rarity = 1, icon = "Interface\\Icons\\INV_Boots_01", quantity = 3 },
+        "|cff9d9d9d|Hitem:6196::::::::60:::::|h[Noboru's Cudgel]|h|r",  -- Poor
+        "|cffffffff|Hitem:2770:0:0:0:0:0:0:0|h[Copper Ore]|h|r",   -- Common
+        "|cff1eff00|Hitem:11382::::::::80:::::|h[Blood of the Mountain]|h|r", -- Uncommon
+        "|cff0070dd|Hitem:7713::::::::80:::::|h[Illusionary Rod]|h|r", -- Rare
+        "|cffa335ee|Hitem:873::::::::80:::::|h[Staff of Jordan]|h|r", -- Epic
+        "|cffff8000|Hitem:17182::::::::80:::::|h[Sulfuras, Hand of Ragnaros]|h|r", -- Legendary
+        "|cffe5cc80|Hitem:128910::::::::80::::1:750:|h[Strom'kar, the Warbreaker]|h|r", -- Artifact
+        "|cff00ccff|Hitem:48689::::::::80:::::|h[Stained Shadowcraft Tunic]|h|r", -- Heirloom
     }
 
     -- Test money loot (with different amounts)
-    local moneyItems = {
-        { gold = 5000, silver = 0, copper = 0 },   -- 5000 gold
-        { gold = 0, silver = 250, copper = 0 },    -- 250 silver
-        { gold = 0, silver = 0, copper = 1200 },   -- 1200 copper
-        { gold = 1, silver = 50, copper = 500 },   -- 1 gold, 50 silver, 500 copper
+    local moneyMessages = {
+        "You receive loot: 50 Copper",                   
+        "You receive loot: 10 Silver 30 Copper",         
+        "You receive loot: 25 Silver",                   
+        "You receive loot: 3 Gold 15 Silver",            
+        "You receive loot: 10 Gold 50 Silver 25 Copper" 
     }
 
-    -- Helper function to show loot item notification
-    local function ShowLootNotification(item, delay)
-        C_Timer.After(delay, function()
-            local lootData = {
-                itemName = item.name,
-                itemLink = string.format("|c%x+|Hitem:12345::::::::60:::::::|h[%s]|h|r", 12345, item.name),  -- 12345 is a dummy item ID
-                itemIcon = item.icon,  -- Item icon path
-            }
-            local currencyData = nil  -- No currency for loot notification
-            Looti_ShowNotification(notificationFrame, lootData, currencyData, item.rarity)
-        end)
-    end
-
-    -- Helper function to show money loot notification
-    local function ShowMoneyNotification(currency, delay)
-        C_Timer.After(delay, function()
-            -- Calculate totalCopper from gold, silver, and copper
-            local totalCopper = (currency.gold * 10000) + (currency.silver * 100) + currency.copper
-            
-            if totalCopper > 0 then
-                local moneyData = {
-                    totalCopper = totalCopper,
-                    text = GetCoinTextureString(totalCopper),
-                    icon = currency.gold > 0 and currencyIcons.gold or currency.silver > 0 and currencyIcons.silver or currencyIcons.copper,
-                }
-        
-                -- Show notification for looted money
-                Looti_ShowNotification(notificationFrame, nil, moneyData, -1)  -- -1 for money items (custom rarity)
-            end
-        end)
-    end
-
     -- Simulate loot item notifications with delay
-    local delay = 0
-    for _, item in ipairs(lootItems) do
-        delay = delay + 0.25  -- Increase delay for each item
-        ShowLootNotification(item, delay)
+    for _, itemLink in ipairs(lootItems) do
+        local message = "You receive loot: " .. itemLink  
+        handleLootMessage(notificationFrame, message)
     end
 
     -- Simulate money loot notifications with delay
-    for _, currency in ipairs(moneyItems) do
-        delay = delay + 0.25  -- Increase delay for each money item
-        ShowMoneyNotification(currency, delay)
+    for _, message in ipairs(moneyMessages) do
+        handleMoneyMessage(notificationFrame, message)
     end
 end
 
@@ -67,3 +38,5 @@ SLASH_TESTLOOTI1 = "/lootitest"
 SlashCmdList["TESTLOOTI"] = function()
     Looti_Test()
 end
+
+_G["Looti_Test"] = Looti_Test
