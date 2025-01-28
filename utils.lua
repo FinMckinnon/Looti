@@ -8,4 +8,9 @@ local function GetRarityColor(rarity)
     end
 end
 
+local function log(str)
+    print(str)
+end
+
 _G["GetRarityColor"] = GetRarityColor
+_G["log"] = log

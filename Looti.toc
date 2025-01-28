@@ -11,5 +11,5 @@ LootiNotificationsManager.lua
 LootiNotifications.lua
 Looti.lua
 
-LootiSettingsPanel.lua
 LootiTest.lua
+LootiSettingsPanel.lua
