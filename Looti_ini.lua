@@ -6,7 +6,7 @@ LootiConfig = LootiConfig or {
     displayBackground = true,  -- Default to true
     displayDuration = 1,
     notificationFrameX = 0, 
-    notificationFrameY = 0
+    notificationFrameY = 0,
 }
 
 LootiNotificationSettings = LootiNotificationSettings or {
@@ -23,21 +23,11 @@ end
 
 LootiNotificationSettings:UpdateFrameDimensions()
 
-lootFlags = {
-    [-1] = true,  -- Show currency (for all currencies)
-    [0] = true, -- Poor 
-    [1] = true,  -- Common 
-    [2] = true, -- Uncommon 
-    [3] = true, -- Rare 
-    [4] = false, -- Epic 
-    [5] = false, -- Legendary 
-    [6] = false, -- Artifact 
-    [7] = false -- Heirloom 
-}
+
 
 currencyIcons = {
-    copper = "Interface\\Icons\\INV_Misc_Coin_01",  -- Copper
-    silver = "Interface\\Icons\\INV_Misc_Coin_02",  -- Silver
-    gold = "Interface\\Icons\\INV_Misc_Coin_03"    -- Gold
+    copper = "Interface\\Icons\\INV_misc_coin_05",  -- Copper
+    silver = "Interface\\Icons\\INV_Misc_Coin_03",  -- Silver
+    gold = "Interface\\Icons\\INV_Misc_Coin_01"    -- Gold
 }
 
