@@ -16,8 +16,16 @@ end
 
 -- Show notification
 function Looti_ShowNotification(parent, itemData, currencyData, rarity)
-    if not lootFlags[rarity] then
-        return
+    if itemData then
+        if LootiConfig.showLootNotifications then
+            if rarity < LootiConfig.notificationThreshold then
+                return
+            end
+        end
+    elseif currencyData then
+        if not LootiConfig.showMoneyNotifications then
+            return
+        end
     end
 
     local notification = CreateFrame("Frame", nil, parent, "BackdropTemplate")
@@ -101,15 +109,12 @@ end
 
 local function handleMoneyMessage(frame, message)
     if LootiConfig.showMoneyNotifications then
-        -- Process money loot with support for multiple denominations
         local gold, silver, copper = 0, 0, 0
         
-        -- Check for gold, silver, and copper in the loot message
         gold = tonumber((message:match("(%d+) Gold")) or 0)
         silver = tonumber((message:match("(%d+) Silver")) or 0)
         copper = tonumber((message:match("(%d+) Copper")) or 0)
 
-        -- If any money is looted, display the notification
         if gold > 0 or silver > 0 or copper > 0 then
             local totalCopper = (gold * 10000) + (silver * 100) + copper
             local moneyData = {
@@ -118,8 +123,7 @@ local function handleMoneyMessage(frame, message)
                 icon = gold > 0 and currencyIcons.gold or silver > 0 and currencyIcons.silver or currencyIcons.copper,
             }
 
-            -- Show notification for looted money
-            Looti_ShowNotification(frame, nil, moneyData, -1)  -- -1 can be used for money items or a custom rarity
+            Looti_ShowNotification(frame, nil, moneyData, nil)  
         end
     end
 end
