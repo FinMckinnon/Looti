@@ -1,7 +1,7 @@
 local AceGUI = LibStub("AceGUI-3.0")
 local columnWidth = 300
+local minWidth, minHeight = columnWidth, 600
 
--- Empty handler functions (placeholders)
 local function HandleLootNotifications(value)
     tempSettingsData.showLootNotifications = value
 end
@@ -26,8 +26,8 @@ local function HandleDisplayDurationChange(value)
     tempSettingsData.displayDuration = value
 end
 
+-- Save the settings to the saved config from tempSettingsData
 local function HandleSaveSettings()
-    -- Save the settings to the saved config from tempSettingsData
     LootiConfig.showLootNotifications = tempSettingsData.showLootNotifications
     LootiConfig.showMoneyNotifications = tempSettingsData.showMoneyNotifications
     LootiConfig.notificationThreshold = tempSettingsData.notificationThreshold
@@ -43,7 +43,6 @@ end
 
 -- Function to open the settings window
 local function OpenLootiSettings()
-    -- Create tempSettingsData to hold the temporary settings
     tempSettingsData = {
         showLootNotifications = LootiConfig.showLootNotifications,
         showMoneyNotifications = LootiConfig.showMoneyNotifications,
@@ -55,40 +54,45 @@ local function OpenLootiSettings()
 
     -- Create the main settings frame
     local frame = AceGUI:Create("Frame")
-    frame:SetTitle("Loot Notifications Settings")
+    frame:SetTitle("Looti Settings")
     frame:SetStatusText(getStatusString())
     frame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
     
     -- Set the initial size of the frame
     frame:SetWidth(columnWidth + 50)
-    frame:SetHeight(600)  -- Increased height to accommodate the new slider
+    frame:SetHeight(600)  
+    frame.frame:SetScript("OnSizeChanged", function(self, width, height)
+        if width < minWidth then
+            self:SetWidth(minWidth)
+        end
+        if height < minHeight then
+            self:SetHeight(minHeight)
+        end
+    end)
     
-    -- Apply the 'Table' layout for grid structure with 2 columns (Display Settings + Slider side by side)
     frame:SetLayout("Table")
-    frame:SetUserData("table", {columns = {columnWidth}, spaceH = 10, spaceV = 10})  -- Set 1 column for each row
-    
-    -- Center alignment for all child elements
+    frame:SetUserData("table", {columns = {columnWidth}, spaceH = 10, spaceV = 10})  
     frame:SetUserData("align", "CENTER")
 
     -- Button to display Loot Notification Frame
     local displayButton = AceGUI:Create("Button")
-    displayButton:SetText("Display Loot Notification Frame")
-    displayButton:SetWidth(columnWidth)  -- Increase the width to make the text fully visible
+    displayButton:SetText("Show Notification Frame")
+    displayButton:SetWidth(columnWidth)  
     displayButton:SetCallback("OnClick", function()
         NotificationManager:SetShowNotificationFrame(true)
     end)
-    frame:AddChild(displayButton)  -- Automatically placed in the first row
+    frame:AddChild(displayButton)  
 
-    -- Group for Display Settings (Loot and Money Notifications checkboxes)
+    -- Group for Notification Settings (Loot and Money Notifications checkboxes)
     local displaySettingsGroup = AceGUI:Create("InlineGroup")
-    displaySettingsGroup:SetLayout("Flow")  -- Use Flow inside the section
-    displaySettingsGroup:SetTitle("Display Settings")
-    frame:AddChild(displaySettingsGroup)  -- Automatically placed in the next row
+    displaySettingsGroup:SetLayout("Flow")  
+    displaySettingsGroup:SetTitle("Notification Settings")
+    frame:AddChild(displaySettingsGroup) 
 
     -- Loot Notifications Checkbox
     local enableLootCheckbox = AceGUI:Create("CheckBox")
     enableLootCheckbox:SetLabel("Enable Loot Notifications")
-    enableLootCheckbox:SetValue(tempSettingsData.showLootNotifications)  -- Default to tempSettingsData value
+    enableLootCheckbox:SetValue(tempSettingsData.showLootNotifications)  
     enableLootCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
         HandleLootNotifications(value)
     end)
@@ -97,37 +101,37 @@ local function OpenLootiSettings()
     -- Money Notifications Checkbox
     local enableMoneyCheckbox = AceGUI:Create("CheckBox")
     enableMoneyCheckbox:SetLabel("Enable Money Notifications")
-    enableMoneyCheckbox:SetValue(tempSettingsData.showMoneyNotifications)  -- Default to tempSettingsData value
+    enableMoneyCheckbox:SetValue(tempSettingsData.showMoneyNotifications) 
     enableMoneyCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
         HandleMoneyNotifications(value)
     end)
     displaySettingsGroup:AddChild(enableMoneyCheckbox)
 
-    -- Rarity Threshold Slider (this will be placed next to Display Settings)
+    -- Rarity Threshold Slider 
     local thresholdSlider = AceGUI:Create("Slider")
     thresholdSlider:SetLabel("Notification Threshold (Rarity)")
-    thresholdSlider:SetSliderValues(0, 7, 1)  -- Min 0, Max 7, Step 1
-    thresholdSlider:SetValue(tempSettingsData.notificationThreshold)  -- Default to tempSettingsData value
+    thresholdSlider:SetSliderValues(0, 7, 1)  
+    thresholdSlider:SetValue(tempSettingsData.notificationThreshold)  
     thresholdSlider:SetCallback("OnValueChanged", function(widget, event, value)
         HandleThresholdChange(value)
     end)
-    frame:AddChild(thresholdSlider)  -- This will go in the second column next to Display Settings
+    frame:AddChild(thresholdSlider)  
 
     -- Display Duration Slider (this will go on a new row)
     local durationSlider = AceGUI:Create("Slider")
     durationSlider:SetLabel("Display Duration (Seconds)")
-    durationSlider:SetSliderValues(0.5, 5, 0.5)  -- Min 1, Max 10, Step 1
-    durationSlider:SetValue(tempSettingsData.displayDuration)  -- Default to tempSettingsData value
+    durationSlider:SetSliderValues(0.5, 5, 0.5)  
+    durationSlider:SetValue(tempSettingsData.displayDuration)  
     durationSlider:SetCallback("OnValueChanged", function(widget, event, value)
         HandleDisplayDurationChange(value)
     end)
-    frame:AddChild(durationSlider)  -- This will go into its own row below the threshold slider
+    frame:AddChild(durationSlider)  
 
     -- Group for Notification Settings (Loot Scroll Direction and Display Background checkboxes)
     local notificationSettingsGroup = AceGUI:Create("InlineGroup")
-    notificationSettingsGroup:SetLayout("Flow")  -- Use Flow inside the section
-    notificationSettingsGroup:SetTitle("Notification Settings")
-    frame:AddChild(notificationSettingsGroup)  -- Automatically placed in the next row
+    notificationSettingsGroup:SetLayout("Flow") 
+    notificationSettingsGroup:SetTitle("Notification Display Settings")
+    frame:AddChild(notificationSettingsGroup)  
 
     -- Loot Scroll Direction Dropdown
     local scrollDirectionDropdown = AceGUI:Create("Dropdown")
@@ -136,7 +140,7 @@ local function OpenLootiSettings()
         ["up"] = "Scroll Up",
         ["down"] = "Scroll Down"
     })
-    scrollDirectionDropdown:SetValue(tempSettingsData.scrollDirection)  -- Default to tempSettingsData value
+    scrollDirectionDropdown:SetValue(tempSettingsData.scrollDirection) 
     scrollDirectionDropdown:SetCallback("OnValueChanged", function(widget, event, value)
         HandleScrollDirectionChange(value)
     end)
@@ -145,24 +149,38 @@ local function OpenLootiSettings()
     -- Display Notification Background Checkbox
     local displayBackgroundCheckbox = AceGUI:Create("CheckBox")
     displayBackgroundCheckbox:SetLabel("Display Notification Background")
-    displayBackgroundCheckbox:SetValue(tempSettingsData.displayBackground)  -- Default to tempSettingsData value
+    displayBackgroundCheckbox:SetValue(tempSettingsData.displayBackground)  
     displayBackgroundCheckbox:SetWidth(250)
     displayBackgroundCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
         HandleBackgroundDisplayChange(value)
     end)
     notificationSettingsGroup:AddChild(displayBackgroundCheckbox)
 
+    -- Group for Notification Settings (Loot and Money Notifications checkboxes)
+    local butonGroup = AceGUI:Create("InlineGroup")
+    butonGroup:SetFullWidth(true)
+    butonGroup:SetTitle("") 
+    butonGroup:SetLayout("Flow")  
+
+    -- Save Button at the bottom (on the next row)
+    local testButton = AceGUI:Create("Button")
+    testButton:SetText("Test Looti")
+    testButton:SetWidth(columnWidth/2.2)
+    testButton:SetCallback("OnClick", function()
+        Looti_Test()
+    end)
+    butonGroup:AddChild(testButton)
+    
     -- Save Button at the bottom (on the next row)
     local saveButton = AceGUI:Create("Button")
     saveButton:SetText("Save Settings")
-    saveButton:SetWidth(columnWidth)
+    saveButton:SetWidth(columnWidth/2.2)
     saveButton:SetCallback("OnClick", function()
         HandleSaveSettings() 
-        frame:Hide()  -- Optionally close the settings frame after saving
     end)
+    butonGroup:AddChild(saveButton)
 
-    -- Add the save button, it will go to the next available grid slot
-    frame:AddChild(saveButton)
+    frame:AddChild(butonGroup)
 end
 
 -- Register the slash command to open the settings window
