@@ -91,6 +91,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
         local addonName = ...
         if addonName == "Looti" then
             LoadFramePosition()
+            EnsureLootiSettings()
             NotificationManager:SetShowNotificationFrame(false)
         end
     elseif event == "CHAT_MSG_LOOT" then

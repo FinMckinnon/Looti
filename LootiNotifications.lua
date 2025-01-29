@@ -1,6 +1,8 @@
+-- LootNotifications.lua
 local activeNotifications = {}
+local notificationStack = {}
+local ticker
 
--- Function to set notification data
 local function setNotificationData(itemData, currencyData, rarity, text, icon)
     if itemData then
         local r, g, b = GetRarityColor(rarity)
@@ -14,34 +16,37 @@ local function setNotificationData(itemData, currencyData, rarity, text, icon)
     end
 end
 
--- Show notification
-function Looti_ShowNotification(parent, itemData, currencyData, rarity)
-    if itemData then
-        if LootiConfig.showLootNotifications then
-            if rarity < LootiConfig.notificationThreshold then
-                return
-            end
+local function ProcessNotifications()
+    if #notificationStack == 0 then
+        if ticker then
+            ticker:Cancel()
+            ticker = nil
         end
-    elseif currencyData then
-        if not LootiConfig.showMoneyNotifications then
-            return
-        end
+        return
     end
+
+    local data = table.remove(notificationStack, 1)
+    Looti_ShowNotification(data.parent, data.itemData, data.currencyData, data.rarity)
+end
+
+local function AddNotification(parent, itemData, currencyData, rarity)
+    table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData, rarity = rarity })
+    if not ticker then
+        ticker = C_Timer.NewTicker(LootiConfig.notificationDelay, ProcessNotifications)
+    end
+end
+
+function Looti_ShowNotification(parent, itemData, currencyData, rarity)
+    if itemData and not LootiConfig.showLootNotifications then return end
+    if currencyData and not LootiConfig.showMoneyNotifications then return end
+    if itemData and rarity < LootiConfig.notificationThreshold then return end
 
     local notification = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     notification:SetSize(LootiNotificationSettings.NOTIFICATION_WIDTH, LootiNotificationSettings.NOTIFICATION_HEIGHT)
 
     if LootiConfig.displayBackground then
-        notification:SetBackdrop({
-            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-            tile = true,
-            tileSize = 32,
-            edgeSize = 0,
-            insets = { left = 10, right = 10, top = 10, bottom = 10 }
-        })
+        notification:SetBackdrop({ bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", tile = true, tileSize = 32 })
         notification:SetBackdropColor(0, 0, 0, 0.8)
-    else
-        notification:SetBackdrop(nil)
     end
 
     local icon = notification:CreateTexture(nil, "ARTWORK")
@@ -54,13 +59,11 @@ function Looti_ShowNotification(parent, itemData, currencyData, rarity)
     setNotificationData(itemData, currencyData, rarity, text, icon)
     table.insert(activeNotifications, 1, notification)
 
-    local delay = 0.15
-    C_Timer.After(delay, function()
-        UIFrameFadeIn(notification, 0.5, 0, 1)
-        C_Timer.After(0.05, UpdateNotificationPositions)
-    end)
+    UIFrameFadeIn(notification, 0.5, 0, 1)
+    C_Timer.After(0.05, UpdateNotificationPositions)
+    
 
-    C_Timer.After(LootiConfig.displayDuration + delay, function()
+    C_Timer.After(LootiConfig.displayDuration, function()
         UIFrameFadeOut(notification, 0.5, 1, 0)
         C_Timer.After(0.5, function()
             for i, frame in ipairs(activeNotifications) do
@@ -75,60 +78,38 @@ function Looti_ShowNotification(parent, itemData, currencyData, rarity)
     end)
 end
 
--- Update notification positions
 function UpdateNotificationPositions()
     for i, frame in ipairs(activeNotifications) do
         local yOffset = LootiNotificationSettings.BASE_Y + (i - 1) * LootiNotificationSettings.SPACING
         frame:ClearAllPoints()
-        local startPoint = "TOP"
-        if LootiConfig.scrollDirection == "up" then
-            yOffset = -yOffset
-            startPoint = "BOTTOM"
-        end
-        frame:SetPoint(startPoint, notificationFrame, startPoint, 0, yOffset)
+        frame:SetPoint(LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", notificationFrame, LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", 0, LootiConfig.scrollDirection == "up" and -yOffset or yOffset)
     end
 end
 
-
 local function handleLootMessage(frame, message)
-    if LootiConfig.showLootNotifications then
-        if message:find("You receive loot") or message:find("You have looted") then
-            local itemLink = message:match("|c%x+|Hitem:.-|h|r")
-            if itemLink then
-                local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemIcon = GetItemInfo(itemLink)
-                if itemName and itemIcon and itemRarity then
-                    if itemRarity >= LootiConfig.notificationThreshold then
-                        local itemData = {itemName = itemName, itemIcon = itemIcon}
-                        Looti_ShowNotification(frame, itemData, nil, itemRarity)
-                    end
-                end
+    local itemLink = message:match("|c%x+|Hitem:.-|h|r")
+    if itemLink then
+        local itemName, _, itemRarity, _, _, _, _, _, _, itemIcon = GetItemInfo(itemLink)
+        if itemName and itemIcon and itemRarity then
+            if itemRarity >= LootiConfig.notificationThreshold then
+                AddNotification(frame, { itemName = itemName, itemIcon = itemIcon }, nil, itemRarity)
             end
         end
     end
 end
 
 local function handleMoneyMessage(frame, message)
-    if LootiConfig.showMoneyNotifications then
-        local gold, silver, copper = 0, 0, 0
-        
-        gold = tonumber((message:match("(%d+) Gold")) or 0)
-        silver = tonumber((message:match("(%d+) Silver")) or 0)
-        copper = tonumber((message:match("(%d+) Copper")) or 0)
-
-        if gold > 0 or silver > 0 or copper > 0 then
-            local totalCopper = (gold * 10000) + (silver * 100) + copper
-            local moneyData = {
-                totalCopper = totalCopper,
-                text = GetCoinTextureString(totalCopper),
-                icon = gold > 0 and currencyIcons.gold or silver > 0 and currencyIcons.silver or currencyIcons.copper,
-            }
-
-            Looti_ShowNotification(frame, nil, moneyData, nil)  
-        end
+    local gold = tonumber(message:match("(%d+) Gold") or 0) * 10000
+    local silver = tonumber(message:match("(%d+) Silver") or 0) * 100
+    local copper = tonumber(message:match("(%d+) Copper") or 0)
+    local totalCopper = gold + silver + (copper or 0)
+    
+    if totalCopper > 0 then
+        AddNotification(frame, nil, { totalCopper = totalCopper, text = GetCoinTextureString(totalCopper), icon = gold > 0 and currencyIcons.gold or silver > 0 and currencyIcons.silver or currencyIcons.copper }, nil)
     end
 end
 
 _G["handleLootMessage"] = handleLootMessage
 _G["handleMoneyMessage"] = handleMoneyMessage
-_G["Looti_ShowNotification"] = Looti_ShowNotification
+_G["AddNotification"] = AddNotification
 _G["UpdateNotificationPositions"] = UpdateNotificationPositions
