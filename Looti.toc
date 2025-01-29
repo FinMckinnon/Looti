@@ -1,4 +1,4 @@
-## Interface: 11505
+## Interface: 11506
 ## Title: Looti
 ## Notes: Displays a notification with the item name and icon when you loot an item.
 ## Author: 
