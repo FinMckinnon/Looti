@@ -5,38 +5,49 @@ The Looti addon is a simple scrolling loot notification tool for looted items an
 ## Installation
 To install Looti, download **Looti.zip** then place it into your Addons folder for your World of Warcraft installation, regularly at  ```C:\Program Files (x86)\World of Warcraft\#GAMEVERSION#\Interface\AddOns``` where GAMEVERSION represents your Game Version of World of Warcraft.
 
-## Settings Panel
+# Looti - Lightweight Loot Notification System
 
-To access the settings for Looti, use the command ```/looti```) .
+Looti is a **super lightweight**, **simplistic**, scrolling loot notification system with customizable settings. The goal of this addon is to provide a **barebones loot notification system** using only **core WoW and Lua commands**, ensuring **minimal maintenance** and **low risk of errors** after all features are implemented.
 
-### Enable Loot Notifications
-- **Description**: Toggle the display of loot notifications.
-- **Controls**: Checkbox that, when unchecked, disables notifications for looted items.
+## Accessing Settings
+To open the settings panel, use the command:
+```sh
+/looti
+```
 
-### Enable Money Notifications
-- **Description**: Toggle the display of notifications for looted money (gold, silver, copper).
-- **Controls**: Checkbox that, when unchecked, disables notifications for money looted.
-
-### Notification Threshold (Rarity)
-- **Description**: Sets the rarity threshold for item notifications. Items with a rarity higher than this threshold will be shown in notifications.
-- **Controls**: Slider that ranges from 0 (Poor) to 7 (Heirloom).
-
-### Scroll Direction
-- **Description**: Determines the direction in which the notifications will scroll.
-- **Controls**: Dropdown to select either "Up" or "Down".
-
-### Display Background
-- **Description**: Toggle whether a background is displayed behind notifications.
-- **Controls**: Checkbox that, when unchecked, removes the background from notifications.
-
-### Notification Display Duration
-- **Description**: Sets how long the notification will remain visible on screen.
-- **Controls**: Slider to adjust the duration, with values ranging from 0.5 to 5 seconds.
-
-### Display Loot Notification Frame
-- **Description**: This button opens the notification frame, which displays where the notifications are displayed. The frame can be moved around by displaying the frame and then moving the frame to your desired location then clicking on the tick.
-- **Controls**: Button to enable the notification frame.
-
-### Test
-- **Description**: This button will show test items and money notifications so you can hone your notifications as you like without having to find them in the world.
 ---
+## Enable Notifications
+- Easily toggle notifications **for loot or money** (gold, silver, copper).
+- Configure what types of loot notifications you want to see.
+---
+
+## Notification Threshold (Rarity)
+Define a **rarity threshold** to control which items trigger notifications.  
+Move the slider to your desired rarity—only items **at or above** that rarity will be displayed.
+
+### Rarity Levels:
+| Value | Rarity  | Color       |
+|-------|---------|------------|
+| **0** | Poor    | ⚫ Gray     |
+| **1** | Common  | ⚪ White    |
+| **2** | Uncommon | 🟢 Green   |
+| **3** | Rare    | 🔵 Blue    |
+| **4** | Epic    | 🟣 Purple  |
+| **5** | Legendary | 🟠 Orange |
+| **6** | Artifact | 🟡 Light Gold |
+| **7** | Heirloom | 🔵 Blizzard Blue |
+
+---
+## Display Settings
+Looti provides several customization options to fit your UI preferences:
+
+- **Moveable notifications frame** – Place notifications anywhere on your screen.
+- **Adjust notification direction** – Choose whether notifications scroll **up** or **down**.
+- **Toggle background transparency** – Make notifications stand out or keep your screen clean.
+- **Control display timing**:
+  - **Set notification duration** – How long each notification stays visible.
+  - **Adjust delay between notifications** – Customize how quickly new notifications appear.
+---
+
+## Test Looti
+Once you save your settings with the save button, use the test looti button to test out the notifications.
