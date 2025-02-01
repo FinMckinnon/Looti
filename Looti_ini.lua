@@ -23,6 +23,15 @@ currencyIcons = {
     gold = "Interface\\Icons\\INV_Misc_Coin_01"    -- Gold
 }
 
+rarityData = {
+    [0] = {name = "Poor", color = {GetItemQualityColor(0)}},   
+    [1] = {name = "Common", color = {GetItemQualityColor(1)}},  
+    [2] = {name = "Uncommon", color = {GetItemQualityColor(2)}},
+    [3] = {name = "Rare", color = {GetItemQualityColor(3)}},    
+    [4] = {name = "Epic", color = {GetItemQualityColor(4)}},    
+    [5] = {name = "Legendary", color = {GetItemQualityColor(5)}}, 
+}
+
 local function EnsureDefaults(targetTable, defaultTable)
     if not targetTable then
         targetTable = {}

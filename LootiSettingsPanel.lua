@@ -113,15 +113,29 @@ local function OpenLootiSettings()
     end)
     displaySettingsGroup:AddChild(enableMoneyCheckbox)
 
-    -- Rarity Threshold Slider 
+    -- Rarity Threshold Slider
     local thresholdSlider = AceGUI:Create("Slider")
     thresholdSlider:SetLabel("Notification Threshold (Rarity)")
-    thresholdSlider:SetSliderValues(0, 7, 1)  
-    thresholdSlider:SetValue(tempSettingsData.notificationThreshold)  
+    thresholdSlider:SetSliderValues(0, 5, 1) 
+    thresholdSlider:SetValue(tempSettingsData.notificationThreshold)
+
+    -- Create a text box below the slider to display the rarity name with color
+    local rarityDisplayBox = AceGUI:Create("Label")
+    local initialRarity = rarityData[math.floor(tempSettingsData.notificationThreshold)]
+    rarityDisplayBox:SetText(initialRarity.name)  
+    rarityDisplayBox:SetColor(initialRarity.color[1], initialRarity.color[2], initialRarity.color[3])  
+    rarityDisplayBox:SetJustifyH("CENTER")  
+
+    -- Update the rarity name and color whenever the slider value changes
     thresholdSlider:SetCallback("OnValueChanged", function(widget, event, value)
         HandleThresholdChange(value)
+        local rarity = rarityData[math.floor(value)]
+        rarityDisplayBox:SetText(rarity.name)  
+        rarityDisplayBox:SetColor(rarity.color[1], rarity.color[2], rarity.color[3])  
     end)
-    frame:AddChild(thresholdSlider)  
+
+    frame:AddChild(thresholdSlider)
+    frame:AddChild(rarityDisplayBox)
 
     -- Display Duration Slider (this will go on a new row)
     local durationSlider = AceGUI:Create("Slider")
