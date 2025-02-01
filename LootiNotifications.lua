@@ -90,12 +90,14 @@ function UpdateNotificationPositions()
 end
 
 local function handleLootMessage(frame, message)
-    local itemLink = message:match("|c%x+|Hitem:.-|h|r")
-    if itemLink then
-        local itemName, _, itemRarity, _, _, _, _, _, _, itemIcon = GetItemInfo(itemLink)
-        if itemName and itemIcon and itemRarity then
-            if itemRarity >= LootiConfig.notificationThreshold then
-                AddNotification(frame, { itemName = itemName, itemIcon = itemIcon }, nil, itemRarity)
+    if message:find("You loot") or message:find("You receive") then
+        local itemLink = message:match("|c%x+|Hitem:.-|h|r")
+        if itemLink then
+            local itemName, _, itemRarity, _, _, _, _, _, _, itemIcon = GetItemInfo(itemLink)
+            if itemName and itemIcon and itemRarity then
+                if itemRarity >= LootiConfig.notificationThreshold then
+                    AddNotification(frame, { itemName = itemName, itemIcon = itemIcon }, nil, itemRarity)
+                end
             end
         end
     end
