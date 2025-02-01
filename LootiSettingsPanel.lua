@@ -26,6 +26,10 @@ local function HandleDisplayDurationChange(value)
     tempSettingsData.displayDuration = value
 end
 
+local function HandleNotificationDelayChange(value)
+    tempSettingsData.notificationDelay = value
+end
+
 -- Save the settings to the saved config from tempSettingsData
 local function HandleSaveSettings()
     LootiConfig.showLootNotifications = tempSettingsData.showLootNotifications
@@ -34,6 +38,7 @@ local function HandleSaveSettings()
     LootiConfig.scrollDirection = tempSettingsData.scrollDirection
     LootiConfig.displayBackground = tempSettingsData.displayBackground
     LootiConfig.displayDuration = tempSettingsData.displayDuration
+    LootiConfig.notificationDelay = tempSettingsData.notificationDelay
     print("Settings saved!")
 end
 
@@ -49,7 +54,8 @@ local function OpenLootiSettings()
         notificationThreshold = LootiConfig.notificationThreshold,
         scrollDirection = LootiConfig.scrollDirection,
         displayBackground = LootiConfig.displayBackground,
-        displayDuration = LootiConfig.displayDuration
+        displayDuration = LootiConfig.displayDuration,
+        notificationDelay = LootiConfig.notificationDelay
     }
 
     -- Create the main settings frame
@@ -126,6 +132,16 @@ local function OpenLootiSettings()
         HandleDisplayDurationChange(value)
     end)
     frame:AddChild(durationSlider)  
+
+    -- Display Duration Slider (this will go on a new row)
+    local notificationDelaySlider = AceGUI:Create("Slider")
+    notificationDelaySlider:SetLabel("Delay Between Notifications (Seconds)")
+    notificationDelaySlider:SetSliderValues(0, 1, 0.1)  
+    notificationDelaySlider:SetValue(tempSettingsData.notificationDelay)  
+    notificationDelaySlider:SetCallback("OnValueChanged", function(widget, event, value)
+        HandleNotificationDelayChange(value)
+    end)
+    frame:AddChild(notificationDelaySlider)  
 
     -- Group for Notification Settings (Loot Scroll Direction and Display Background checkboxes)
     local notificationSettingsGroup = AceGUI:Create("InlineGroup")

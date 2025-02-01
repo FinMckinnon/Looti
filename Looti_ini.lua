@@ -7,7 +7,7 @@ local defaultConfig = {
     displayDuration = 1,
     notificationFrameX = 0,
     notificationFrameY = 0,
-    notificationDelay = 0.25
+    notificationDelay = 0.2
 }
 
 LootiNotificationSettings = LootiNotificationSettings or {
@@ -38,7 +38,7 @@ end
 
 local function EnsureLootiSettings()
     LootiConfig = EnsureDefaults(LootiConfig, defaultConfig)
-    LootiNotificationSettings = EnsureDefaults(LootiNotificationSettings, defaultNotificationSettings)
+    LootiNotificationSettings = EnsureDefaults(LootiNotificationSettings, defaultConfig)
 end
 
 function LootiNotificationSettings:UpdateFrameDimensions()

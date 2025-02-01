@@ -1,4 +1,3 @@
--- LootNotifications.lua
 local activeNotifications = {}
 local notificationStack = {}
 local ticker
@@ -30,9 +29,13 @@ local function ProcessNotifications()
 end
 
 local function AddNotification(parent, itemData, currencyData, rarity)
-    table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData, rarity = rarity })
-    if not ticker then
-        ticker = C_Timer.NewTicker(LootiConfig.notificationDelay, ProcessNotifications)
+    if #activeNotifications == 0 then
+        Looti_ShowNotification(parent, itemData, currencyData, rarity)
+    else
+        table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData, rarity = rarity })
+        if not ticker then
+            ticker = C_Timer.NewTicker(LootiConfig.notificationDelay, ProcessNotifications)
+        end
     end
 end
 
