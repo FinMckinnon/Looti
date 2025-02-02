@@ -117,14 +117,24 @@ local function DisplaySettingsSection(container, tempSettingsData)
     container:AddChild(displayBackgroundCheckbox)
 
     -- Display Notification Background Checkbox
-    local displayCoallationCheckbox = AceGUI:Create("CheckBox")
-    displayCoallationCheckbox:SetLabel("Display Coallations (x2, x3, ...)")
-    displayCoallationCheckbox:SetValue(tempSettingsData.showQuantity)  
-    displayCoallationCheckbox:SetWidth(250)
-    displayCoallationCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+    local showQuantityCheckbox = AceGUI:Create("CheckBox")
+    showQuantityCheckbox:SetLabel("Display Coallations (x2, x3, ...)")
+    showQuantityCheckbox:SetValue(tempSettingsData.showQuantity)  
+    showQuantityCheckbox:SetWidth(250)
+    showQuantityCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
         settingsPanel.HandleShowQuantityChange(value)
     end)
-    container:AddChild(displayCoallationCheckbox)
+    container:AddChild(showQuantityCheckbox)
+
+    -- Display Notification Background Checkbox
+    local showIconCheckbox = AceGUI:Create("CheckBox")
+    showIconCheckbox:SetLabel("Show Icon")
+    showIconCheckbox:SetValue(tempSettingsData.showIcon)  
+    showIconCheckbox:SetWidth(250)
+    showIconCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleShowIconChange(value)
+    end)
+    container:AddChild(showIconCheckbox)
 end
 
 -- Function to create a TabGroup
@@ -186,13 +196,11 @@ local function CreateTabGroup(tempSettingsData)
 
     frame:AddChild(butonGroup)
 
-    -- Select the first tab by default
     tabGroup:SelectTab("tab1")
 end
 
 -- Function to open the Looti Settings window
 local function OpenLootiSettings()
-    -- Initialize settings data
     tempSettingsData = {
         showLootNotifications = LootiConfig.showLootNotifications,
         showMoneyNotifications = LootiConfig.showMoneyNotifications,
@@ -202,10 +210,10 @@ local function OpenLootiSettings()
         displayDuration = LootiConfig.displayDuration,
         notificationDelay = LootiConfig.notificationDelay,
         maximumNotifications = LootiConfig.maximumNotifications,
-        showQuantity = LootiConfig.showQuantity
+        showQuantity = LootiConfig.showQuantity,
+        showIcon = LootiConfig.showIcon
     }
 
-    -- Create the tab group for settings
     CreateTabGroup(tempSettingsData)
 end
 

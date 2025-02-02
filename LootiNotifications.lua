@@ -66,16 +66,18 @@ function Looti_ShowNotification(parent, itemData, currencyData, rarity)
     local icon = notification:CreateTexture(nil, "ARTWORK")
     icon:SetSize(32, 32)
     icon:SetPoint("LEFT", notification, "LEFT", 5, 0)
+    if not LootiConfig.showIcon then 
+        icon:SetAlpha(0)
+    end
 
     local text = notification:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    text:SetPoint("LEFT", icon, "RIGHT", 10, 0)
+    text:SetPoint("LEFT", icon or notification, "LEFT", icon and 42 or 5, 0)
 
     setNotificationData(itemData, currencyData, rarity, text, icon)
     table.insert(activeNotifications, 1, notification)
 
     UIFrameFadeIn(notification, 0.5, 0, 1)
     C_Timer.After(0.05, UpdateNotificationPositions)
-    
 
     C_Timer.After(LootiConfig.displayDuration, function()
         UIFrameFadeOut(notification, fadeoutTime, 1, 0)
@@ -121,9 +123,6 @@ local function handleLootMessage(frame, message)
         end
     end
 end
-
-
-
 
 local function handleMoneyMessage(frame, message)
     local gold = tonumber(message:match("(%d+) Gold") or 0) * 10000
