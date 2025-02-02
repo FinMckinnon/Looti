@@ -15,7 +15,7 @@ LootiNotificationSettings = LootiNotificationSettings or {
     BASE_Y = 0,
     SPACING = -35,
     NOTIFICATION_WIDTH = 300,
-    NOTIFICATION_HEIGHT = 50,
+    NOTIFICATION_HEIGHT =35,
 }
 
 currencyIcons = {
