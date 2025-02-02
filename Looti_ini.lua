@@ -8,7 +8,8 @@ local LootiConfigDefault = {
     notificationFrameX = 0,
     notificationFrameY = 0,
     notificationDelay = 0.4,
-    maximumNotifications = 0
+    maximumNotifications = 0,
+    showQuantity = true
 }
 
 LootiNotificationSettingsDefault = {

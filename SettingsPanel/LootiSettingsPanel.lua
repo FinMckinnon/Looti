@@ -3,7 +3,7 @@ local columnWidth = 375
 local minWidth, minHeight = columnWidth, 600
 
 -- Function to display Notification Settings (Loot and Money Notifications)
-local function DisplayNotificationSettingsSection(container, tempSettingsData)
+local function NotificationSettingsSection(container, tempSettingsData)
     container:ReleaseChildren()  -- Clears the tab content before adding new widgets
 
     local displaySettingsGroup = AceGUI:Create("InlineGroup")
@@ -56,7 +56,7 @@ local function DisplayNotificationSettingsSection(container, tempSettingsData)
 end
 
 -- Function to display Notification Display Settings (Loot Scroll Direction and Background)
-local function DisplayNotificationDisplaySettingsSection(container, tempSettingsData)
+local function DisplaySettingsSection(container, tempSettingsData)
     container:ReleaseChildren()  -- Clears the tab content before adding new widgets
 
     -- Display Duration Slider
@@ -115,6 +115,16 @@ local function DisplayNotificationDisplaySettingsSection(container, tempSettings
         settingsPanel.HandleBackgroundDisplayChange(value)
     end)
     container:AddChild(displayBackgroundCheckbox)
+
+    -- Display Notification Background Checkbox
+    local displayCoallationCheckbox = AceGUI:Create("CheckBox")
+    displayCoallationCheckbox:SetLabel("Display Coallations (x2, x3, ...)")
+    displayCoallationCheckbox:SetValue(tempSettingsData.showQuantity)  
+    displayCoallationCheckbox:SetWidth(250)
+    displayCoallationCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleShowQuantityChange(value)
+    end)
+    container:AddChild(displayCoallationCheckbox)
 end
 
 -- Function to create a TabGroup
@@ -131,8 +141,8 @@ local function CreateTabGroup(tempSettingsData)
     tabGroup:SetHeight(500)
 
     local tabFunctions = {
-        ["tab1"] = function(container) DisplayNotificationSettingsSection(container, tempSettingsData) end,
-        ["tab2"] = function(container) DisplayNotificationDisplaySettingsSection(container, tempSettingsData) end
+        ["tab1"] = function(container) NotificationSettingsSection(container, tempSettingsData) end,
+        ["tab2"] = function(container) DisplaySettingsSection(container, tempSettingsData) end
     }
 
     -- Set tabs
@@ -191,7 +201,8 @@ local function OpenLootiSettings()
         displayBackground = LootiConfig.displayBackground,
         displayDuration = LootiConfig.displayDuration,
         notificationDelay = LootiConfig.notificationDelay,
-        maximumNotifications = LootiConfig.maximumNotifications
+        maximumNotifications = LootiConfig.maximumNotifications,
+        showQuantity = LootiConfig.showQuantity
     }
 
     -- Create the tab group for settings

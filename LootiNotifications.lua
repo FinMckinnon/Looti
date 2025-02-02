@@ -100,19 +100,30 @@ function UpdateNotificationPositions()
     end
 end
 
+local function getQuantityText(quantity)
+    return (quantity > 1) and "x" .. quantity or ""  
+end
+
 local function handleLootMessage(frame, message)
     if message:find("You loot") or message:find("You receive") then
         local itemLink = message:match("|c%x+|Hitem:.-|h|r")
+        local quantity = tonumber(message:match("x(%d+)")) or 1  
+        
         if itemLink then
             local itemName, _, itemRarity, _, _, _, _, _, _, itemIcon = GetItemInfo(itemLink)
             if itemName and itemIcon and itemRarity then
                 if itemRarity >= LootiConfig.notificationThreshold then
-                    AddNotification(frame, { itemName = itemName, itemIcon = itemIcon }, nil, itemRarity)
+                    local quantityText = LootiConfig.showQuantity and getQuantityText(quantity) or ""
+                    local displayText = itemName .. " " .. quantityText
+                    AddNotification(frame, { itemName = displayText, itemIcon = itemIcon }, nil, itemRarity)
                 end
             end
         end
     end
 end
+
+
+
 
 local function handleMoneyMessage(frame, message)
     local gold = tonumber(message:match("(%d+) Gold") or 0) * 10000

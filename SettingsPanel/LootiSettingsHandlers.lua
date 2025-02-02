@@ -30,6 +30,10 @@ local function HandleMaximumNotificationsChange(value)
     tempSettingsData.maximumNotifications = value
 end
 
+local function HandleShowQuantityChange(value)
+    tempSettingsData.showQuantity = value
+end
+
 -- Save the settings to the saved config from tempSettingsData
 local function HandleSaveSettings()
     LootiConfig.showLootNotifications = tempSettingsData.showLootNotifications
@@ -40,7 +44,8 @@ local function HandleSaveSettings()
     LootiConfig.displayDuration = tempSettingsData.displayDuration
     LootiConfig.notificationDelay = tempSettingsData.notificationDelay
     LootiConfig.maximumNotifications = tempSettingsData.maximumNotifications
-    print("Settings saved!")
+    LootiConfig.showQuantity = tempSettingsData.showQuantity
+    print("Looti Settings saved!")
 end
 
 _G["settingsPanel"] = {
@@ -52,5 +57,6 @@ _G["settingsPanel"] = {
     HandleDisplayDurationChange = HandleDisplayDurationChange,
     HandleNotificationDelayChange = HandleNotificationDelayChange,
     HandleMaximumNotificationsChange = HandleMaximumNotificationsChange,
-    HandleSaveSettings = HandleSaveSettings
+    HandleSaveSettings = HandleSaveSettings,
+    HandleShowQuantityChange = HandleShowQuantityChange
 }
