@@ -30,6 +30,10 @@ local function HandleNotificationDelayChange(value)
     tempSettingsData.notificationDelay = value
 end
 
+local function HandleMaximumNotificationsChange(value)
+    tempSettingsData.maximumNotifications = value
+end
+
 -- Save the settings to the saved config from tempSettingsData
 local function HandleSaveSettings()
     LootiConfig.showLootNotifications = tempSettingsData.showLootNotifications
@@ -39,11 +43,8 @@ local function HandleSaveSettings()
     LootiConfig.displayBackground = tempSettingsData.displayBackground
     LootiConfig.displayDuration = tempSettingsData.displayDuration
     LootiConfig.notificationDelay = tempSettingsData.notificationDelay
+    LootiConfig.maximumNotifications = tempSettingsData.maximumNotifications
     print("Settings saved!")
-end
-
-local function getStatusString()
-    return "Looti is " .. (tempSettingsData.showLootNotifications and tempSettingsData.showMoneyNotifications and "enabled" or "disabled")
 end
 
 -- Function to open the settings window
@@ -55,13 +56,13 @@ local function OpenLootiSettings()
         scrollDirection = LootiConfig.scrollDirection,
         displayBackground = LootiConfig.displayBackground,
         displayDuration = LootiConfig.displayDuration,
-        notificationDelay = LootiConfig.notificationDelay
+        notificationDelay = LootiConfig.notificationDelay,
+        maximumNotifications = LootiConfig.maximumNotifications
     }
 
     -- Create the main settings frame
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Looti Settings")
-    frame:SetStatusText(getStatusString())
     frame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
     
     -- Set the initial size of the frame
@@ -116,6 +117,7 @@ local function OpenLootiSettings()
     -- Rarity Threshold Slider
     local thresholdSlider = AceGUI:Create("Slider")
     thresholdSlider:SetLabel("Notification Threshold (Rarity)")
+    thresholdSlider:SetWidth(columnWidth)
     thresholdSlider:SetSliderValues(0, 5, 1) 
     thresholdSlider:SetValue(tempSettingsData.notificationThreshold)
 
@@ -125,6 +127,7 @@ local function OpenLootiSettings()
     rarityDisplayBox:SetText(initialRarity.name)  
     rarityDisplayBox:SetColor(initialRarity.color[1], initialRarity.color[2], initialRarity.color[3])  
     rarityDisplayBox:SetJustifyH("CENTER")  
+    rarityDisplayBox:SetWidth(columnWidth)
 
     -- Update the rarity name and color whenever the slider value changes
     thresholdSlider:SetCallback("OnValueChanged", function(widget, event, value)
@@ -140,6 +143,7 @@ local function OpenLootiSettings()
     -- Display Duration Slider (this will go on a new row)
     local durationSlider = AceGUI:Create("Slider")
     durationSlider:SetLabel("Display Duration (Seconds)")
+    durationSlider:SetWidth(columnWidth)
     durationSlider:SetSliderValues(0.5, 5, 0.5)  
     durationSlider:SetValue(tempSettingsData.displayDuration)  
     durationSlider:SetCallback("OnValueChanged", function(widget, event, value)
@@ -147,15 +151,27 @@ local function OpenLootiSettings()
     end)
     frame:AddChild(durationSlider)  
 
-    -- Display Duration Slider (this will go on a new row)
+    -- Display Duration Slider 
     local notificationDelaySlider = AceGUI:Create("Slider")
     notificationDelaySlider:SetLabel("Delay Between Notifications (Seconds)")
+    notificationDelaySlider:SetWidth(columnWidth)
     notificationDelaySlider:SetSliderValues(0, 1, 0.1)  
     notificationDelaySlider:SetValue(tempSettingsData.notificationDelay)  
     notificationDelaySlider:SetCallback("OnValueChanged", function(widget, event, value)
         HandleNotificationDelayChange(value)
     end)
     frame:AddChild(notificationDelaySlider)  
+
+    -- Display Duration Slider (this will go on a new row)
+    local maximumNotificationsSlider = AceGUI:Create("Slider")
+    maximumNotificationsSlider:SetLabel("Max Notifications (0 = No Limit)")
+    maximumNotificationsSlider:SetWidth(columnWidth)
+    maximumNotificationsSlider:SetSliderValues(0, 10, 1)  
+    maximumNotificationsSlider:SetValue(tempSettingsData.maximumNotifications)  
+    maximumNotificationsSlider:SetCallback("OnValueChanged", function(widget, event, value)
+        HandleMaximumNotificationsChange(value)
+    end)
+    frame:AddChild(maximumNotificationsSlider)  
 
     -- Group for Notification Settings (Loot Scroll Direction and Display Background checkboxes)
     local notificationSettingsGroup = AceGUI:Create("InlineGroup")
@@ -186,13 +202,12 @@ local function OpenLootiSettings()
     end)
     notificationSettingsGroup:AddChild(displayBackgroundCheckbox)
 
-    -- Group for Notification Settings (Loot and Money Notifications checkboxes)
+    -- Group for Test and Save Buttons 
     local butonGroup = AceGUI:Create("InlineGroup")
     butonGroup:SetFullWidth(true)
     butonGroup:SetTitle("") 
     butonGroup:SetLayout("Flow")  
 
-    -- Save Button at the bottom (on the next row)
     local testButton = AceGUI:Create("Button")
     testButton:SetText("Test Looti")
     testButton:SetWidth(columnWidth/2.2)
@@ -201,7 +216,6 @@ local function OpenLootiSettings()
     end)
     butonGroup:AddChild(testButton)
     
-    -- Save Button at the bottom (on the next row)
     local saveButton = AceGUI:Create("Button")
     saveButton:SetText("Save Settings")
     saveButton:SetWidth(columnWidth/2.2)

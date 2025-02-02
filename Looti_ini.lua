@@ -7,7 +7,8 @@ local defaultConfig = {
     displayDuration = 1,
     notificationFrameX = 0,
     notificationFrameY = 0,
-    notificationDelay = 0.2
+    notificationDelay = 0.4,
+    maximumNotifications = 0
 }
 
 LootiNotificationSettings = LootiNotificationSettings or {

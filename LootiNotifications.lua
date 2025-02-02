@@ -1,6 +1,7 @@
 local activeNotifications = {}
 local notificationStack = {}
 local ticker
+local fadeoutTime = 0.5
 
 local function setNotificationData(itemData, currencyData, rarity, text, icon)
     if itemData then
@@ -15,6 +16,8 @@ local function setNotificationData(itemData, currencyData, rarity, text, icon)
     end
 end
 
+
+
 local function ProcessNotifications()
     if #notificationStack == 0 then
         if ticker then
@@ -28,13 +31,21 @@ local function ProcessNotifications()
     Looti_ShowNotification(data.parent, data.itemData, data.currencyData, data.rarity)
 end
 
+local function TryProcessNotifications()
+    if #activeNotifications < LootiConfig.maximumNotifications or LootiConfig.maximumNotifications == 0 then
+        ProcessNotifications()
+    else
+        C_Timer.After(0.05, TryProcessNotifications) 
+    end
+end
+
 local function AddNotification(parent, itemData, currencyData, rarity)
     if #activeNotifications == 0 then
         Looti_ShowNotification(parent, itemData, currencyData, rarity)
     else
         table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData, rarity = rarity })
         if not ticker then
-            ticker = C_Timer.NewTicker(LootiConfig.notificationDelay, ProcessNotifications)
+            ticker = C_Timer.NewTicker(LootiConfig.notificationDelay, TryProcessNotifications)
         end
     end
 end
@@ -67,8 +78,8 @@ function Looti_ShowNotification(parent, itemData, currencyData, rarity)
     
 
     C_Timer.After(LootiConfig.displayDuration, function()
-        UIFrameFadeOut(notification, 0.5, 1, 0)
-        C_Timer.After(0.5, function()
+        UIFrameFadeOut(notification, fadeoutTime, 1, 0)
+        C_Timer.After(fadeoutTime, function()
             for i, frame in ipairs(activeNotifications) do
                 if frame == notification then
                     table.remove(activeNotifications, i)
