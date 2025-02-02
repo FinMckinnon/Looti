@@ -1,6 +1,6 @@
 -- Create a draggable frame for moving loot notification area
 notificationFrame = CreateFrame("Frame", "notificationFrame", UIParent, "BackdropTemplate")
-notificationFrame:SetSize(LootiNotificationSettings.NOTI_FRAME_WIDTH, LootiNotificationSettings.NOTI_FRAME_HEIGHT)
+notificationFrame:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT)
 notificationFrame:SetClampedToScreen(true)
 notificationFrame:SetFrameStrata("BACKGROUND")
 notificationFrame:SetMovable(true)  

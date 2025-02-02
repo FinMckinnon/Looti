@@ -56,7 +56,7 @@ function Looti_ShowNotification(parent, itemData, currencyData, rarity)
     if itemData and rarity < LootiConfig.notificationThreshold then return end
 
     local notification = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    notification:SetSize(LootiNotificationSettings.NOTIFICATION_WIDTH, LootiNotificationSettings.NOTIFICATION_HEIGHT)
+    notification:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT)
 
     if LootiConfig.displayBackground then
         notification:SetBackdrop({ bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", tile = true, tileSize = 32 })

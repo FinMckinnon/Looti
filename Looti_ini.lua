@@ -1,4 +1,4 @@
-local defaultConfig = {
+local LootiConfigDefault = {
     showLootNotifications = true,
     showMoneyNotifications = true,
     notificationThreshold = 3,
@@ -11,12 +11,15 @@ local defaultConfig = {
     maximumNotifications = 0
 }
 
-LootiNotificationSettings = LootiNotificationSettings or {
+LootiNotificationSettingsDefault = {
     BASE_Y = 0,
     SPACING = -35,
-    NOTIFICATION_WIDTH = 300,
-    NOTIFICATION_HEIGHT =35,
+    NOTIFICATION_FRAME_WIDTH = 300,
+    NOTIFICATION_FRAME_HEIGHT =35,
 }
+
+LootiNotificationSettings = LootiNotificationSettings or LootiNotificationSettingsDefault
+LootiConfig = LootiConfig or LootiConfigDefault
 
 currencyIcons = {
     copper = "Interface\\Icons\\INV_misc_coin_05",  -- Copper
@@ -47,15 +50,8 @@ local function EnsureDefaults(targetTable, defaultTable)
 end
 
 local function EnsureLootiSettings()
-    LootiConfig = EnsureDefaults(LootiConfig, defaultConfig)
-    LootiNotificationSettings = EnsureDefaults(LootiNotificationSettings, defaultConfig)
+    LootiConfig = EnsureDefaults(LootiConfig, LootiConfigDefault)
+    LootiNotificationSettings = EnsureDefaults(LootiNotificationSettings, LootiNotificationSettingsDefault)
 end
-
-function LootiNotificationSettings:UpdateFrameDimensions()
-    self.NOTI_FRAME_WIDTH = self.NOTIFICATION_WIDTH + 20
-    self.NOTI_FRAME_HEIGHT = self.NOTIFICATION_HEIGHT * 5
-end
-
-LootiNotificationSettings:UpdateFrameDimensions()
 
 _G["EnsureLootiSettings"] = EnsureLootiSettings
