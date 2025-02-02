@@ -14,7 +14,6 @@ local LootiConfigDefault = {
 }
 
 LootiNotificationSettingsDefault = {
-    BASE_Y = 0,
     SPACING = -35,
     NOTIFICATION_FRAME_WIDTH = 300,
     NOTIFICATION_FRAME_HEIGHT =35,

@@ -96,7 +96,7 @@ end
 
 function UpdateNotificationPositions()
     for i, frame in ipairs(activeNotifications) do
-        local yOffset = LootiNotificationSettings.BASE_Y + (i - 1) * LootiNotificationSettings.SPACING
+        local yOffset = (i - 1) * LootiNotificationSettings.SPACING
         frame:ClearAllPoints()
         frame:SetPoint(LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", notificationFrame, LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", 0, LootiConfig.scrollDirection == "up" and -yOffset or yOffset)
     end

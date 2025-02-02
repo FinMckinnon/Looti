@@ -118,7 +118,7 @@ local function DisplaySettingsSection(container, tempSettingsData)
 
     -- Display Notification Background Checkbox
     local showQuantityCheckbox = AceGUI:Create("CheckBox")
-    showQuantityCheckbox:SetLabel("Display Coallations (x2, x3, ...)")
+    showQuantityCheckbox:SetLabel("Display Quantities (x2, x3, ...)")
     showQuantityCheckbox:SetValue(tempSettingsData.showQuantity)  
     showQuantityCheckbox:SetWidth(250)
     showQuantityCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
@@ -143,6 +143,15 @@ local function CreateTabGroup(tempSettingsData)
     frame:SetTitle("Looti Settings")
     frame:SetWidth(columnWidth + 35)
     frame:SetHeight(600)
+
+    -- Button to display Loot Notification Frame
+    local displayButton = AceGUI:Create("Button")
+    displayButton:SetText("Show Notification Frame")
+    displayButton:SetWidth(columnWidth)  
+    displayButton:SetCallback("OnClick", function()
+        NotificationManager:SetShowNotificationFrame(true)
+    end)
+    frame:AddChild(displayButton)  
 
     -- Create a TabGroup
     local tabGroup = AceGUI:Create("TabGroup")

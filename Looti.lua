@@ -1,6 +1,6 @@
 -- Create a draggable frame for moving loot notification area
 notificationFrame = CreateFrame("Frame", "notificationFrame", UIParent, "BackdropTemplate")
-notificationFrame:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT)
+notificationFrame:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT + 2)
 notificationFrame:SetClampedToScreen(true)
 notificationFrame:SetFrameStrata("BACKGROUND")
 notificationFrame:SetMovable(true)  
@@ -19,7 +19,7 @@ notificationFrame:SetBackdropColor(0, 0, 0, 0)
 
 -- Create a title text for the movable frame
 local title = notificationFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-title:SetPoint("TOP", notificationFrame, "TOP", 0, -5)
+title:SetPoint("TOP", notificationFrame, "TOP", 0, -12)
 title:SetText("Loot Notifications")
 title:Hide()
 
@@ -33,7 +33,7 @@ local function LoadFramePosition()
     if LootiConfig.notificationFrameX and LootiConfig.notificationFrameY then
         notificationFrame:SetPoint("CENTER", UIParent, "CENTER", LootiConfig.notificationFrameX, LootiConfig.notificationFrameY)
     else
-        notificationFrame:SetPoint("CENTER", UIParent, "CENTER", 0, LootiNotificationSettings.BASE_Y)
+        notificationFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     end
 end
 
@@ -56,8 +56,8 @@ toggleButton.icon = toggleButton:CreateTexture(nil, "ARTWORK")
 toggleButton.icon:SetAllPoints()
 toggleButton.icon:SetTexture("Interface\\Buttons\\UI-CheckBox-Check")
 toggleButton:SetScript("OnClick", function(self)
-    NotificationManager:SetShowNotificationFrame(false)
     SaveFramePosition()
+    NotificationManager:SetShowNotificationFrame(false)
 end)
 toggleButton:Hide()
 
@@ -90,9 +90,9 @@ frame:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" then
         local addonName = ...
         if addonName == "Looti" then
-            LoadFramePosition()
-            EnsureLootiSettings()
             NotificationManager:SetShowNotificationFrame(false)
+            EnsureLootiSettings()
+            LoadFramePosition()
         end
     elseif event == "CHAT_MSG_LOOT" then
         local message = ...
