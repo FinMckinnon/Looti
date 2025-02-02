@@ -2,51 +2,6 @@ local AceGUI = LibStub("AceGUI-3.0")
 local columnWidth = 300
 local minWidth, minHeight = columnWidth, 600
 
-local function HandleLootNotifications(value)
-    tempSettingsData.showLootNotifications = value
-end
-
-local function HandleMoneyNotifications(value)
-    tempSettingsData.showMoneyNotifications = value
-end
-
-local function HandleThresholdChange(value)
-    tempSettingsData.notificationThreshold = value
-end
-
-local function HandleScrollDirectionChange(value)
-    tempSettingsData.scrollDirection = value
-end
-
-local function HandleBackgroundDisplayChange(value)
-    tempSettingsData.displayBackground = value
-end
-
-local function HandleDisplayDurationChange(value)
-    tempSettingsData.displayDuration = value
-end
-
-local function HandleNotificationDelayChange(value)
-    tempSettingsData.notificationDelay = value
-end
-
-local function HandleMaximumNotificationsChange(value)
-    tempSettingsData.maximumNotifications = value
-end
-
--- Save the settings to the saved config from tempSettingsData
-local function HandleSaveSettings()
-    LootiConfig.showLootNotifications = tempSettingsData.showLootNotifications
-    LootiConfig.showMoneyNotifications = tempSettingsData.showMoneyNotifications
-    LootiConfig.notificationThreshold = tempSettingsData.notificationThreshold
-    LootiConfig.scrollDirection = tempSettingsData.scrollDirection
-    LootiConfig.displayBackground = tempSettingsData.displayBackground
-    LootiConfig.displayDuration = tempSettingsData.displayDuration
-    LootiConfig.notificationDelay = tempSettingsData.notificationDelay
-    LootiConfig.maximumNotifications = tempSettingsData.maximumNotifications
-    print("Settings saved!")
-end
-
 -- Function to open the settings window
 local function OpenLootiSettings()
     tempSettingsData = {
@@ -101,7 +56,7 @@ local function OpenLootiSettings()
     enableLootCheckbox:SetLabel("Enable Loot Notifications")
     enableLootCheckbox:SetValue(tempSettingsData.showLootNotifications)  
     enableLootCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
-        HandleLootNotifications(value)
+        settingsPanel.HandleLootNotifications(value)
     end)
     displaySettingsGroup:AddChild(enableLootCheckbox)
 
@@ -110,7 +65,7 @@ local function OpenLootiSettings()
     enableMoneyCheckbox:SetLabel("Enable Money Notifications")
     enableMoneyCheckbox:SetValue(tempSettingsData.showMoneyNotifications) 
     enableMoneyCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
-        HandleMoneyNotifications(value)
+        settingsPanel.HandleMoneyNotifications(value)
     end)
     displaySettingsGroup:AddChild(enableMoneyCheckbox)
 
@@ -131,7 +86,7 @@ local function OpenLootiSettings()
 
     -- Update the rarity name and color whenever the slider value changes
     thresholdSlider:SetCallback("OnValueChanged", function(widget, event, value)
-        HandleThresholdChange(value)
+        settingsPanel.HandleThresholdChange(value)
         local rarity = rarityData[math.floor(value)]
         rarityDisplayBox:SetText(rarity.name)  
         rarityDisplayBox:SetColor(rarity.color[1], rarity.color[2], rarity.color[3])  
@@ -147,7 +102,7 @@ local function OpenLootiSettings()
     durationSlider:SetSliderValues(0.5, 5, 0.5)  
     durationSlider:SetValue(tempSettingsData.displayDuration)  
     durationSlider:SetCallback("OnValueChanged", function(widget, event, value)
-        HandleDisplayDurationChange(value)
+        settingsPanel.HandleDisplayDurationChange(value)
     end)
     frame:AddChild(durationSlider)  
 
@@ -158,7 +113,7 @@ local function OpenLootiSettings()
     notificationDelaySlider:SetSliderValues(0, 1, 0.1)  
     notificationDelaySlider:SetValue(tempSettingsData.notificationDelay)  
     notificationDelaySlider:SetCallback("OnValueChanged", function(widget, event, value)
-        HandleNotificationDelayChange(value)
+        settingsPanel.HandleNotificationDelayChange(value)
     end)
     frame:AddChild(notificationDelaySlider)  
 
@@ -169,7 +124,7 @@ local function OpenLootiSettings()
     maximumNotificationsSlider:SetSliderValues(0, 10, 1)  
     maximumNotificationsSlider:SetValue(tempSettingsData.maximumNotifications)  
     maximumNotificationsSlider:SetCallback("OnValueChanged", function(widget, event, value)
-        HandleMaximumNotificationsChange(value)
+        settingsPanel.HandleMaximumNotificationsChange(value)
     end)
     frame:AddChild(maximumNotificationsSlider)  
 
@@ -188,7 +143,7 @@ local function OpenLootiSettings()
     })
     scrollDirectionDropdown:SetValue(tempSettingsData.scrollDirection) 
     scrollDirectionDropdown:SetCallback("OnValueChanged", function(widget, event, value)
-        HandleScrollDirectionChange(value)
+        settingsPanel.HandleScrollDirectionChange(value)
     end)
     notificationSettingsGroup:AddChild(scrollDirectionDropdown)
 
@@ -198,7 +153,7 @@ local function OpenLootiSettings()
     displayBackgroundCheckbox:SetValue(tempSettingsData.displayBackground)  
     displayBackgroundCheckbox:SetWidth(250)
     displayBackgroundCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
-        HandleBackgroundDisplayChange(value)
+        settingsPanel.HandleBackgroundDisplayChange(value)
     end)
     notificationSettingsGroup:AddChild(displayBackgroundCheckbox)
 
@@ -220,11 +175,56 @@ local function OpenLootiSettings()
     saveButton:SetText("Save Settings")
     saveButton:SetWidth(columnWidth/2.2)
     saveButton:SetCallback("OnClick", function()
-        HandleSaveSettings() 
+        settingsPanel.HandleSaveSettings() 
     end)
     butonGroup:AddChild(saveButton)
 
     frame:AddChild(butonGroup)
+end
+
+local function CreateTabGroup()
+    -- Create the main frame
+    local frame = AceGUI:Create("Frame")
+    frame:SetTitle("Looti Settings")
+    frame:SetWidth(300)
+    frame:SetHeight(200)
+
+    -- Create a TabGroup
+    local tabGroup = AceGUI:Create("TabGroup")
+    tabGroup:SetLayout("Fill")  -- Set layout to fill to occupy the entire space of the frame
+    tabGroup:SetWidth(300)
+    tabGroup:SetHeight(150)
+
+    -- Set the titles and content of the tabs
+    local tabs = {
+        {value = "tab1", text = "Tab 1", contents = "Content of Tab 1"},
+        {value = "tab2", text = "Tab 2", contents = "Content of Tab 2"},
+        {value = "tab3", text = "Tab 3", contents = "Content of Tab 3"}
+    }
+
+    -- Function to display the content of the selected tab
+    local function DisplayTabContent(tabKey)
+        -- Find the selected tab and display its content
+        for _, tab in ipairs(tabs) do
+            if tab.value == tabKey then
+                print(tab.contents)  -- Here you can replace this with any action to show the tab's content
+            end
+        end
+    end
+
+    -- Set the tabs in the TabGroup
+    tabGroup:SetTabs(tabs)
+
+    -- Set the callback for when a tab is selected
+    tabGroup:SetCallback("OnGroupSelected", function(widget, event, group)
+        DisplayTabContent(group)  -- Display content for the selected tab
+    end)
+
+    -- Add the TabGroup to the frame
+    frame:AddChild(tabGroup)
+
+    -- Select the first tab by default
+    tabGroup:SelectTab("tab1")
 end
 
 -- Register the slash command to open the settings window
