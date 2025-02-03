@@ -10,7 +10,11 @@ local LootiConfigDefault = {
     notificationDelay = 0.4,
     maximumNotifications = 0,
     showQuantity = true,
-    showIcon = true
+    showIcon = true,
+    showText = true,
+    iconSize = 32,
+    textDisplay = "CENTER",
+    iconDisplay = "LEFT"
 }
 
 LootiNotificationSettingsDefault = {

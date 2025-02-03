@@ -2,21 +2,72 @@ local activeNotifications = {}
 local notificationStack = {}
 local ticker
 local fadeoutTime = 0.5
+local frameMargin = 5
 
 local function setNotificationData(itemData, currencyData, rarity, text, icon)
+    local contentText, contentIcon, r, g, b
+
     if itemData then
-        local r, g, b = GetRarityColor(rarity)
-        text:SetTextColor(r, g, b)
-        text:SetText(itemData.itemName)
-        icon:SetTexture(itemData.itemIcon)
-    elseif currencyData then
-        text:SetTextColor(1, 1, 1)
-        text:SetText(currencyData.text)
-        icon:SetTexture(currencyData.icon)
+        r, g, b = GetRarityColor(rarity)
+        contentText, contentIcon = itemData.itemName, itemData.itemIcon
+    else
+        r, g, b = 1, 1, 1
+        contentText, contentIcon = currencyData.text, currencyData.icon
+    end
+
+    text:SetTextColor(r, g, b)
+    text:SetText(contentText)
+    if icon and contentIcon then
+        icon:SetTexture(contentIcon)
     end
 end
 
+local function getNotificationData(notification)
+    local text, icon
+    local iconMarginX, textMarginX
+    local initialMarginX = LootiConfig.iconSize + (frameMargin * 2)
+    local iconMarginModifier = 0
 
+    -- Calculate icon margin modifier
+    if LootiConfig.iconDisplay == "LEFT" then
+        iconMarginModifier = -1
+    elseif LootiConfig.iconDisplay == "RIGHT" then
+        iconMarginModifier = 1
+    end
+
+    -- Create text if enabled
+    if LootiConfig.showText then
+        text = notification:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+        
+        -- Determine the position of the text based on the icon display and text display settings
+        if LootiConfig.textDisplay == "LEFT" and LootiConfig.iconDisplay == "LEFT" then
+            textMarginX = initialMarginX
+        elseif LootiConfig.textDisplay == "RIGHT" and LootiConfig.iconDisplay == "RIGHT" then
+            textMarginX = -initialMarginX
+        else
+            textMarginX = 0
+        end
+        
+        text:SetPoint(LootiConfig.textDisplay, notification, LootiConfig.textDisplay, textMarginX, 0)
+    end
+
+    -- Create icon if enabled
+    if LootiConfig.showIcon then
+        icon = notification:CreateTexture(nil, "ARTWORK")
+        icon:SetSize(LootiConfig.iconSize, LootiConfig.iconSize)
+
+        -- If text exists, adjust icon positioning relative to the text
+        if text then
+            iconMarginX = (LootiConfig.iconSize + frameMargin) * iconMarginModifier
+            icon:SetPoint(LootiConfig.iconDisplay, text, LootiConfig.iconDisplay, iconMarginX, 0)
+        else
+            -- If no text, position the icon in its own place
+            icon:SetPoint(LootiConfig.iconDisplay, notification, LootiConfig.iconDisplay, iconMarginX, 0)
+        end
+    end
+
+    return text, icon
+end
 
 local function ProcessNotifications()
     if #notificationStack == 0 then
@@ -63,15 +114,10 @@ function Looti_ShowNotification(parent, itemData, currencyData, rarity)
         notification:SetBackdropColor(0, 0, 0, 0.8)
     end
 
-    local icon = notification:CreateTexture(nil, "ARTWORK")
-    icon:SetSize(32, 32)
-    icon:SetPoint("LEFT", notification, "LEFT", 5, 0)
-    if not LootiConfig.showIcon then 
-        icon:SetAlpha(0)
+    local text, icon = getNotificationData(notification)
+    if not text and not icon then 
+        return 
     end
-
-    local text = notification:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    text:SetPoint("LEFT", icon or notification, "LEFT", icon and 42 or 5, 0)
 
     setNotificationData(itemData, currencyData, rarity, text, icon)
     table.insert(activeNotifications, 1, notification)

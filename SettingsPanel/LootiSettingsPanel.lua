@@ -35,8 +35,8 @@ local function NotificationSettingsSection(container, tempSettingsData)
     thresholdSlider:SetValue(tempSettingsData.notificationThreshold)
 
     -- Create a text box below the slider to display the rarity name with color
-    local rarityDisplayBox = AceGUI:Create("Label")
     local initialRarity = rarityData[math.floor(tempSettingsData.notificationThreshold)]
+    local rarityDisplayBox = AceGUI:Create("Label")
     rarityDisplayBox:SetText(initialRarity.name)  
     rarityDisplayBox:SetColor(initialRarity.color[1], initialRarity.color[2], initialRarity.color[3]) 
     rarityDisplayBox:SetWidth(columnWidth)
@@ -105,6 +105,35 @@ local function DisplaySettingsSection(container, tempSettingsData)
         settingsPanel.HandleScrollDirectionChange(value)
     end)
     container:AddChild(scrollDirectionDropdown)
+
+    -- Loot Scroll Direction Dropdown
+    local textDisplayDropdown = AceGUI:Create("Dropdown")
+    textDisplayDropdown:SetLabel("Text Display")
+    textDisplayDropdown:SetWidth(columnWidth)
+    textDisplayDropdown:SetList({
+        ["LEFT"] = "Left",
+        ["CENTER"] = "Center",
+        ["RIGHT"] = "Right",
+    })
+    textDisplayDropdown:SetValue(tempSettingsData.textDisplay) 
+    textDisplayDropdown:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleTextDisplayChange(value)
+    end)
+    container:AddChild(textDisplayDropdown)
+
+    -- Loot Scroll Direction Dropdown
+    local iconDisplayDropdown = AceGUI:Create("Dropdown")
+    iconDisplayDropdown:SetLabel("Icon Display")
+    iconDisplayDropdown:SetWidth(columnWidth)
+    iconDisplayDropdown:SetList({
+        ["LEFT"] = "Left",
+        ["RIGHT"] = "Right",
+    })
+    iconDisplayDropdown:SetValue(tempSettingsData.iconDisplay) 
+    iconDisplayDropdown:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleIconDisplayChange(value)
+    end)
+    container:AddChild(iconDisplayDropdown)
 
     -- Display Notification Background Checkbox
     local displayBackgroundCheckbox = AceGUI:Create("CheckBox")
@@ -220,7 +249,9 @@ local function OpenLootiSettings()
         notificationDelay = LootiConfig.notificationDelay,
         maximumNotifications = LootiConfig.maximumNotifications,
         showQuantity = LootiConfig.showQuantity,
-        showIcon = LootiConfig.showIcon
+        showIcon = LootiConfig.showIcon,
+        textDisplay = LootiConfig.textDisplay,
+        iconDisplay = LootiConfig.iconDisplay
     }
 
     CreateTabGroup(tempSettingsData)
