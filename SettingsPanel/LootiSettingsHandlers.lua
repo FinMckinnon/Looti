@@ -46,6 +46,18 @@ local function HandleTextDisplayChange(value)
     tempSettingsData.textDisplay = value
 end
 
+local function HandleNotificationAlphaChange(value)
+    tempSettingsData.notificationAlpha = value
+end
+
+local function HandleNotificationScaleChange(value)
+    tempSettingsData.notificationScale = value
+end
+
+local function HandleBackgroundAlphaChange(value)
+    tempSettingsData.backgroundAlpha = value
+end
+
 -- Save the settings to the saved config from tempSettingsData
 local function HandleSaveSettings()
     LootiConfig.showLootNotifications = tempSettingsData.showLootNotifications
@@ -60,6 +72,9 @@ local function HandleSaveSettings()
     LootiConfig.showIcon = tempSettingsData.showIcon
     LootiConfig.iconDisplay = tempSettingsData.iconDisplay
     LootiConfig.textDisplay = tempSettingsData.textDisplay
+    LootiConfig.notificationAlpha = tempSettingsData.notificationAlpha
+    LootiConfig.notificationScale = tempSettingsData.notificationScale
+    LootiConfig.backgroundAlpha = tempSettingsData.backgroundAlpha
     print("Looti Settings saved!")
 end
 
@@ -76,5 +91,8 @@ _G["settingsPanel"] = {
     HandleShowQuantityChange = HandleShowQuantityChange,
     HandleShowIconChange = HandleShowIconChange,
     HandleIconDisplayChange = HandleIconDisplayChange,
-    HandleTextDisplayChange = HandleTextDisplayChange
+    HandleTextDisplayChange = HandleTextDisplayChange,
+    HandleNotificationAlphaChange = HandleNotificationAlphaChange,
+    HandleNotificationScaleChange = HandleNotificationScaleChange,
+    HandleBackgroundAlphaChange = HandleBackgroundAlphaChange,
 }

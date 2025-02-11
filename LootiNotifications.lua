@@ -21,10 +21,13 @@ local function setNotificationData(itemData, currencyData, text, icon)
         contentText, contentIcon = currencyData.text, currencyData.icon
     end
 
-    text:SetTextColor(r, g, b)
+    text:SetTextColor(r, g, b, LootiConfig.notificationAlpha)
     text:SetText(contentText)
+    text:SetScale(LootiConfig.notificationScale)
     if icon and contentIcon then
         icon:SetTexture(contentIcon)
+        icon:SetAlpha(LootiConfig.notificationAlpha)
+        icon:SetScale(LootiConfig.notificationScale)
     end
 end
 
@@ -113,11 +116,11 @@ function Looti_ShowNotification(parent, itemData, currencyData)
     if itemData and itemData.itemRarity < LootiConfig.notificationThreshold then return end
 
     local notification = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    notification:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT)
+    notification:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH * LootiConfig.notificationScale, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT * LootiConfig.notificationScale)
 
     if LootiConfig.displayBackground then
         notification:SetBackdrop({ bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", tile = true, tileSize = 32 })
-        notification:SetBackdropColor(0, 0, 0, 0.8)
+        notification:SetBackdropColor(0, 0, 0, LootiConfig.backgroundAlpha)
     end
 
     local text, icon = getNotificationData(notification)
@@ -148,7 +151,7 @@ end
 
 function UpdateNotificationPositions()
     for i, frame in ipairs(activeNotifications) do
-        local yOffset = (i - 1) * LootiNotificationSettings.SPACING
+        local yOffset = (i - 1) * (LootiNotificationSettings.SPACING * LootiConfig.notificationScale)
         frame:ClearAllPoints()
         frame:SetPoint(LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", notificationFrame, LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", 0, LootiConfig.scrollDirection == "up" and -yOffset or yOffset)
     end

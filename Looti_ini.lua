@@ -14,7 +14,10 @@ local LootiConfigDefault = {
     showText = true,
     iconSize = 32,
     textDisplay = "CENTER",
-    iconDisplay = "LEFT"
+    iconDisplay = "LEFT",
+    notificationAlpha = 1,
+    notificationScale = 1,
+    backgroundAlpha = 0.8
 }
 
 LootiNotificationSettingsDefault = {

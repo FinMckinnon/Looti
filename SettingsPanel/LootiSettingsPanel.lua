@@ -1,6 +1,6 @@
 local AceGUI = LibStub("AceGUI-3.0")
 local columnWidth = 375
-local minWidth, minHeight = columnWidth, 600
+local minWidth, minHeight = columnWidth, 710
 
 -- Function to display Notification Settings (Loot and Money Notifications)
 local function NotificationSettingsSection(container, tempSettingsData)
@@ -92,6 +92,28 @@ local function DisplaySettingsSection(container, tempSettingsData)
     end)
     container:AddChild(maximumNotificationsSlider)  
 
+    -- Notifications Alpha
+    local notificiationAlphaSlider = AceGUI:Create("Slider")
+    notificiationAlphaSlider:SetLabel("Notification Alpha")
+    notificiationAlphaSlider:SetWidth(columnWidth)
+    notificiationAlphaSlider:SetSliderValues(0, 1, 0.1)  
+    notificiationAlphaSlider:SetValue(tempSettingsData.notificationAlpha)  
+    notificiationAlphaSlider:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleNotificationAlphaChange(value)
+    end)
+    container:AddChild(notificiationAlphaSlider)  
+
+    -- Notifications SCale
+    local notificiationScaleSlider = AceGUI:Create("Slider")
+    notificiationScaleSlider:SetLabel("Notification Scale")
+    notificiationScaleSlider:SetWidth(columnWidth)
+    notificiationScaleSlider:SetSliderValues(0, 2, 0.1)  
+    notificiationScaleSlider:SetValue(tempSettingsData.notificationScale)  
+    notificiationScaleSlider:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleNotificationScaleChange(value)
+    end)
+    container:AddChild(notificiationScaleSlider) 
+
     -- Loot Scroll Direction Dropdown
     local scrollDirectionDropdown = AceGUI:Create("Dropdown")
     scrollDirectionDropdown:SetLabel("Loot Scroll Direction")
@@ -145,6 +167,17 @@ local function DisplaySettingsSection(container, tempSettingsData)
     end)
     container:AddChild(displayBackgroundCheckbox)
 
+    -- Background Alpha
+    local notificiationBackgroundSlider = AceGUI:Create("Slider")
+    notificiationBackgroundSlider:SetLabel("Notification Background Alpha")
+    notificiationBackgroundSlider:SetWidth(columnWidth)
+    notificiationBackgroundSlider:SetSliderValues(0, 1, 0.1)  
+    notificiationBackgroundSlider:SetValue(tempSettingsData.backgroundAlpha)  
+    notificiationBackgroundSlider:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleBackgroundAlphaChange(value)
+    end)
+    container:AddChild(notificiationBackgroundSlider)  
+
     -- Display Notification Background Checkbox
     local showQuantityCheckbox = AceGUI:Create("CheckBox")
     showQuantityCheckbox:SetLabel("Display Quantities (x2, x3, ...)")
@@ -171,7 +204,7 @@ local function CreateTabGroup(tempSettingsData)
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Looti Settings")
     frame:SetWidth(columnWidth + 35)
-    frame:SetHeight(600)
+    frame:SetHeight(minHeight)
 
     -- Button to display Loot Notification Frame
     local displayButton = AceGUI:Create("Button")
@@ -193,10 +226,41 @@ local function CreateTabGroup(tempSettingsData)
         ["tab2"] = function(container) DisplaySettingsSection(container, tempSettingsData) end
     }
 
+    --[[
+    General Settings:   
+                        [Checkbox] Enable Loot Notifications
+                        [Checkbox] Enable Money Notifications
+                        [Checkbox] Show Item Quantities (x2, x3, etc.)
+                        [Checkbox] Show Loot Icon
+                        [Slider] Notification Threshold (Rarity)
+                        
+    Display Settings:   
+                        [Slider] Notification Alpha (Transparency)
+                        [Slider] Notification Scale (Size)
+
+                        [Checkbox] Display Notification Background
+                        [Slider] Notification Background Alpha
+
+                        [Dropdown] Loot Scroll Direction (Up / Down)
+                        [Dropdown] Icon Display (Left / Right)
+                        [Dropdown] Text Display (Left / Center / Right)
+
+    Notification Behavior:   
+                        [Slider] Display Duration (Seconds)
+                        [Slider] Delay Between Notifications (Seconds)
+                        [Slider] Max Notifications Displayed (0 = No Limit)
+
+    Advanced Settings:   
+                        [Future Debugging Features] Placeholder for logs/debug mode if needed
+                        [Reset Button] Restore Defaults
+]]--
+
     -- Set tabs
     local tabs = {
-        {value = "tab1", text = "Notification Settings"},
-        {value = "tab2", text = "Notification Display Settings"}
+        {value = "tab1", text = "General Settings"},
+        {value = "tab2", text = "Display Settings"},
+        {value = "tab3", text = "Notification Behavior"},
+        {value = "tab4", text = "Advanced Settings"},
     }
     tabGroup:SetTabs(tabs)
 
@@ -251,9 +315,11 @@ local function OpenLootiSettings()
         showQuantity = LootiConfig.showQuantity,
         showIcon = LootiConfig.showIcon,
         textDisplay = LootiConfig.textDisplay,
-        iconDisplay = LootiConfig.iconDisplay
+        iconDisplay = LootiConfig.iconDisplay,
+        notificationAlpha = LootiConfig.notificationAlpha,
+        notificationScale = LootiConfig.notificationScale,
+        backgroundAlpha = LootiConfig.backgroundAlpha
     }
-
     CreateTabGroup(tempSettingsData)
 end
 

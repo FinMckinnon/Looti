@@ -1,5 +1,5 @@
 NotificationManager = {
-    showNotificationFrame = true, -- Initialise as true
+    showNotificationFrame = true, 
     listeners = {} -- Stores listener callbacks
 }
 
