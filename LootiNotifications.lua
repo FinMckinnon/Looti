@@ -4,12 +4,18 @@ local ticker
 local fadeoutTime = 0.5
 local frameMargin = 5
 
-local function setNotificationData(itemData, currencyData, rarity, text, icon)
+local function getQuantityText(quantity)
+    return (quantity and quantity > 1) and "x" .. quantity or ""
+end
+
+local function setNotificationData(itemData, currencyData, text, icon)
     local contentText, contentIcon, r, g, b
 
     if itemData then
-        r, g, b = GetRarityColor(rarity)
-        contentText, contentIcon = itemData.itemName, itemData.itemIcon
+        r, g, b = GetRarityColor(itemData.itemRarity)
+        local quantityText = LootiConfig.showQuantity and getQuantityText(itemData.itemQuantity) or ""
+        contentText = itemData.itemName .. " |cFFFFFFFF" .. quantityText .. "|r"
+        contentIcon = itemData.itemIcon
     else
         r, g, b = 1, 1, 1
         contentText, contentIcon = currencyData.text, currencyData.icon
@@ -79,7 +85,7 @@ local function ProcessNotifications()
     end
 
     local data = table.remove(notificationStack, 1)
-    Looti_ShowNotification(data.parent, data.itemData, data.currencyData, data.rarity)
+    Looti_ShowNotification(data.parent, data.itemData, data.currencyData)
 end
 
 local function TryProcessNotifications()
@@ -90,21 +96,21 @@ local function TryProcessNotifications()
     end
 end
 
-local function AddNotification(parent, itemData, currencyData, rarity)
+local function AddNotification(parent, itemData, currencyData)
     if #activeNotifications == 0 then
-        Looti_ShowNotification(parent, itemData, currencyData, rarity)
+        Looti_ShowNotification(parent, itemData, currencyData)
     else
-        table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData, rarity = rarity })
+        table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData})
         if not ticker then
             ticker = C_Timer.NewTicker(LootiConfig.notificationDelay, TryProcessNotifications)
         end
     end
 end
 
-function Looti_ShowNotification(parent, itemData, currencyData, rarity)
+function Looti_ShowNotification(parent, itemData, currencyData)
     if itemData and not LootiConfig.showLootNotifications then return end
     if currencyData and not LootiConfig.showMoneyNotifications then return end
-    if itemData and rarity < LootiConfig.notificationThreshold then return end
+    if itemData and itemData.itemRarity < LootiConfig.notificationThreshold then return end
 
     local notification = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     notification:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT)
@@ -119,7 +125,7 @@ function Looti_ShowNotification(parent, itemData, currencyData, rarity)
         return 
     end
 
-    setNotificationData(itemData, currencyData, rarity, text, icon)
+    setNotificationData(itemData, currencyData, text, icon)
     table.insert(activeNotifications, 1, notification)
 
     UIFrameFadeIn(notification, 0.5, 0, 1)
@@ -148,22 +154,18 @@ function UpdateNotificationPositions()
     end
 end
 
-local function getQuantityText(quantity)
-    return (quantity > 1) and "x" .. quantity or ""  
-end
+
 
 local function handleLootMessage(frame, message)
     if message:find("You loot") or message:find("You receive") then
         local itemLink = message:match("|c%x+|Hitem:.-|h|r")
-        local quantity = tonumber(message:match("x(%d+)")) or 1  
+        local itemQuantity = tonumber(message:match("x(%d+)")) or 1  
         
         if itemLink then
             local itemName, _, itemRarity, _, _, _, _, _, _, itemIcon = GetItemInfo(itemLink)
             if itemName and itemIcon and itemRarity then
                 if itemRarity >= LootiConfig.notificationThreshold then
-                    local quantityText = LootiConfig.showQuantity and getQuantityText(quantity) or ""
-                    local displayText = itemName .. " " .. quantityText
-                    AddNotification(frame, { itemName = displayText, itemIcon = itemIcon }, nil, itemRarity)
+                    AddNotification(frame, { itemName = itemName, itemIcon = itemIcon, itemRarity = itemRarity, itemQuantity = itemQuantity }, nil )
                 end
             end
         end
