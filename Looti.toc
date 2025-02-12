@@ -12,5 +12,11 @@ LootiNotifications.lua
 Looti.lua
 
 LootiTest.lua
+
+## Settings
 SettingsPanel/LootiSettingsHandlers.lua
 SettingsPanel/LootiSettingsPanel.lua
+SettingsPanel/Tabs/Looti_advancedSettingsTab.lua
+SettingsPanel/Tabs/Looti_displaySettingsTab.lua
+SettingsPanel/Tabs/Looti_generalSettingsTab.lua
+SettingsPanel/Tabs/Looti_notificationBehaviorSettingsTab.lua
