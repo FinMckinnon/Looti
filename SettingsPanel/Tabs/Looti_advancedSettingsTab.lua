@@ -3,7 +3,7 @@
     [Reset Button] Restore Defaults
 ]]--
 
-local function createAdvancedSettingsTab(container, tempSettingsData, columnWidth)
+local function CreateAdvancedSettingsTab(container, tempSettingsData, columnWidth)
     container:ReleaseChildren()  -- Clears the tab content before adding new widgets
 
     local resetMessage = AceGUI:Create("Label")
@@ -14,4 +14,4 @@ local function createAdvancedSettingsTab(container, tempSettingsData, columnWidt
     container:AddChild(resetMessage)
 end
 
-_G["createAdvancedSettingsTab"] = createAdvancedSettingsTab
+_G["CreateAdvancedSettingsTab"] = CreateAdvancedSettingsTab

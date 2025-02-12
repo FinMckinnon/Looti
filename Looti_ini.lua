@@ -1,3 +1,5 @@
+AceGUI = LibStub("AceGUI-3.0")
+
 local LootiConfigDefault = {
     showLootNotifications = true,
     showMoneyNotifications = true,

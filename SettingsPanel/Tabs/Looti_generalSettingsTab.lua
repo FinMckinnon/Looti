@@ -3,13 +3,15 @@
     [Checkbox] Enable Money Notifications
     [Checkbox] Show Item Quantities (x2, x3, etc.)
     [Checkbox] Show Loot Icon
+    
     [Slider] Notification Threshold (Rarity)
 ]]--
 
-local function createGeneralNotificationToggles(container, tempSettingsData, columnWidth)
+local function CreateGeneralNotificationToggles(container, tempSettingsData, columnWidth)
     -- Grouped frame for the checkboxes
     local notificationTogglesGroup = AceGUI:Create("InlineGroup")
     notificationTogglesGroup:SetLayout("Flow")  
+    notificationTogglesGroup:SetFullWidth(true)  
     notificationTogglesGroup:SetTitle("Notification Toggles")
     container:AddChild(notificationTogglesGroup) 
 
@@ -39,7 +41,7 @@ local function createGeneralNotificationToggles(container, tempSettingsData, col
     showQuantityCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
         settingsPanel.HandleShowQuantityChange(value)
     end)
-    container:AddChild(showQuantityCheckbox)
+    notificationTogglesGroup:AddChild(showQuantityCheckbox)
 
     -- Display Icons Checkbox
     local showIconCheckbox = AceGUI:Create("CheckBox")
@@ -49,13 +51,13 @@ local function createGeneralNotificationToggles(container, tempSettingsData, col
     showIconCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
         settingsPanel.HandleShowIconChange(value)
     end)
-    container:AddChild(showIconCheckbox)
+    notificationTogglesGroup:AddChild(showIconCheckbox)
 end
 
-local function createRaritySlider(container, tempSettingsData, columnWidth)
+local function CreateRaritySlider(container, tempSettingsData, columnWidth)
     -- Rarity Threshold Slider
     local thresholdSlider = AceGUI:Create("Slider")
-    thresholdSlider:SetLabel("Notification Threshold (Rarity)")
+    thresholdSlider:SetLabel("Notification Rarity Threshold")
     thresholdSlider:SetWidth(columnWidth)
     thresholdSlider:SetSliderValues(0, 5, 1) 
     thresholdSlider:SetValue(tempSettingsData.notificationThreshold)
@@ -81,12 +83,12 @@ local function createRaritySlider(container, tempSettingsData, columnWidth)
     container:AddChild(rarityDisplayBox)
 end
 
-local function createGeneralSettingsTab(container, tempSettingsData, columnWidth)
+local function CreateGeneralSettingsTab(container, tempSettingsData, columnWidth)
     container:ReleaseChildren()  -- Clears the tab content before adding new widgets
 
-    createGeneralNotificationToggles(container, tempSettingsData, columnWidth)
+    CreateGeneralNotificationToggles(container, tempSettingsData, columnWidth)
 
-    createRaritySlider(container, tempSettingsData, columnWidth)
+    CreateRaritySlider(container, tempSettingsData, columnWidth)
 end
 
-_G["createGeneralSettingsTab"] = createGeneralSettingsTab
+_G["CreateGeneralSettingsTab"] = CreateGeneralSettingsTab

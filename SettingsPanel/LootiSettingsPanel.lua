@@ -1,4 +1,3 @@
-AceGUI = LibStub("AceGUI-3.0")
 local columnWidth = 375
 local minWidth, minHeight = columnWidth, 600
 
@@ -18,7 +17,6 @@ end
 local function createFooterButtonGroup(frame)
     -- Group for Test and Save Buttons 
     local butonGroup = AceGUI:Create("InlineGroup")
-    butonGroup:SetFullWidth(true)
     butonGroup:SetWidth(columnWidth)
     butonGroup:SetTitle("") 
     butonGroup:SetLayout("Flow")  
@@ -59,10 +57,10 @@ local function CreateTabGroup(frame, tempSettingsData)
     }
 
     local tabFunctions = {
-        ["general_settings"] = function(container) createGeneralSettingsTab(container, tempSettingsData, columnWidth) end,
-        ["display_settings"] = function(container) createDisplaySettingsTab(container, tempSettingsData, columnWidth) end,
-        ["notification_behavior_settings"] = function(container) createNotificationBehaviorSettingsTab(container, tempSettingsData, columnWidth) end,
-        ["advanced_settings"] = function(container) createAdvancedSettingsTab(container, tempSettingsData, columnWidth) end
+        ["general_settings"] = function(container) CreateGeneralSettingsTab(container, tempSettingsData, columnWidth) end,
+        ["display_settings"] = function(container) CreateDisplaySettingsTab(container, tempSettingsData, columnWidth) end,
+        ["notification_behavior_settings"] = function(container) CreateNotificationBehaviorSettingsTab(container, tempSettingsData, columnWidth) end,
+        ["advanced_settings"] = function(container) CreateAdvancedSettingsTab(container, tempSettingsData, columnWidth) end
     }
 
     tabGroup:SetTabs(tabs)
