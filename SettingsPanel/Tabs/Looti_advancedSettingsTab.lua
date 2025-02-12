@@ -3,15 +3,30 @@
     [Reset Button] Restore Defaults
 ]]--
 
+-- Reset Looti button with confirmation pop up
+local function CreateButtonWithConfirmation(parent, buttonText, confirmTitle, confirmMessage, onConfirm, width, tempSettingsData)
+    local button = AceGUI:Create("Button")
+    button:SetText(buttonText)
+    button:SetWidth(width)
+    button:SetCallback("OnClick", function()
+        settingsPanel.HandleResetButtonClick(tempSettingsData)
+    end)
+    parent:AddChild(button)
+end
+
+-- Advanced Settings Tab
 local function CreateAdvancedSettingsTab(container, tempSettingsData, columnWidth)
     container:ReleaseChildren()  -- Clears the tab content before adding new widgets
 
-    local resetMessage = AceGUI:Create("Label")
-    resetMessage:SetWidth(columnWidth)
-    resetMessage:SetFullWidth(true)
-    resetMessage:SetJustifyH("CENTER")  
-    resetMessage:SetText("Reset Settings")  
-    container:AddChild(resetMessage)
+    CreateButtonWithConfirmation(
+        container,
+        "Reset Looti",
+        "Reset Looti",
+        "Are you sure you want to reset Looti?",
+        HandleReset,
+        columnWidth,
+        tempSettingsData
+    )
 end
 
 _G["CreateAdvancedSettingsTab"] = CreateAdvancedSettingsTab

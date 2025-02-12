@@ -84,7 +84,7 @@ local function CreateOrientationOptions(container, tempSettingsData, columnWidth
     -- Loot Scroll Direction Dropdown
     local scrollDirectionDropdown = AceGUI:Create("Dropdown")
     scrollDirectionDropdown:SetLabel("Loot Scroll Direction")
-    scrollDirectionDropdown:SetWidth(columnWidth)
+    scrollDirectionDropdown:SetFullWidth(true)
     scrollDirectionDropdown:SetList({
         ["up"] = "Scroll Up",
         ["down"] = "Scroll Down"

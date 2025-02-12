@@ -1,6 +1,6 @@
 AceGUI = LibStub("AceGUI-3.0")
 
-local LootiConfigDefault = {
+LootiConfigDefault = {
     showLootNotifications = true,
     showMoneyNotifications = true,
     notificationThreshold = 3,

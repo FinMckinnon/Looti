@@ -1,5 +1,5 @@
 local columnWidth = 375
-local minWidth, minHeight = columnWidth, 600
+local minWidth, minHeight = columnWidth, 675
 
 -- Button group displayed at the top of the settings page
 local function CreateHeaderButtonGroup(frame)

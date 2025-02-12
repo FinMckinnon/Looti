@@ -13,6 +13,9 @@ Looti.lua
 
 LootiTest.lua
 
+## GUI
+SettingsPanel\Components\Looti_popUpDialogue.lua
+
 ## Settings
 SettingsPanel/LootiSettingsHandlers.lua
 SettingsPanel/LootiSettingsPanel.lua

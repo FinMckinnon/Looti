@@ -58,24 +58,25 @@ local function HandleBackgroundAlphaChange(value)
     tempSettingsData.backgroundAlpha = value
 end
 
--- Save the settings to the saved config from tempSettingsData
+local function HandleReset(tempSettingsData)
+    copyTable(LootiConfig, LootiConfigDefault)
+    copyTable(tempSettingsData, LootiConfig)
+    LOOTI_CHAT_LOG("Looti has been reset.", "update")
+end
+
+local function HandleResetButtonClick(tempSettingsData)
+    CreateConfirmationPopup("RESET_LOOTI_POP_UP", "Confirm Action", "Are you sure you want to reset Looti?", function()
+        HandleReset(tempSettingsData)
+    end)
+    
+end
+
+-- Function to save settings from tempSettingsData to LootiConfig
 local function HandleSaveSettings()
-    LootiConfig.showLootNotifications = tempSettingsData.showLootNotifications
-    LootiConfig.showMoneyNotifications = tempSettingsData.showMoneyNotifications
-    LootiConfig.notificationThreshold = tempSettingsData.notificationThreshold
-    LootiConfig.scrollDirection = tempSettingsData.scrollDirection
-    LootiConfig.displayBackground = tempSettingsData.displayBackground
-    LootiConfig.displayDuration = tempSettingsData.displayDuration
-    LootiConfig.notificationDelay = tempSettingsData.notificationDelay
-    LootiConfig.maximumNotifications = tempSettingsData.maximumNotifications
-    LootiConfig.showQuantity = tempSettingsData.showQuantity
-    LootiConfig.showIcon = tempSettingsData.showIcon
-    LootiConfig.iconDisplay = tempSettingsData.iconDisplay
-    LootiConfig.textDisplay = tempSettingsData.textDisplay
-    LootiConfig.notificationAlpha = tempSettingsData.notificationAlpha
-    LootiConfig.notificationScale = tempSettingsData.notificationScale
-    LootiConfig.backgroundAlpha = tempSettingsData.backgroundAlpha
-    print("Looti Settings saved!")
+    for setting, value in pairs(tempSettingsData) do
+        LootiConfig[setting] = value
+    end
+    LOOTI_CHAT_LOG("Looti Settings saved!")
 end
 
 _G["settingsPanel"] = {
@@ -95,4 +96,5 @@ _G["settingsPanel"] = {
     HandleNotificationAlphaChange = HandleNotificationAlphaChange,
     HandleNotificationScaleChange = HandleNotificationScaleChange,
     HandleBackgroundAlphaChange = HandleBackgroundAlphaChange,
+    HandleResetButtonClick = HandleResetButtonClick,
 }
