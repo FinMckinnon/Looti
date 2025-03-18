@@ -1,39 +1,28 @@
-name: Update TOC
+name: Update TOC Interface version(s)
 
 on:
   schedule:
-    - cron: '0 0 * * 0' # Runs weekly (every Sunday)
+    - cron: '0 12 * * *' # Runs daily at 12:00 UTC
   workflow_dispatch: # Allows manual execution
 
-permissions:
-  contents: write # Needed to push updates
-
 jobs:
-  update-toc:
+  run:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Clone project
+        uses: actions/checkout@v4
 
-      - name: Get Latest WoW Classic Interface Version
-        id: wow_version
-        run: |
-          # Fetch the latest interface version from Wowpedia or another reliable source
-          INTERFACE=$(curl -s "https://wowpedia.fandom.com/api.php?action=parse&page=API_LatestInterface&format=json" | jq -r '.parse.text["*"]' | grep -oP 'Interface: \K[0-9]+')
-          if [ -z "$INTERFACE" ]; then
-            echo "Failed to fetch interface version" >&2
-            exit 1
-          fi
-          echo "INTERFACE_VERSION=$INTERFACE" >> $GITHUB_ENV
+      - name: Update TOC Interface version
+        uses: p3lim/toc-interface-updater@v4
+        with:
+          flavor: classic_era # Set to Classic Era
+          beta: false         # Optional: Set to true if you want to include beta versions
+          ptr: false          # Optional: Set to true if you want to include PTR versions
 
-      - name: Update TOC File
-        run: |
-          sed -i "s/## Interface: .*/## Interface: $INTERFACE_VERSION/" *.toc
-
-      - name: Commit and Push Changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git diff --quiet || (git add *.toc && git commit -m "Update TOC to $INTERFACE_VERSION" && git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main)
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: Update Interface version
+          commit-message: Update Interface version
+          branch: interface-version
+          delete-branch: true
