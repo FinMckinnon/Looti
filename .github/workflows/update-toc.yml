@@ -15,10 +15,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Get Latest WoW Classic Interface Version from WoWWiki
+      - name: Get Latest WoW Classic Interface Version
         id: wow_version
         run: |
-          INTERFACE=$(curl -s "https://wowwiki.fandom.com/wiki/API_LatestInterface" | sed -n 's/.*<span class="api">\([0-9]\+\)<\/span>.*/\1/p')
+          # Fetch the latest interface version from Wowpedia or another reliable source
+          INTERFACE=$(curl -s "https://wowpedia.fandom.com/api.php?action=parse&page=API_LatestInterface&format=json" | jq -r '.parse.text["*"]' | grep -oP 'Interface: \K[0-9]+')
           if [ -z "$INTERFACE" ]; then
             echo "Failed to fetch interface version" >&2
             exit 1
