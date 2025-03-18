@@ -3,10 +3,10 @@ name: Update TOC
 on:
   schedule:
     - cron: '0 0 * * 0' # Runs weekly (every Sunday)
-  workflow_dispatch: # Manual trigger option
+  workflow_dispatch: # Allows manual execution
 
 permissions:
-  contents: write # Required for pushing changes
+  contents: write # Needed to push updates
 
 jobs:
   update-toc:
@@ -15,10 +15,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Get Latest WoW Classic Interface Version
+      - name: Get Latest WoW Classic Interface Version from WoWWiki
         id: wow_version
         run: |
-          INTERFACE=$(curl -s https://api.blizzard.com/data/wow/namespace/static-classic-us | grep -oP '(?<=interface":)\d+')
+          INTERFACE=$(curl -s "https://wowwiki.fandom.com/wiki/API_LatestInterface" | grep -oP '(?<=<span class="api">)\d+')
           if [ -z "$INTERFACE" ]; then
             echo "Failed to fetch interface version" >&2
             exit 1
