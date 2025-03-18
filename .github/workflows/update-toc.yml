@@ -18,7 +18,7 @@ jobs:
       - name: Get Latest WoW Classic Interface Version from WoWWiki
         id: wow_version
         run: |
-          INTERFACE=$(curl -s "https://wowwiki.fandom.com/wiki/API_LatestInterface" | grep -oP '(?<=<span class="api">)\d+')
+          INTERFACE=$(curl -s "https://wowwiki.fandom.com/wiki/API_LatestInterface" | sed -n 's/.*<span class="api">\([0-9]\+\)<\/span>.*/\1/p')
           if [ -z "$INTERFACE" ]; then
             echo "Failed to fetch interface version" >&2
             exit 1
