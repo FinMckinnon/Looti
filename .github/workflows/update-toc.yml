@@ -2,8 +2,8 @@ name: Update TOC Interface version(s)
 
 on:
   schedule:
-    - cron: '0 12 * * *' # Runs daily at 12:00 UTC
-  workflow_dispatch: # Allows manual execution
+    - cron: '0 12 * * *' 
+  workflow_dispatch: 
 
 jobs:
   run:
@@ -11,18 +11,20 @@ jobs:
     steps:
       - name: Clone project
         uses: actions/checkout@v4
+        with:
+          ref: dev 
 
       - name: Update TOC Interface version
         uses: p3lim/toc-interface-updater@v4
         with:
-          flavor: classic_era # Set to Classic Era
-          beta: false         # Optional: Set to true if you want to include beta versions
-          ptr: false          # Optional: Set to true if you want to include PTR versions
+          flavor: classic_era 
+          beta: false         
+          ptr: false          
 
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          title: Update Interface version
-          commit-message: Update Interface version
-          branch: interface-version
-          delete-branch: true
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Update TOC Interface version for Classic Era"
+          git push origin dev
