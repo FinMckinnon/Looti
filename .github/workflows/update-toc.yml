@@ -1,0 +1,29 @@
+name: Update TOC
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Runs weekly (every Sunday)
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  update-toc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Get Latest WoW Classic Interface Version
+        id: wow_version
+        run: |
+          INTERFACE=$(curl -s https://classic.wowhead.com/news | grep -oP 'Interface: \K\d{5,6}' | head -1)
+          echo "INTERFACE_VERSION=$INTERFACE" >> $GITHUB_ENV
+
+      - name: Update TOC File
+        run: |
+          sed -i "s/## Interface: .*/## Interface: $INTERFACE_VERSION/" *.toc
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git diff --quiet || (git add *.toc && git commit -m "Update TOC to $INTERFACE_VERSION" && git push)
