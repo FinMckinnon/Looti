@@ -23,7 +23,9 @@ jobs:
           sed -i "s/## Interface: .*/## Interface: $INTERFACE_VERSION/" *.toc
 
       - name: Commit and Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git diff --quiet || (git add *.toc && git commit -m "Update TOC to $INTERFACE_VERSION" && git push)
+          git diff --quiet || (git add *.toc && git commit -m "Update TOC to $INTERFACE_VERSION" && git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main)
