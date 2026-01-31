@@ -21,10 +21,9 @@ jobs:
         with:
           flavor: |
             retail
-            classic
+            classic_era
             tbc
             wrath
-            cata
             mists
 
       - name: Create pull request
