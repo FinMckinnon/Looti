@@ -1,0 +1,36 @@
+name: Update TOC Interface version(s)
+
+on:
+  schedule:
+    - cron: 0 12 * * *
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update TOC Interface version
+        uses: p3lim/toc-interface-updater@v4
+        with:
+          flavor: |
+            retail
+            classic
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          base: dev
+          title: Update TOC Interface versions
+          commit-message: Update TOC Interface versions
+          branch: interface-version
+          delete-branch: true

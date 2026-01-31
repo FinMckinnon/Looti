@@ -1,0 +1,30 @@
+name: Update TOC Interface version(s)
+
+on:
+  schedule:
+    - cron: '0 12 * * *' 
+  workflow_dispatch: 
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+        with:
+          ref: main 
+
+      - name: Update TOC Interface version
+        uses: p3lim/toc-interface-updater@v4
+        with:
+          flavor: classic_era 
+          beta: false         
+          ptr: false          
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Update TOC Interface version for Classic Era"
+          git push origin main
