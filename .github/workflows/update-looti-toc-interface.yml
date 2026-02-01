@@ -1,4 +1,4 @@
-name: Update TOC Interface versions
+name: Update TOC Interface version(s)
 
 on:
   schedule:
