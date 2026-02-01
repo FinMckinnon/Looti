@@ -10,27 +10,29 @@ permissions:
   pull-requests: write
 
 jobs:
-  run:
+  update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout dev branch
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: main
 
-      - name: Update TOC Interface version
+      - name: Update TOC Interface versions
         uses: p3lim/toc-interface-updater@v4
         with:
           flavor: |
             retail
+            classic_era
             classic
+            tbc
+            wrath
+            mists
+            anniversary
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v8
         with:
-          base: dev
-          title: Update TOC Interface versions
-          commit-message: Update TOC Interface versions
-          branch: interface-version
+          title: Update Interface versions
+          commit-message: Update Interface versions
+          branch: update/interface
           delete-branch: true
