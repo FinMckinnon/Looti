@@ -5,6 +5,8 @@
 ## Version: 1.0
 ## SavedVariables:  LootiNotificationSettings, LootiConfig
 
+Libs/AceGUI-3.0/AceGUI-3.0.xml
+
 Looti_ini.lua
 utils.lua
 LootiNotificationsManager.lua
@@ -23,3 +25,4 @@ SettingsPanel/Tabs/Looti_advancedSettingsTab.lua
 SettingsPanel/Tabs/Looti_displaySettingsTab.lua
 SettingsPanel/Tabs/Looti_generalSettingsTab.lua
 SettingsPanel/Tabs/Looti_notificationBehaviorSettingsTab.lua
+

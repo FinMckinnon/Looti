@@ -82,6 +82,13 @@ local function CreateSettingsWindow(tempSettingsData)
     frame:SetWidth(columnWidth + 35)
     frame:SetHeight(minHeight)
 
+    local rawFrame = frame.frame or frame
+    if rawFrame.SetResizeBounds then
+        rawFrame:SetResizeBounds(columnWidth + 35, minHeight)
+    else
+        rawFrame:SetMinResize(columnWidth + 35, minHeight)
+    end
+
     CreateHeaderButtonGroup(frame)
 
     CreateTabGroup(frame, tempSettingsData)
