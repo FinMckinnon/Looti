@@ -85,6 +85,8 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("CHAT_MSG_LOOT")
 frame:RegisterEvent("CHAT_MSG_MONEY")
 frame:RegisterEvent("ADDON_LOADED")
+-- Auto Looting
+frame:RegisterEvent("LOOT_READY")
 
 frame:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" then
@@ -100,5 +102,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
     elseif event == "CHAT_MSG_MONEY" then
         local message = ...
         handleMoneyMessage(notificationFrame, message)
+    elseif event == "LOOT_READY" then
+        handleFastLoot()
     end
 end)
