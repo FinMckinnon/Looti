@@ -1,26 +1,35 @@
 {
+    "Lua.runtime.version": "Lua 5.1",
+    "Lua.runtime.builtin": {
+        "basic": "disable",
+        "debug": "disable",
+        "io": "disable",
+        "math": "disable",
+        "os": "disable",
+        "package": "disable",
+        "string": "disable",
+        "table": "disable",
+        "utf8": "disable"
+    },
+    "Lua.workspace.library": [
+        "~\\.vscode\\extensions\\ketho.wow-api-0.22.1\\Annotations\\Core"
+    ],
+    "Lua.type.weakUnionCheck": true,
     "Lua.diagnostics.globals": [
-        "UIParent",
         "CLOSE",
-        "GameFontHighlightSmall",
-        "GameFontDisableSmall",
-        "GameTooltip",
-        "GameFontNormalSmall",
         "FONT_COLOR_CODE_CLOSE",
-        "GameFontNormal",
         "SetDesaturation",
-        "WOW_PROJECT_ID",
-        "WOW_PROJECT_MAINLINE",
         "ColorPickerFrame",
-        "ChatFontNormal",
         "OKAY",
         "NOT_BOUND",
         "ACCEPT",
-        "UIFrameFadeIn",
-        "UIFrameFadeOut",
         "SlashCmdList",
         "StaticPopupDialogs",
         "StaticPopup_Show",
-        "DEFAULT_CHAT_FRAME"
+        "DEFAULT_CHAT_FRAME",
+        "LOOT"
+    ],
+    "Lua.diagnostics.disable": [
+        "assign-type-mismatch"
     ]
 }

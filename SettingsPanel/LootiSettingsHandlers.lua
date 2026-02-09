@@ -34,6 +34,14 @@ local function HandleShowQuantityChange(value)
     tempSettingsData.showQuantity = value
 end
 
+local function HandleShowItemLevelChange(value)
+    tempSettingsData.showItemLevel = value
+end
+
+local function HandleShowItemLevelUpgradeIconChange(value)
+    tempSettingsData.showItemLevelUpgradeIcon = value
+end
+
 local function HandleShowIconChange(value)
     tempSettingsData.showIcon = value
 end
@@ -57,6 +65,7 @@ end
 local function HandleBackgroundAlphaChange(value)
     tempSettingsData.backgroundAlpha = value
 end
+
 
 local function HandleReset(tempSettingsData)
     copyTable(LootiConfig, LootiConfigDefault)
@@ -90,11 +99,13 @@ _G["settingsPanel"] = {
     HandleMaximumNotificationsChange = HandleMaximumNotificationsChange,
     HandleSaveSettings = HandleSaveSettings,
     HandleShowQuantityChange = HandleShowQuantityChange,
+    HandleShowItemLevelChange = HandleShowItemLevelChange,
+    HandleShowItemLevelUpgradeIconChange = HandleShowItemLevelUpgradeIconChange,
     HandleShowIconChange = HandleShowIconChange,
     HandleIconDisplayChange = HandleIconDisplayChange,
     HandleTextDisplayChange = HandleTextDisplayChange,
     HandleNotificationAlphaChange = HandleNotificationAlphaChange,
     HandleNotificationScaleChange = HandleNotificationScaleChange,
     HandleBackgroundAlphaChange = HandleBackgroundAlphaChange,
-    HandleResetButtonClick = HandleResetButtonClick,
+    HandleResetButtonClick = HandleResetButtonClick
 }
