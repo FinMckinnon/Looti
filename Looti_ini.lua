@@ -24,28 +24,56 @@ LootiConfigDefault = {
     backgroundAlpha = 0.8
 }
 
+LootiFiltersDefault = {
+    blacklist = {
+        [6196] = true,
+        [2589] = true,
+        [2592] = true,
+        [4306] = true,
+        [2320] = true,
+        [2321] = true,
+        [4338] = true,
+        [858] = true,
+        [929] = true,
+        [2447] = true,
+        [3383] = true,
+        [5498] = true,
+        [8150] = true,
+        [4603] = true,
+        [6889] = true,
+        [3928] = true,
+        [5571] = true,
+        [4234] = true,
+        [2449] = true,
+    },
+    whitelist = {
+
+    }
+}
+
 LootiNotificationSettingsDefault = {
     SPACING = -35,
     NOTIFICATION_FRAME_WIDTH = 300,
-    NOTIFICATION_FRAME_HEIGHT =35,
+    NOTIFICATION_FRAME_HEIGHT = 35,
 }
 
-LootiNotificationSettings = LootiNotificationSettings or LootiNotificationSettingsDefault
 LootiConfig = LootiConfig or LootiConfigDefault
+LootiFilters = LootiFilters or LootiFiltersDefault
+LootiNotificationSettings = LootiNotificationSettings or LootiNotificationSettingsDefault
 
 currencyIcons = {
-    copper = "Interface\\Icons\\INV_misc_coin_05",  -- Copper
-    silver = "Interface\\Icons\\INV_Misc_Coin_03",  -- Silver
+    copper = "Interface\\Icons\\INV_misc_coin_05", -- Copper
+    silver = "Interface\\Icons\\INV_Misc_Coin_03", -- Silver
     gold = "Interface\\Icons\\INV_Misc_Coin_01"    -- Gold
 }
 
 rarityData = {
-    [0] = {name = "Poor", color = {GetItemQualityColor(0)}},   
-    [1] = {name = "Common", color = {GetItemQualityColor(1)}},  
-    [2] = {name = "Uncommon", color = {GetItemQualityColor(2)}},
-    [3] = {name = "Rare", color = {GetItemQualityColor(3)}},    
-    [4] = {name = "Epic", color = {GetItemQualityColor(4)}},    
-    [5] = {name = "Legendary", color = {GetItemQualityColor(5)}}, 
+    [0] = { name = "Poor", color = { GetItemQualityColor(0) } },
+    [1] = { name = "Common", color = { GetItemQualityColor(1) } },
+    [2] = { name = "Uncommon", color = { GetItemQualityColor(2) } },
+    [3] = { name = "Rare", color = { GetItemQualityColor(3) } },
+    [4] = { name = "Epic", color = { GetItemQualityColor(4) } },
+    [5] = { name = "Legendary", color = { GetItemQualityColor(5) } },
 }
 
 local function EnsureDefaults(targetTable, defaultTable)
@@ -63,6 +91,7 @@ end
 
 local function EnsureLootiSettings()
     LootiConfig = EnsureDefaults(LootiConfig, LootiConfigDefault)
+    LootiFilters = EnsureDefaults(LootiFilters, LootiFiltersDefault)
     LootiNotificationSettings = EnsureDefaults(LootiNotificationSettings, LootiNotificationSettingsDefault)
 end
 

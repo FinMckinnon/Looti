@@ -253,15 +253,25 @@ function UpdateNotificationPositions()
     end
 end
 
-
+local function isItemBlacklisted(itemID)
+    if not LootiFilters.blacklist or not next(LootiFilters.blacklist) then
+        return false
+    end
+    return LootiFilters.blacklist[itemID] == true
+end
 
 local function handleLootMessage(frame, message)
     if message:find("You loot") or message:find("You receive") then
-        local itemLink = message:match("|c%x+|Hitem:.-|h|r")
+
+        local itemID = tonumber(message:match("item:(%d+)"))
+        if isItemBlacklisted(itemID) then
+            return
+        end
+
         local itemQuantity = tonumber(message:match("x(%d+)")) or 1  
         
-        if itemLink then
-            local itemName, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, itemIcon = GetItemInfo(itemLink)
+        if itemID then
+            local itemName, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, itemIcon = GetItemInfo(itemID)
             if itemName and itemIcon and itemRarity then
                 if itemRarity >= LootiConfig.notificationThreshold then
                     AddNotification(frame, { itemName = itemName, itemIcon = itemIcon, itemRarity = itemRarity, itemQuantity = itemQuantity, itemLevel = itemLevel, itemEquipLoc = itemEquipLoc }, nil )

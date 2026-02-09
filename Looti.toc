@@ -4,7 +4,7 @@
 ## Author: FinLaFin
 ## Version: 2.3
 ## IconTexture: Interface\AddOns\Looti\Media\looti_icon.tga
-## SavedVariables:  LootiNotificationSettings, LootiConfig
+## SavedVariables:  LootiNotificationSettings, LootiConfig, LootiFilters
 
 Libs/AceGUI-3.0/AceGUI-3.0.xml
 
@@ -26,3 +26,4 @@ SettingsPanel/Tabs/Looti_advancedSettingsTab.lua
 SettingsPanel/Tabs/Looti_displaySettingsTab.lua
 SettingsPanel/Tabs/Looti_generalSettingsTab.lua
 SettingsPanel/Tabs/Looti_notificationBehaviorSettingsTab.lua
+SettingsPanel/Windows/Looti_FilterEditor.lua
