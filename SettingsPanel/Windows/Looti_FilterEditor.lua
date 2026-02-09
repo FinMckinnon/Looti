@@ -1,6 +1,7 @@
-local columnWidth = 375
--- Make the editor wider so 3-column cells have room for icon+name inline
-local minWidth, minHeight = 600, 675
+local frameWidth = 600
+local frameHeight = 675
+local minWidth, minHeight = frameWidth, frameHeight
+local BlacklistWindowIsOpen = false
 
 local function UpdateSelectedItemDisplay(itemID, itemIcon, itemNameLabel)
     local item = Item:CreateFromItemID(itemID)
@@ -46,12 +47,14 @@ local function UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, ite
                     dispIcon:SetImage(itemIconTexture)
                     dispIcon:SetImageSize(28, 28)
                     dispIcon:SetWidth(36)
+                    dispIcon.frame:EnableMouse(false)
                     cell:AddChild(dispIcon)
 
                     -- Name (narrower so it sits inline with the icon)
                     local nameLabel = AceGUI:Create("Label")
                     nameLabel:SetText(itemName)
                     nameLabel:SetRelativeWidth(0.7)
+                    nameLabel.frame:EnableMouse(false)
                     cell:AddChild(nameLabel)
 
                     -- Click handling on the cell frame
@@ -63,6 +66,8 @@ local function UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, ite
                     end)
 
                     grid:AddChild(cell)
+                    -- Force layout update so the scroll bar recalculates
+                    scrollList:DoLayout()
                 end
             end)
         end
@@ -70,12 +75,26 @@ local function UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, ite
 end
 
 
-local function CreateFilterEditor(listType, filterList)
+local function CreateFilterEditor(listType)
+    if BlacklistWindowIsOpen then
+        return
+    end
+
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Filter Editor")
     frame:SetWidth(minWidth)
     frame:SetHeight(minHeight)
     frame:SetLayout("Flow")
+
+    if listType == "blacklist" then
+        BlacklistWindowIsOpen = true
+    end
+
+    frame:SetCallback("OnClose", function(widget)
+        if listType == "blacklist" then
+            BlacklistWindowIsOpen = false
+        end
+    end)
 
     local bg = frame.frame
 
