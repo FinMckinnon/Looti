@@ -2,18 +2,42 @@ local frameWidth = 600
 local frameHeight = 675
 local minWidth, minHeight = frameWidth, frameHeight
 local BlacklistWindowIsOpen = false
+-- Set true for nil default text input
+local invalidItemID = true
 
 local function UpdateSelectedItemDisplay(itemID, itemIcon, itemNameLabel)
+    local QUESTIONMARK_INV_ICON = 134400
+    itemID = tonumber(itemID)
+    if not itemID then
+        itemIcon:SetImage(QUESTIONMARK_INV_ICON)
+        itemNameLabel:SetText("Invalid ID")
+        invalidItemID = true
+        return
+    end
+
+    -- PRECURSOR: does the item have an icon at all?
+    local _, _, _, _, icon = C_Item.GetItemInfoInstant(itemID)
+    if not icon then
+        itemIcon:SetImage(QUESTIONMARK_INV_ICON)
+        itemNameLabel:SetText("Invalid ID")
+        invalidItemID = true
+        return
+    end
+
+    -- Safe to proceed
     local item = Item:CreateFromItemID(itemID)
     item:ContinueOnItemLoad(function()
         local itemName = item:GetItemName()
         local itemIconTexture = item:GetItemIcon()
+
         if itemName and itemIconTexture then
             itemIcon:SetImage(itemIconTexture)
             itemNameLabel:SetText(itemName)
+            invalidItemID = false
         else
-            itemIcon:SetImage("Interface\\AddOns\\Looti\\Media\\green_up_arrow_icon.tga")
+            itemIcon:SetImage(QUESTIONMARK_INV_ICON)
             itemNameLabel:SetText("Invalid ID")
+            invalidItemID = true
         end
     end)
 end
@@ -136,7 +160,7 @@ local function CreateFilterEditor(listType)
 
     -- Use Label widget
     local itemNameLabel = AceGUI:Create("Label")
-    itemNameLabel:SetText("No Item Selected")
+    itemNameLabel:SetText("Select or Add an Item")
     itemNameLabel:SetFontObject(GameFontNormalLarge)
     itemNameLabel:SetRelativeWidth(0.7)
     selectedItemContainer:AddChild(itemNameLabel)
@@ -168,6 +192,10 @@ local function CreateFilterEditor(listType)
     addBtn:SetText("Add")
     addBtn:SetWidth(80)
     addBtn:SetCallback("OnClick", function()
+        if invalidItemID then
+            return
+        end
+
         local id = itemIDInput:GetText()
         if id and id ~= "" then
             if not LootiFilters[listType] then
@@ -184,6 +212,9 @@ local function CreateFilterEditor(listType)
     removeBtn:SetText("Remove")
     removeBtn:SetWidth(80)
     removeBtn:SetCallback("OnClick", function()
+        if invalidItemID then
+            return
+        end
         local id = itemIDInput:GetText()
         if id and id ~= "" and LootiFilters[listType] then
             LootiFilters[listType][tonumber(id)] = nil
