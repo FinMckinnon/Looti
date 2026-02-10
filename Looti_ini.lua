@@ -1,4 +1,6 @@
 AceGUI = LibStub("AceGUI-3.0")
+local ADDON_NAME, Looti = ...
+_G[ADDON_NAME] = Looti or {}
 
 LootiConfigDefault = {
     showLootNotifications = true,

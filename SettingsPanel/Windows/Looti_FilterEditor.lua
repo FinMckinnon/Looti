@@ -1,3 +1,5 @@
+local _, Looti = ...
+
 local frameWidth = 600
 local frameHeight = 675
 local minWidth, minHeight = frameWidth, frameHeight
@@ -226,6 +228,34 @@ local function CreateActionButtons(parent, listType, itemIDInput, scrollList, it
     buttonGroup:AddChild(removeBtn)
 end
 
+local function CreateCategoryToggles(parent, listType)
+    if not LootiFilters[listType].categories then
+        LootiFilters[listType].categories = {
+            BoE = false,
+            BoP = false,
+            QuestItems = false,
+            Consumables = false,
+            Gear = false,
+            CraftingMats = false,
+        }
+    end
+
+    for categoryKey, isEnabled in pairs(LootiFilters[listType].categories) do
+        local categoryCheckbox = AceGUI:Create("CheckBox")
+        categoryCheckbox:SetLabel(Looti.CATEGORY_LABELS[categoryKey])
+        categoryCheckbox:SetValue(isEnabled)
+
+        categoryCheckbox:SetRelativeWidth(0.5)
+        categoryCheckbox:SetHeight(24)
+
+        categoryCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+            LootiFilters[listType].categories[categoryKey] = value
+        end)
+
+        parent:AddChild(categoryCheckbox)
+    end
+end
+
 -- Main function
 local function CreateFilterEditor(listType)
     -- Prevent duplicate windows
@@ -256,6 +286,15 @@ local function CreateFilterEditor(listType)
     inputButtonContainer:SetLayout("Flow")
     inputButtonContainer:SetFullWidth(true)
     controlContainer:AddChild(inputButtonContainer)
+
+    -- Category checkbox container
+    local checkboxGroup = AceGUI:Create("InlineGroup")
+    checkboxGroup:SetLayout("Flow")
+    checkboxGroup:SetFullWidth(true)
+    controlContainer:AddChild(checkboxGroup)
+
+    -- Category toggles
+    CreateCategoryToggles(checkboxGroup, listType)
 
     -- Item input
     local itemIDInput = CreateItemInput(inputButtonContainer, function(widget, event, value)

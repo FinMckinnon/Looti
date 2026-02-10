@@ -9,6 +9,7 @@
 Libs/AceGUI-3.0/AceGUI-3.0.xml
 
 Looti_ini.lua
+Looti_Constants.lua
 utils.lua
 LootiNotificationsManager.lua
 LootiNotifications.lua
