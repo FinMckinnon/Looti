@@ -3,6 +3,7 @@ local frameHeight = 675
 local minWidth, minHeight = frameWidth, frameHeight
 local BlacklistWindowIsOpen = false
 local WhitelistWindowsIsOpen = false
+
 -- Set true for nil default text input
 local invalidItemID = true
 
@@ -56,7 +57,11 @@ local function UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, ite
         grid:SetFullWidth(true)
         scrollList:AddChild(grid)
 
-        for id in pairs(LootiFilters[listType]) do
+        if not LootiFilters[listType].items then
+            LootiFilters[listType].items = {}
+        end
+
+        for id in pairs(LootiFilters[listType].items) do
             local item = Item:CreateFromItemID(id)
             item:ContinueOnItemLoad(function()
                 local itemName = item:GetItemName()
@@ -103,7 +108,7 @@ end
 
 
 local function CreateFilterEditor(listType)
-    if listType == "blacklist" and listTypeBlacklistWindowIsOpen then
+    if listType == "blacklist" and BlacklistWindowIsOpen then
         return
     end
 
@@ -210,10 +215,7 @@ local function CreateFilterEditor(listType)
 
         local id = itemIDInput:GetText()
         if id and id ~= "" then
-            if not LootiFilters[listType] then
-                LootiFilters[listType] = {}
-            end
-            LootiFilters[listType][tonumber(id)] = true
+            LootiFilters[listType].items[tonumber(id)] = true
             itemIDInput:SetText("")
             UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, itemNameLabel)
         end
@@ -228,8 +230,8 @@ local function CreateFilterEditor(listType)
             return
         end
         local id = itemIDInput:GetText()
-        if id and id ~= "" and LootiFilters[listType] then
-            LootiFilters[listType][tonumber(id)] = nil
+        if id and id ~= "" then
+            LootiFilters[listType].items[tonumber(id)] = nil
             itemIDInput:SetText("")
             UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, itemNameLabel)
         end

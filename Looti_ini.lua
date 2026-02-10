@@ -26,30 +26,33 @@ LootiConfigDefault = {
 
 LootiFiltersDefault = {
     blacklist = {
-        [6196] = true,
-        [2589] = true,
-        [2592] = true,
-        [4306] = true,
-        [2320] = true,
-        [2321] = true,
-        [4338] = true,
-        [858] = true,
-        [929] = true,
-        [2447] = true,
-        [3383] = true,
-        [5498] = true,
-        [8150] = true,
-        [4603] = true,
-        [6889] = true,
-        [3928] = true,
-        [5571] = true,
-        [4234] = true,
-        [2449] = true,
+        items = {
+            [6196] = true,
+            [2589] = true,
+        },
+        categories = {
+            BoE = false,          -- getiteminfo (bindType == 1)
+            BoP = false,          -- getiteminfo (bindType == 2)
+            QuestItems = false,   -- getiteminfo (bindType == 4)
+            Consumables = false,  -- getiteminfo (classID == 0)
+            Gear = false,         -- getiteminfo (equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP")
+            CraftingMats = false, -- getiteminfo (classID == 7)
+        }
     },
     whitelist = {
-        [5571] = true,
-        [4234] = true,
-        [2449] = true,
+        items = {
+            [5571] = true,
+            [4234] = true,
+            [2449] = true,
+        },
+        categories = {
+            BoE = false,          -- getiteminfo (bindType == 1)
+            BoP = false,          -- getiteminfo (bindType == 2)
+            QuestItems = false,   -- getiteminfo (bindType == 4)
+            Consumables = false,  -- getiteminfo (classID == 0)
+            Gear = false,         -- getiteminfo (equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP")
+            CraftingMats = false, -- getiteminfo (classID == 7)
+        }
     }
 }
 
