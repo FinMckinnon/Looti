@@ -47,7 +47,7 @@ local function getNotificationData(notification)
     -- Create text if enabled
     if LootiConfig.showText then
         text = notification:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-        
+
         -- Determine the position of the text based on the icon display and text display settings
         if LootiConfig.textDisplay == "LEFT" and LootiConfig.iconDisplay == "LEFT" then
             textMarginX = initialMarginX
@@ -56,7 +56,7 @@ local function getNotificationData(notification)
         else
             textMarginX = 0
         end
-        
+
         text:SetPoint(LootiConfig.textDisplay, notification, LootiConfig.textDisplay, textMarginX, 0)
     end
 
@@ -95,7 +95,7 @@ local function TryProcessNotifications()
     if #activeNotifications < LootiConfig.maximumNotifications or LootiConfig.maximumNotifications == 0 then
         ProcessNotifications()
     else
-        C_Timer.After(0.05, TryProcessNotifications) 
+        C_Timer.After(0.05, TryProcessNotifications)
     end
 end
 
@@ -103,7 +103,7 @@ local function AddNotification(parent, itemData, currencyData)
     if #activeNotifications == 0 then
         Looti_ShowNotification(parent, itemData, currencyData)
     else
-        table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData})
+        table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData })
         if not ticker then
             ticker = C_Timer.NewTicker(LootiConfig.notificationDelay, TryProcessNotifications)
         end
@@ -116,7 +116,8 @@ function Looti_ShowNotification(parent, itemData, currencyData)
     if itemData and itemData.itemRarity < LootiConfig.notificationThreshold then return end
 
     local notification = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    notification:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH * LootiConfig.notificationScale, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT * LootiConfig.notificationScale)
+    notification:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH * LootiConfig.notificationScale,
+        LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT * LootiConfig.notificationScale)
 
     if LootiConfig.displayBackground then
         notification:SetBackdrop({ bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", tile = true, tileSize = 32 })
@@ -124,8 +125,8 @@ function Looti_ShowNotification(parent, itemData, currencyData)
     end
 
     local text, icon = getNotificationData(notification)
-    if not text and not icon then 
-        return 
+    if not text and not icon then
+        return
     end
 
     setNotificationData(itemData, currencyData, text, icon)
@@ -153,23 +154,20 @@ function UpdateNotificationPositions()
     for i, frame in ipairs(activeNotifications) do
         local yOffset = (i - 1) * (LootiNotificationSettings.SPACING * LootiConfig.notificationScale)
         frame:ClearAllPoints()
-        frame:SetPoint(LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", notificationFrame, LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", 0, LootiConfig.scrollDirection == "up" and -yOffset or yOffset)
+        frame:SetPoint(LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", notificationFrame,
+            LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", 0,
+            LootiConfig.scrollDirection == "up" and -yOffset or yOffset)
     end
 end
 
-
-
-local function handleLootMessage(frame, message)
-    if message:find("You loot") or message:find("You receive") then
-        local itemLink = message:match("|c%x+|Hitem:.-|h|r")
-        local itemQuantity = tonumber(message:match("x(%d+)")) or 1  
-        
-        if itemLink then
-            local itemName, _, itemRarity, _, _, _, _, _, _, itemIcon = GetItemInfo(itemLink)
-            if itemName and itemIcon and itemRarity then
-                if itemRarity >= LootiConfig.notificationThreshold then
-                    AddNotification(frame, { itemName = itemName, itemIcon = itemIcon, itemRarity = itemRarity, itemQuantity = itemQuantity }, nil )
-                end
+local function handleLootMessage(frame, itemLink, itemQuantity)
+    if itemLink then
+        local itemName, _, itemRarity, _, _, _, _, _, _, itemIcon = GetItemInfo(itemLink)
+        if itemName and itemIcon and itemRarity then
+            if itemRarity >= LootiConfig.notificationThreshold then
+                AddNotification(frame,
+                    { itemName = itemName, itemIcon = itemIcon, itemRarity = itemRarity, itemQuantity = itemQuantity },
+                    nil)
             end
         end
     end
@@ -180,9 +178,11 @@ local function handleMoneyMessage(frame, message)
     local silver = tonumber(message:match("(%d+) Silver") or 0) * 100
     local copper = tonumber(message:match("(%d+) Copper") or 0)
     local totalCopper = gold + silver + (copper or 0)
-    
+
     if totalCopper > 0 then
-        AddNotification(frame, nil, { totalCopper = totalCopper, text = GetCoinTextureString(totalCopper), icon = gold > 0 and currencyIcons.gold or silver > 0 and currencyIcons.silver or currencyIcons.copper }, nil)
+        AddNotification(frame, nil,
+            { totalCopper = totalCopper, text = GetCoinTextureString(totalCopper), icon = gold > 0 and currencyIcons
+            .gold or silver > 0 and currencyIcons.silver or currencyIcons.copper }, nil)
     end
 end
 
