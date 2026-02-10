@@ -1,3 +1,6 @@
+
+local LootiSettingsWindowIsOpen = false
+
 local columnWidth = 375
 local minWidth, minHeight = columnWidth, 675
 
@@ -75,8 +78,11 @@ local function CreateTabGroup(frame, tempSettingsData)
     tabGroup:SelectTab("general_settings")
 end
 
+
 -- Function to create a TabGroup
 local function CreateSettingsWindow(tempSettingsData)
+    LootiSettingsWindowIsOpen = true
+
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Looti Settings")
     frame:SetWidth(columnWidth + 35)
@@ -89,34 +95,43 @@ local function CreateSettingsWindow(tempSettingsData)
         rawFrame:SetMinResize(columnWidth + 35, minHeight)
     end
 
+    frame:SetCallback("OnClose", function(widget)
+        LootiSettingsWindowIsOpen = false
+    end)
+
     CreateHeaderButtonGroup(frame)
 
     CreateTabGroup(frame, tempSettingsData)
 
     createFooterButtonGroup(frame)
-
 end
 
 -- Function to open the Looti Settings window
 local function OpenLootiSettings()
-    tempSettingsData = {
-        showLootNotifications = LootiConfig.showLootNotifications,
-        showMoneyNotifications = LootiConfig.showMoneyNotifications,
-        notificationThreshold = LootiConfig.notificationThreshold,
-        scrollDirection = LootiConfig.scrollDirection,
-        displayBackground = LootiConfig.displayBackground,
-        displayDuration = LootiConfig.displayDuration,
-        notificationDelay = LootiConfig.notificationDelay,
-        maximumNotifications = LootiConfig.maximumNotifications,
-        showQuantity = LootiConfig.showQuantity,
-        showIcon = LootiConfig.showIcon,
-        textDisplay = LootiConfig.textDisplay,
-        iconDisplay = LootiConfig.iconDisplay,
-        notificationAlpha = LootiConfig.notificationAlpha,
-        notificationScale = LootiConfig.notificationScale,
-        backgroundAlpha = LootiConfig.backgroundAlpha
-    }
-    CreateSettingsWindow(tempSettingsData)
+    if LootiSettingsWindowIsOpen then 
+        return
+    else
+        tempSettingsData = {
+            showLootNotifications = LootiConfig.showLootNotifications,
+            showMoneyNotifications = LootiConfig.showMoneyNotifications,
+            notificationThreshold = LootiConfig.notificationThreshold,
+            scrollDirection = LootiConfig.scrollDirection,
+            displayBackground = LootiConfig.displayBackground,
+            displayDuration = LootiConfig.displayDuration,
+            notificationDelay = LootiConfig.notificationDelay,
+            maximumNotifications = LootiConfig.maximumNotifications,
+            showQuantity = LootiConfig.showQuantity,
+            showItemLevel = LootiConfig.showItemLevel,
+            showItemLevelUpgradeIcon = LootiConfig.showItemLevelUpgradeIcon,
+            showIcon = LootiConfig.showIcon,
+            textDisplay = LootiConfig.textDisplay,
+            iconDisplay = LootiConfig.iconDisplay,
+            notificationAlpha = LootiConfig.notificationAlpha,
+            notificationScale = LootiConfig.notificationScale,
+            backgroundAlpha = LootiConfig.backgroundAlpha
+        }
+        CreateSettingsWindow(tempSettingsData)
+    end
 end
 
 -- Register the slash command to open the settings window

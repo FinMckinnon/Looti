@@ -2,6 +2,8 @@
     [Checkbox] Enable Loot Notifications
     [Checkbox] Enable Money Notifications
     [Checkbox] Show Item Quantities (x2, x3, etc.)
+    [Checkbox] Show Item Level
+    [Checkbox] Show Item Level Upgrade Icon
     [Checkbox] Show Loot Icon
     
     [Slider] Notification Threshold (Rarity)
@@ -42,6 +44,26 @@ local function CreateGeneralNotificationToggles(container, tempSettingsData, col
         settingsPanel.HandleShowQuantityChange(value)
     end)
     notificationTogglesGroup:AddChild(showQuantityCheckbox)
+
+    -- Display Item Levels Checkbox
+    local showItemLevelCheckbox = AceGUI:Create("CheckBox")
+    showItemLevelCheckbox:SetLabel("Show Item Level")
+    showItemLevelCheckbox:SetValue(tempSettingsData.showItemLevel)  
+    showItemLevelCheckbox:SetWidth(250)
+    showItemLevelCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleShowItemLevelChange(value)
+    end)
+    notificationTogglesGroup:AddChild(showItemLevelCheckbox)
+
+    -- Display Item Level Upgrade IconCheckbox
+    local showItemLevelUpgradeIconCheckbox = AceGUI:Create("CheckBox")
+    showItemLevelUpgradeIconCheckbox:SetLabel("Show Item Level Upgrade Icon")
+    showItemLevelUpgradeIconCheckbox:SetValue(tempSettingsData.showItemLevelUpgradeIcon)  
+    showItemLevelUpgradeIconCheckbox:SetWidth(250)
+    showItemLevelUpgradeIconCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+        settingsPanel.HandleShowItemLevelChange(value)
+    end)
+    notificationTogglesGroup:AddChild(showItemLevelUpgradeIconCheckbox)
 
     -- Display Icons Checkbox
     local showIconCheckbox = AceGUI:Create("CheckBox")

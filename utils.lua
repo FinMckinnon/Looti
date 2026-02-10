@@ -23,6 +23,10 @@ local function LOOTI_CHAT_LOG(msg, event)
     PrintColoredMessage(msg, color)
 end
 
+local function LOOTI_DEBUG_MSG(msg)
+    LOOTI_CHAT_LOG(msg)
+end
+
 local function copyTable(dest, src)
     for key, value in pairs(src) do
         dest[key] = value
@@ -32,3 +36,4 @@ end
 _G["GetRarityColor"] = GetRarityColor
 _G["copyTable"] = copyTable
 _G["LOOTI_CHAT_LOG"] = LOOTI_CHAT_LOG
+_G["LOOTI_DEBUG_MSG"] = LOOTI_DEBUG_MSG
