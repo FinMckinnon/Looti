@@ -263,32 +263,55 @@ local function isItemBlacklisted(itemID)
     return LootiFilters.blacklist[itemID] == true
 end
 
-local function handleLootMessage(frame, itemLink, itemQuantity)
-    if itemLink then
-        local itemID = tonumber(itemLink:match("item:(%d+)"))
-        if isItemBlacklisted(itemID) then
-            return
-        end
+local function isItemWhitelisted(itemID)
+    if not LootiFilters.whitelist or not next(LootiFilters.whitelist) then
+        return false
+    end
+    return LootiFilters.whitelist[itemID] == true
+end
 
-        local itemName, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, itemIcon = GetItemInfo(itemLink)
-        if itemName and itemIcon and itemRarity then
-            if itemRarity >= LootiConfig.notificationThreshold then
-                AddNotification(frame,
-                    {
-                        itemName = itemName,
-                        itemIcon = itemIcon,
-                        itemRarity = itemRarity,
-                        itemQuantity = itemQuantity,
-                        itemLevel =
-                            itemLevel,
-                        itemEquipLoc = itemEquipLoc
-                    }, nil)
-            end
-        end
+local function ShouldShowNotification(itemRarity, isWhitelisted, isBlacklisted)
+    if isWhitelisted then
+        return true
+    end
+    if isBlacklisted then
+        return false
+    end
+    return itemRarity >= LootiConfig.notificationThreshold
+end
+
+local function HandleLootMessage(frame, itemLink, itemQuantity)
+    if not itemLink then
+        return
+    end
+
+    local itemID = tonumber(itemLink:match("item:(%d+)"))
+    if not itemID then
+        return
+    end
+
+    local itemName, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, itemIcon = GetItemInfo(itemLink)
+    if not itemRarity then
+        return
+    end
+
+    local isWhitelisted = isItemWhitelisted(itemID)
+    local isBlacklisted = isItemBlacklisted(itemID)
+
+    if ShouldShowNotification(itemRarity, isWhitelisted, isBlacklisted) then
+        AddNotification(frame, {
+            itemName = itemName,
+            itemIcon = itemIcon,
+            itemRarity = itemRarity,
+            itemQuantity = itemQuantity,
+            itemLevel = itemLevel,
+            itemEquipLoc = itemEquipLoc,
+            itemLink = itemLink
+        }, nil)
     end
 end
 
-local function handleMoneyMessage(frame, message)
+local function HandleMoneyMessage(frame, message)
     local gold = tonumber(message:match("(%d+) Gold") or 0) * 10000
     local silver = tonumber(message:match("(%d+) Silver") or 0) * 100
     local copper = tonumber(message:match("(%d+) Copper") or 0)
@@ -305,7 +328,7 @@ local function handleMoneyMessage(frame, message)
     end
 end
 
-_G["handleLootMessage"] = handleLootMessage
-_G["handleMoneyMessage"] = handleMoneyMessage
+_G["HandleLootMessage"] = HandleLootMessage
+_G["HandleMoneyMessage"] = HandleMoneyMessage
 _G["AddNotification"] = AddNotification
 _G["UpdateNotificationPositions"] = UpdateNotificationPositions

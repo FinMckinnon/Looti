@@ -2,25 +2,32 @@ local frameWidth = 600
 local frameHeight = 675
 local minWidth, minHeight = frameWidth, frameHeight
 local BlacklistWindowIsOpen = false
+local WhitelistWindowsIsOpen = false
 -- Set true for nil default text input
 local invalidItemID = true
 
 local function UpdateSelectedItemDisplay(itemID, itemIcon, itemNameLabel)
-    local QUESTIONMARK_INV_ICON = 134400
+    local function setSelectedItemInfo(iconImage, labelText, isInvalid)
+        itemIcon:SetImage(iconImage)
+        itemNameLabel:SetText(labelText)
+        invalidItemID = isInvalid or false
+    end
+
+    local function setInvalidItemInfo()
+        local QUESTIONMARK_INV_ICON = 134400
+        setSelectedItemInfo(QUESTIONMARK_INV_ICON, "Invalid ID", true)
+    end
+
     itemID = tonumber(itemID)
     if not itemID then
-        itemIcon:SetImage(QUESTIONMARK_INV_ICON)
-        itemNameLabel:SetText("Invalid ID")
-        invalidItemID = true
+        setInvalidItemInfo()
         return
     end
 
-    -- PRECURSOR: does the item have an icon at all?
+    -- Safety check for item info availability
     local _, _, _, _, icon = C_Item.GetItemInfoInstant(itemID)
     if not icon then
-        itemIcon:SetImage(QUESTIONMARK_INV_ICON)
-        itemNameLabel:SetText("Invalid ID")
-        invalidItemID = true
+        setInvalidItemInfo()
         return
     end
 
@@ -31,13 +38,9 @@ local function UpdateSelectedItemDisplay(itemID, itemIcon, itemNameLabel)
         local itemIconTexture = item:GetItemIcon()
 
         if itemName and itemIconTexture then
-            itemIcon:SetImage(itemIconTexture)
-            itemNameLabel:SetText(itemName)
-            invalidItemID = false
+            setSelectedItemInfo(itemIconTexture, itemName, false)
         else
-            itemIcon:SetImage(QUESTIONMARK_INV_ICON)
-            itemNameLabel:SetText("Invalid ID")
-            invalidItemID = true
+            setInvalidItemInfo()
         end
     end)
 end
@@ -100,23 +103,32 @@ end
 
 
 local function CreateFilterEditor(listType)
-    if BlacklistWindowIsOpen then
+    if listType == "blacklist" and listTypeBlacklistWindowIsOpen then
+        return
+    end
+
+    if listType == "whitelist" and WhitelistWindowsIsOpen then
         return
     end
 
     local frame = AceGUI:Create("Frame")
-    frame:SetTitle("Filter Editor")
     frame:SetWidth(minWidth)
     frame:SetHeight(minHeight)
     frame:SetLayout("Flow")
 
     if listType == "blacklist" then
         BlacklistWindowIsOpen = true
+        frame:SetTitle("Blacklist Editor")
+    elseif listType == "whitelist" then
+        WhitelistWindowsIsOpen = true
+        frame:SetTitle("Whitelist Editor")
     end
 
     frame:SetCallback("OnClose", function(widget)
         if listType == "blacklist" then
             BlacklistWindowIsOpen = false
+        elseif listType == "whitelist" then
+            WhitelistWindowsIsOpen = false
         end
     end)
 

@@ -9,7 +9,7 @@ function Looti_Test()
         { link = "|cffa335ee|Hitem:873::::::::80:::::|h[Staff of Jordan]|h|r",                   quantity = 5 }, -- Epic
         { link = "|cffff8000|Hitem:17182::::::::80:::::|h[Sulfuras, Hand of Ragnaros]|h|r",      quantity = 6 }, -- Legendary
         { link = "|cffe5cc80|Hitem:128910::::::::80::::1:750:|h[Strom'kar, the Warbreaker]|h|r", quantity = 7 }, -- Artifact
-        { link = "|cff00ccff|Hitem:48689::::::::80:::::|h[Stained Shadowcraft Tunic]|h|r",       quantity = 8 } -- Rare
+        { link = "|cff00ccff|Hitem:48689::::::::80:::::|h[Stained Shadowcraft Tunic]|h|r",       quantity = 8 }  -- Rare
     }
 
     -- Test money loot (with different amounts)
@@ -23,12 +23,12 @@ function Looti_Test()
 
     -- Simulate loot item notifications with delay
     for _, item in ipairs(lootItems) do
-        handleLootMessage(notificationFrame, item.link, item.quantity)
+        HandleLootMessage(notificationFrame, item.link, item.quantity)
     end
 
     -- Simulate money loot notifications with delay
     for _, message in ipairs(moneyMessages) do
-        handleMoneyMessage(notificationFrame, message)
+        HandleMoneyMessage(notificationFrame, message)
     end
 end
 

@@ -47,7 +47,9 @@ LootiFiltersDefault = {
         [2449] = true,
     },
     whitelist = {
-
+        [5571] = true,
+        [4234] = true,
+        [2449] = true,
     }
 }
 

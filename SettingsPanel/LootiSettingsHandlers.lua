@@ -66,8 +66,8 @@ local function HandleBackgroundAlphaChange(value)
     tempSettingsData.backgroundAlpha = value
 end
 
-local function HandleOpenBlacklistEditor(LootiFilters)
-    CreateFilterEditor("blacklist", LootiFilters.blacklist)
+local function HandleOpenFilterListEditor(listType)
+    CreateFilterEditor(listType)
 end
 
 
@@ -112,5 +112,5 @@ _G["settingsPanel"] = {
     HandleNotificationScaleChange = HandleNotificationScaleChange,
     HandleBackgroundAlphaChange = HandleBackgroundAlphaChange,
     HandleResetButtonClick = HandleResetButtonClick,
-    HandleOpenBlacklistEditor = HandleOpenBlacklistEditor
+    HandleOpenFilterListEditor = HandleOpenFilterListEditor
 }

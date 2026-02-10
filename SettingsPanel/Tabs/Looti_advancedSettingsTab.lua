@@ -28,7 +28,16 @@ local function CreateFilterManagementSection(parent, width, LootiFilters)
     button:SetText("Blacklist")
     button:SetWidth(width)
     button:SetCallback("OnClick", function()
-        settingsPanel.HandleOpenBlacklistEditor(LootiFilters)
+        settingsPanel.HandleOpenFilterListEditor("blacklist")
+    end)
+    filtersManagementSettingsGroup:AddChild(button)
+
+    -- Open Blacklist Button
+    local button = AceGUI:Create("Button")
+    button:SetText("Whitelist")
+    button:SetWidth(width)
+    button:SetCallback("OnClick", function()
+        settingsPanel.HandleOpenFilterListEditor("whitelist")
     end)
     filtersManagementSettingsGroup:AddChild(button)
 end
