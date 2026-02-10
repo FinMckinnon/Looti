@@ -1,10 +1,11 @@
 -- Create a draggable frame for moving loot notification area
 notificationFrame = CreateFrame("Frame", "notificationFrame", UIParent, "BackdropTemplate")
-notificationFrame:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT + 2)
+notificationFrame:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH,
+    LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT + 2)
 notificationFrame:SetClampedToScreen(true)
 notificationFrame:SetFrameStrata("BACKGROUND")
-notificationFrame:SetMovable(true)  
-notificationFrame:EnableMouse(true) 
+notificationFrame:SetMovable(true)
+notificationFrame:EnableMouse(true)
 notificationFrame:SetBackdropColor(0, 0, 0, 0)
 
 -- Set background for the move frame (optional)
@@ -31,7 +32,8 @@ end
 
 local function LoadFramePosition()
     if LootiConfig.notificationFrameX and LootiConfig.notificationFrameY then
-        notificationFrame:SetPoint("CENTER", UIParent, "CENTER", LootiConfig.notificationFrameX, LootiConfig.notificationFrameY)
+        notificationFrame:SetPoint("CENTER", UIParent, "CENTER", LootiConfig.notificationFrameX,
+            LootiConfig.notificationFrameY)
     else
         notificationFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     end
@@ -80,11 +82,44 @@ NotificationManager:AddListener(function(isVisible)
     end
 end)
 
+-- var for tracking loot slots when loot window is opened
+local lootSlots = {}
+
+local function handleLootOpened()
+    wipe(lootSlots)
+    local numSlots = GetNumLootItems()
+    for slot = 1, numSlots do
+        local link = GetLootSlotLink(slot)
+        if link then
+            local _, _, quantity = GetLootSlotInfo(slot)
+
+            lootSlots[slot] = {
+                link = link,
+                quantity = quantity or 1,
+            }
+        end
+    end
+end
+
+local function handleLootSlotCleared(slot)
+    local data = lootSlots[slot]
+    if data then
+        handleLootMessage(notificationFrame, data.link, data.quantity)
+        lootSlots[slot] = nil
+    end
+end
+
 -- Listener for loot/money events
 local frame = CreateFrame("Frame")
-frame:RegisterEvent("CHAT_MSG_LOOT")
+frame:RegisterEvent("LOOT_OPENED")
+frame:RegisterEvent("LOOT_SLOT_CLEARED")
 frame:RegisterEvent("CHAT_MSG_MONEY")
+frame:RegisterEvent("LOOT_ITEM_ROLL_WON")
 frame:RegisterEvent("ADDON_LOADED")
+
+-- Required
+-- Master Looter assigning an item.
+--      Currently no way to implement this with out checking chat event.
 
 frame:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" then
@@ -94,11 +129,18 @@ frame:SetScript("OnEvent", function(self, event, ...)
             EnsureLootiSettings()
             LoadFramePosition()
         end
-    elseif event == "CHAT_MSG_LOOT" then
-        local message = ...
-        handleLootMessage(notificationFrame, message)
     elseif event == "CHAT_MSG_MONEY" then
         local message = ...
         handleMoneyMessage(notificationFrame, message)
+    elseif event == "LOOT_OPENED" then
+        handleLootOpened()
+    elseif event == "LOOT_SLOT_CLEARED" then
+        local slot = ...
+        handleLootSlotCleared(slot)
+    elseif event == "LOOT_ITEM_ROLL_WON" then
+        local itemLink, rollQuantity, _, _, _ = ...
+        if itemLink then
+            handleLootMessage(notificationFrame, itemLink, rollQuantity or 1)
+        end
     end
 end)

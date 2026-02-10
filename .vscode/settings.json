@@ -26,10 +26,6 @@
         "SlashCmdList",
         "StaticPopupDialogs",
         "StaticPopup_Show",
-        "DEFAULT_CHAT_FRAME",
-        "LOOT"
-    ],
-    "Lua.diagnostics.disable": [
-        "assign-type-mismatch"
+        "DEFAULT_CHAT_FRAME"
     ]
 }

@@ -27,8 +27,8 @@ local function isEquippableUpgrade(equipSlot, itemLevel)
         INVTYPE_FEET = 8,
         INVTYPE_WRIST = 9,
         INVTYPE_HAND = 10,
-        INVTYPE_FINGER = {11, 12},  -- Two ring slots
-        INVTYPE_TRINKET = {13, 14}, -- Two trinket slots
+        INVTYPE_FINGER = { 11, 12 },  -- Two ring slots
+        INVTYPE_TRINKET = { 13, 14 }, -- Two trinket slots
         INVTYPE_CLOAK = 15,
         INVTYPE_WEAPON = 16,
         INVTYPE_SHIELD = 17,
@@ -41,13 +41,13 @@ local function isEquippableUpgrade(equipSlot, itemLevel)
         INVTYPE_RANGEDRIGHT = 16,
         INVTYPE_RELIC = 16,
     }
-    
+
     local slots = slotMap[equipSlot]
     if not slots then
         return false
     end
 
-    
+
     -- Handle slots that can have multiple positions (rings, trinkets)
     if type(slots) == "table" then
         for _, slotID in ipairs(slots) do
@@ -71,14 +71,14 @@ local function isEquippableUpgrade(equipSlot, itemLevel)
             -- Nothing equipped, so it's an upgrade
             return true
         end
-        
+
         local equippedItemLevel = C_Item.GetCurrentItemLevel(ItemLocation:CreateFromEquipmentSlot(slots))
         return itemLevel > equippedItemLevel
     end
 end
 
 
-local function setNotificationData(itemData, currencyData, text, icon, upgradeIcon) 
+local function setNotificationData(itemData, currencyData, text, icon, upgradeIcon)
     local contentText, contentIcon, r, g, b, isUpgrade
 
     if itemData then
@@ -111,68 +111,68 @@ local function setNotificationData(itemData, currencyData, text, icon, upgradeIc
     end
 end
 
-    local function getNotificationData(notification)
-        local text, icon, upgradeIcon
-        local iconMarginX, textMarginX, upgradeIconMarginX
-        local initialMarginX = LootiConfig.iconSize + (frameMargin * 2)
-        local iconMarginModifier = 0
+local function getNotificationData(notification)
+    local text, icon, upgradeIcon
+    local iconMarginX, textMarginX, upgradeIconMarginX
+    local initialMarginX = LootiConfig.iconSize + (frameMargin * 2)
+    local iconMarginModifier = 0
 
-        -- Calculate icon margin modifier
-        if LootiConfig.iconDisplay == "LEFT" then
-            iconMarginModifier = -1
-        elseif LootiConfig.iconDisplay == "RIGHT" then
-            iconMarginModifier = 1
-        end
-
-        -- Create text if enabled
-        if LootiConfig.showText then
-            text = notification:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-            
-            -- Determine the position of the text based on the icon display and text display settings
-            if LootiConfig.textDisplay == "LEFT" and LootiConfig.iconDisplay == "LEFT" then
-                textMarginX = initialMarginX
-            elseif LootiConfig.textDisplay == "RIGHT" and LootiConfig.iconDisplay == "RIGHT" then
-                textMarginX = -initialMarginX
-            else
-                textMarginX = 0
-            end
-            
-            text:SetPoint(LootiConfig.textDisplay, notification, LootiConfig.textDisplay, textMarginX, 0)
-        end
-
-        -- Create icon if enabled
-        if LootiConfig.showIcon then
-            icon = notification:CreateTexture(nil, "ARTWORK")
-            icon:SetSize(LootiConfig.iconSize, LootiConfig.iconSize)
-
-            -- If text exists, adjust icon positioning relative to the text
-            if text then
-                iconMarginX = (LootiConfig.iconSize + frameMargin) * iconMarginModifier
-                icon:SetPoint(LootiConfig.iconDisplay, text, LootiConfig.iconDisplay, iconMarginX, 0)
-            else
-                -- If no text, position the icon in its own place
-                icon:SetPoint(LootiConfig.iconDisplay, notification, LootiConfig.iconDisplay, iconMarginX, 0)
-            end
-        end
-
-        -- Create upgrade if enabled
-        if LootiConfig.showItemLevelUpgradeIcon then
-            upgradeIcon = notification:CreateTexture(nil, "ARTWORK")
-            upgradeIcon:SetSize(LootiConfig.iconSize/2, LootiConfig.iconSize/2)
-
-            -- Always position upgrade icon to the right  of the text
-            if text then
-                upgradeIconMarginX = frameMargin
-                upgradeIcon:SetPoint("LEFT", text, "RIGHT", upgradeIconMarginX, 0)
-            else
-                -- If no text, position the icon on the right edge of the frame
-                upgradeIcon:SetPoint("RIGHT", notification, "RIGHT", -frameMargin, 0)
-            end
-        end
-
-
-        return text, icon, upgradeIcon
+    -- Calculate icon margin modifier
+    if LootiConfig.iconDisplay == "LEFT" then
+        iconMarginModifier = -1
+    elseif LootiConfig.iconDisplay == "RIGHT" then
+        iconMarginModifier = 1
     end
+
+    -- Create text if enabled
+    if LootiConfig.showText then
+        text = notification:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+
+        -- Determine the position of the text based on the icon display and text display settings
+        if LootiConfig.textDisplay == "LEFT" and LootiConfig.iconDisplay == "LEFT" then
+            textMarginX = initialMarginX
+        elseif LootiConfig.textDisplay == "RIGHT" and LootiConfig.iconDisplay == "RIGHT" then
+            textMarginX = -initialMarginX
+        else
+            textMarginX = 0
+        end
+
+        text:SetPoint(LootiConfig.textDisplay, notification, LootiConfig.textDisplay, textMarginX, 0)
+    end
+
+    -- Create icon if enabled
+    if LootiConfig.showIcon then
+        icon = notification:CreateTexture(nil, "ARTWORK")
+        icon:SetSize(LootiConfig.iconSize, LootiConfig.iconSize)
+
+        -- If text exists, adjust icon positioning relative to the text
+        if text then
+            iconMarginX = (LootiConfig.iconSize + frameMargin) * iconMarginModifier
+            icon:SetPoint(LootiConfig.iconDisplay, text, LootiConfig.iconDisplay, iconMarginX, 0)
+        else
+            -- If no text, position the icon in its own place
+            icon:SetPoint(LootiConfig.iconDisplay, notification, LootiConfig.iconDisplay, iconMarginX, 0)
+        end
+    end
+
+    -- Create upgrade if enabled
+    if LootiConfig.showItemLevelUpgradeIcon then
+        upgradeIcon = notification:CreateTexture(nil, "ARTWORK")
+        upgradeIcon:SetSize(LootiConfig.iconSize / 2, LootiConfig.iconSize / 2)
+
+        -- Always position upgrade icon to the right  of the text
+        if text then
+            upgradeIconMarginX = frameMargin
+            upgradeIcon:SetPoint("LEFT", text, "RIGHT", upgradeIconMarginX, 0)
+        else
+            -- If no text, position the icon on the right edge of the frame
+            upgradeIcon:SetPoint("RIGHT", notification, "RIGHT", -frameMargin, 0)
+        end
+    end
+
+
+    return text, icon, upgradeIcon
+end
 
 local function ProcessNotifications()
     if #notificationStack == 0 then
@@ -191,7 +191,7 @@ local function TryProcessNotifications()
     if #activeNotifications < LootiConfig.maximumNotifications or LootiConfig.maximumNotifications == 0 then
         ProcessNotifications()
     else
-        C_Timer.After(0.05, TryProcessNotifications) 
+        C_Timer.After(0.05, TryProcessNotifications)
     end
 end
 
@@ -199,7 +199,7 @@ local function AddNotification(parent, itemData, currencyData)
     if #activeNotifications == 0 then
         Looti_ShowNotification(parent, itemData, currencyData)
     else
-        table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData})
+        table.insert(notificationStack, { parent = parent, itemData = itemData, currencyData = currencyData })
         if not ticker then
             ticker = C_Timer.NewTicker(LootiConfig.notificationDelay, TryProcessNotifications)
         end
@@ -212,7 +212,8 @@ function Looti_ShowNotification(parent, itemData, currencyData)
     if itemData and itemData.itemRarity < LootiConfig.notificationThreshold then return end
 
     local notification = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    notification:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH * LootiConfig.notificationScale, LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT * LootiConfig.notificationScale)
+    notification:SetSize(LootiNotificationSettings.NOTIFICATION_FRAME_WIDTH * LootiConfig.notificationScale,
+        LootiNotificationSettings.NOTIFICATION_FRAME_HEIGHT * LootiConfig.notificationScale)
 
     if LootiConfig.displayBackground then
         notification:SetBackdrop({ bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", tile = true, tileSize = 32 })
@@ -220,8 +221,8 @@ function Looti_ShowNotification(parent, itemData, currencyData)
     end
 
     local text, icon, upgradeIcon = getNotificationData(notification)
-    if not text and not icon and not upgradeIcon then 
-        return 
+    if not text and not icon and not upgradeIcon then
+        return
     end
 
     setNotificationData(itemData, currencyData, text, icon, upgradeIcon)
@@ -249,7 +250,9 @@ function UpdateNotificationPositions()
     for i, frame in ipairs(activeNotifications) do
         local yOffset = (i - 1) * (LootiNotificationSettings.SPACING * LootiConfig.notificationScale)
         frame:ClearAllPoints()
-        frame:SetPoint(LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", notificationFrame, LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", 0, LootiConfig.scrollDirection == "up" and -yOffset or yOffset)
+        frame:SetPoint(LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", notificationFrame,
+            LootiConfig.scrollDirection == "up" and "BOTTOM" or "TOP", 0,
+            LootiConfig.scrollDirection == "up" and -yOffset or yOffset)
     end
 end
 
@@ -260,22 +263,26 @@ local function isItemBlacklisted(itemID)
     return LootiFilters.blacklist[itemID] == true
 end
 
-local function handleLootMessage(frame, message)
-    if message:find("You loot") or message:find("You receive") then
-
-        local itemID = tonumber(message:match("item:(%d+)"))
+local function handleLootMessage(frame, itemLink, itemQuantity)
+    if itemLink then
+        local itemID = tonumber(itemLink:match("item:(%d+)"))
         if isItemBlacklisted(itemID) then
             return
         end
 
-        local itemQuantity = tonumber(message:match("x(%d+)")) or 1  
-        
-        if itemID then
-            local itemName, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, itemIcon = GetItemInfo(itemID)
-            if itemName and itemIcon and itemRarity then
-                if itemRarity >= LootiConfig.notificationThreshold then
-                    AddNotification(frame, { itemName = itemName, itemIcon = itemIcon, itemRarity = itemRarity, itemQuantity = itemQuantity, itemLevel = itemLevel, itemEquipLoc = itemEquipLoc }, nil )
-                end
+        local itemName, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, itemIcon = GetItemInfo(itemLink)
+        if itemName and itemIcon and itemRarity then
+            if itemRarity >= LootiConfig.notificationThreshold then
+                AddNotification(frame,
+                    {
+                        itemName = itemName,
+                        itemIcon = itemIcon,
+                        itemRarity = itemRarity,
+                        itemQuantity = itemQuantity,
+                        itemLevel =
+                            itemLevel,
+                        itemEquipLoc = itemEquipLoc
+                    }, nil)
             end
         end
     end
@@ -286,9 +293,15 @@ local function handleMoneyMessage(frame, message)
     local silver = tonumber(message:match("(%d+) Silver") or 0) * 100
     local copper = tonumber(message:match("(%d+) Copper") or 0)
     local totalCopper = gold + silver + (copper or 0)
-    
+
     if totalCopper > 0 then
-        AddNotification(frame, nil, { totalCopper = totalCopper, text = GetCoinTextureString(totalCopper), icon = gold > 0 and currencyIcons.gold or silver > 0 and currencyIcons.silver or currencyIcons.copper }, nil)
+        AddNotification(frame, nil,
+            {
+                totalCopper = totalCopper,
+                text = GetCoinTextureString(totalCopper),
+                icon = gold > 0 and currencyIcons
+                    .gold or silver > 0 and currencyIcons.silver or currencyIcons.copper
+            }, nil)
     end
 end
 
