@@ -1,8 +1,6 @@
 local frameWidth = 600
 local frameHeight = 675
 local minWidth, minHeight = frameWidth, frameHeight
-local BlacklistWindowIsOpen = false
-local WhitelistWindowsIsOpen = false
 
 -- Set true for nil default text input
 local invalidItemID = true
@@ -82,7 +80,6 @@ local function UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, ite
                     dispIcon.frame:EnableMouse(false)
                     cell:AddChild(dispIcon)
 
-                    -- Name (narrower so it sits inline with the icon)
                     local nameLabel = AceGUI:Create("Label")
                     nameLabel:SetText(itemName)
                     nameLabel:SetRelativeWidth(0.7)
@@ -107,43 +104,47 @@ local function UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, ite
 end
 
 
-local function CreateFilterEditor(listType)
-    if listType == "blacklist" and BlacklistWindowIsOpen then
-        return
-    end
+-- Configuration
+local WINDOW_CONFIG = {
+    blacklist = {
+        title = "Blacklist Editor",
+        isOpenFlag = "BlacklistWindowIsOpen"
+    },
+    whitelist = {
+        title = "Whitelist Editor",
+        isOpenFlag = "WhitelistWindowsIsOpen"
+    }
+}
 
-    if listType == "whitelist" and WhitelistWindowsIsOpen then
-        return
-    end
+-- State management
+local function isWindowOpen(listType)
+    local flagName = WINDOW_CONFIG[listType].isOpenFlag
+    return _G[flagName]
+end
 
+local function setWindowOpen(listType, isOpen)
+    local flagName = WINDOW_CONFIG[listType].isOpenFlag
+    _G[flagName] = isOpen
+end
+
+-- UI Component Creators
+local function CreateFrameBase(listType)
     local frame = AceGUI:Create("Frame")
     frame:SetWidth(minWidth)
     frame:SetHeight(minHeight)
     frame:SetLayout("Flow")
+    frame:SetTitle(WINDOW_CONFIG[listType].title)
 
-    if listType == "blacklist" then
-        BlacklistWindowIsOpen = true
-        frame:SetTitle("Blacklist Editor")
-    elseif listType == "whitelist" then
-        WhitelistWindowsIsOpen = true
-        frame:SetTitle("Whitelist Editor")
-    end
-
-    frame:SetCallback("OnClose", function(widget)
-        if listType == "blacklist" then
-            BlacklistWindowIsOpen = false
-        elseif listType == "whitelist" then
-            WhitelistWindowsIsOpen = false
-        end
+    -- Handle window state change on close
+    frame:SetCallback("OnClose", function()
+        setWindowOpen(listType, false)
     end)
 
+    -- Backdrop setup
     local bg = frame.frame
-
-    -- Required in Classic / Wrath
     if not bg.SetBackdrop then
         Mixin(bg, BackdropTemplateMixin)
     end
-
     bg:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -151,99 +152,129 @@ local function CreateFilterEditor(listType)
         edgeSize = 1,
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
-
-    bg:SetBackdropColor(0.08, 0.08, 0.08, 0.95) -- dark background
+    bg:SetBackdropColor(0.08, 0.08, 0.08, 0.95)
     bg:SetBackdropBorderColor(0, 0, 0, 1)
 
-    -- Declare scrollList early to avoid nil reference in button callbacks
-    local scrollList
+    return frame
+end
 
-    -- Controls container (input + buttons)
-    local controlContainer = AceGUI:Create("InlineGroup")
-    controlContainer:SetLayout("List")
-    controlContainer:SetFullWidth(true)
-    frame:AddChild(controlContainer)
+local function CreateSelectedItemDisplay(parent)
+    local container = AceGUI:Create("SimpleGroup")
+    container:SetLayout("Flow")
+    container:SetFullWidth(true)
+    parent:AddChild(container)
 
-    local selectedItemContainer = AceGUI:Create("SimpleGroup")
-    selectedItemContainer:SetLayout("Flow")
-    selectedItemContainer:SetFullWidth(true)
-    controlContainer:AddChild(selectedItemContainer)
+    local icon = AceGUI:Create("Icon")
+    icon:SetImageSize(32, 32)
+    icon:SetWidth(70)
+    container:AddChild(icon)
 
-    -- Use Icon widget
-    local itemIcon = AceGUI:Create("Icon")
-    itemIcon:SetImageSize(32, 32)
-    itemIcon:SetWidth(70)
-    selectedItemContainer:AddChild(itemIcon)
+    local nameLabel = AceGUI:Create("Label")
+    nameLabel:SetText("Select or Add an Item")
+    nameLabel:SetFontObject(GameFontNormalLarge)
+    nameLabel:SetRelativeWidth(0.7)
+    container:AddChild(nameLabel)
 
-    -- Use Label widget
-    local itemNameLabel = AceGUI:Create("Label")
-    itemNameLabel:SetText("Select or Add an Item")
-    itemNameLabel:SetFontObject(GameFontNormalLarge)
-    itemNameLabel:SetRelativeWidth(0.7)
-    selectedItemContainer:AddChild(itemNameLabel)
+    return icon, nameLabel
+end
 
-    -- Input and Buttons Container
-    local inputButtonContainer = AceGUI:Create("SimpleGroup")
-    inputButtonContainer:SetLayout("Flow")
-    inputButtonContainer:SetFullWidth(true)
-    controlContainer:AddChild(inputButtonContainer)
+local function CreateItemInput(parent, onEnterCallback)
+    local input = AceGUI:Create("EditBox")
+    input:SetLabel("Item ID")
+    input:SetWidth(200)
+    input:SetCallback("OnEnterPressed", onEnterCallback)
+    parent:AddChild(input)
+    return input
+end
 
-    -- Item ID Input
-    local itemIDInput = AceGUI:Create("EditBox")
-    itemIDInput:SetLabel("Item ID")
-    itemIDInput:SetWidth(200)
-    itemIDInput:SetCallback("OnEnterPressed", function(widget, event, value)
-        if value and value ~= "" then
-            UpdateSelectedItemDisplay(tonumber(value), itemIcon, itemNameLabel)
-        end
-    end)
-    inputButtonContainer:AddChild(itemIDInput)
-
-    -- Buttons Container
+local function CreateActionButtons(parent, listType, itemIDInput, scrollList, itemIcon, itemNameLabel)
     local buttonGroup = AceGUI:Create("SimpleGroup")
     buttonGroup:SetLayout("Flow")
     buttonGroup:SetHeight(40)
-    inputButtonContainer:AddChild(buttonGroup)
+    parent:AddChild(buttonGroup)
 
+    -- Add Button
     local addBtn = AceGUI:Create("Button")
     addBtn:SetText("Add")
     addBtn:SetWidth(80)
     addBtn:SetCallback("OnClick", function()
-        if invalidItemID then
-            return
-        end
+        if invalidItemID then return end
 
-        local id = itemIDInput:GetText()
-        if id and id ~= "" then
-            LootiFilters[listType].items[tonumber(id)] = true
+        local id = tonumber(itemIDInput:GetText())
+        if id then
+            LootiFilters[listType].items[id] = true
             itemIDInput:SetText("")
             UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, itemNameLabel)
         end
     end)
     buttonGroup:AddChild(addBtn)
 
+    -- Remove Button
     local removeBtn = AceGUI:Create("Button")
     removeBtn:SetText("Remove")
     removeBtn:SetWidth(80)
     removeBtn:SetCallback("OnClick", function()
-        if invalidItemID then
-            return
-        end
-        local id = itemIDInput:GetText()
-        if id and id ~= "" then
-            LootiFilters[listType].items[tonumber(id)] = nil
+        if invalidItemID then return end
+
+        local id = tonumber(itemIDInput:GetText())
+        if id then
+            LootiFilters[listType].items[id] = nil
             itemIDInput:SetText("")
             UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, itemNameLabel)
         end
     end)
     buttonGroup:AddChild(removeBtn)
+end
 
-    -- Scrollable List (fill remaining height)
-    scrollList = AceGUI:Create("ScrollFrame")
+-- Main function
+local function CreateFilterEditor(listType)
+    -- Prevent duplicate windows
+    if isWindowOpen(listType) then
+        return
+    end
+    setWindowOpen(listType, true)
+
+    -- Create main frame
+    local frame = CreateFrameBase(listType)
+
+    -- Controls container
+    local controlContainer = AceGUI:Create("InlineGroup")
+    controlContainer:SetLayout("List")
+    controlContainer:SetFullWidth(true)
+    frame:AddChild(controlContainer)
+
+    -- Selected item display
+    local selectedItemContainer = AceGUI:Create("SimpleGroup")
+    selectedItemContainer:SetLayout("Flow")
+    selectedItemContainer:SetFullWidth(true)
+    controlContainer:AddChild(selectedItemContainer)
+
+    local itemIcon, itemNameLabel = CreateSelectedItemDisplay(selectedItemContainer)
+
+    -- Input and buttons container
+    local inputButtonContainer = AceGUI:Create("SimpleGroup")
+    inputButtonContainer:SetLayout("Flow")
+    inputButtonContainer:SetFullWidth(true)
+    controlContainer:AddChild(inputButtonContainer)
+
+    -- Item input
+    local itemIDInput = CreateItemInput(inputButtonContainer, function(widget, event, value)
+        local id = tonumber(value)
+        if id then
+            UpdateSelectedItemDisplay(id, itemIcon, itemNameLabel)
+        end
+    end)
+
+    -- Scrollable list
+    local scrollList = AceGUI:Create("ScrollFrame")
     scrollList:SetFullWidth(true)
     scrollList:SetFullHeight(true)
     frame:AddChild(scrollList)
 
+    -- Action buttons (needs scrollList reference, so created after)
+    CreateActionButtons(inputButtonContainer, listType, itemIDInput, scrollList, itemIcon, itemNameLabel)
+
+    -- Populate list
     UpdateFilterList(scrollList, itemIDInput, listType, itemIcon, itemNameLabel)
 
     return frame
