@@ -1,9 +1,6 @@
 {
     "Lua.diagnostics.globals": [
         "UIParent",
-        "SlashCmdList",
-        "UIFrameFadeIn",
-        "UIFrameFadeOut",
         "CLOSE",
         "GameFontHighlightSmall",
         "GameFontDisableSmall",
@@ -12,6 +9,8 @@
         "FONT_COLOR_CODE_CLOSE",
         "GameFontNormal",
         "SetDesaturation",
+        "UIFrameFadeIn",
+        "UIFrameFadeOut",
         "WOW_PROJECT_ID",
         "WOW_PROJECT_MAINLINE",
         "ColorPickerFrame",
@@ -19,6 +18,7 @@
         "OKAY",
         "NOT_BOUND",
         "ACCEPT",
+        "SlashCmdList",
         "StaticPopupDialogs",
         "StaticPopup_Show",
         "DEFAULT_CHAT_FRAME"
