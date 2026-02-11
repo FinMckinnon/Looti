@@ -64,12 +64,12 @@ To install Looti, download **Looti.zip** then place it into your Addons folder f
 <span style="font-size: 14px;"><strong>Whitelist & Blacklist Support</strong> – Create custom filters using item IDs or categories to control exactly what you see.</span>
 <span style="font-size: 14px;"><strong>Category-Based Filtering</strong> – Automatically sort notifications by item type:</span>
 
-<span style="font-size: 13px;">Quest Items & Keys</span>
-<span style="font-size: 13px;">Consumables (Potions, Food, Bandages)</span>
-<span style="font-size: 13px;">Gear & Equipment</span>
-<span style="font-size: 13px;">Crafting Materials (Trade Goods, Gems, Recipes, Glyphs)</span>
-<span style="font-size: 13px;">Miscellaneous (Mounts, Toys, Pet Items)</span>
-<span style="font-size: 13px;">Bind on Equip (BoE) & Bind on Pickup (BoP)</span>
+* <span style="font-size: 13px;">Quest Items & Keys</span>
+* <span style="font-size: 13px;">Consumables (Potions, Food, Bandages)</span>
+* <span style="font-size: 13px;">Gear & Equipment</span>
+* <span style="font-size: 13px;">Crafting Materials (Trade Goods, Gems, Recipes, Glyphs)</span>
+* <span style="font-size: 13px;">Miscellaneous (Mounts, Toys, Pet Items)</span>
+* <span style="font-size: 13px;">Bind on Equip (BoE) & Bind on Pickup (BoP)</span>
 
 <span style="font-size: 14px;"><strong>Flexible Control</strong> – Show only what matters to you, whether it's valuable BoEs, quest progress, or crafting supplies.</span>
 
