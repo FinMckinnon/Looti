@@ -29,31 +29,28 @@ LootiConfigDefault = {
 LootiFiltersDefault = {
     blacklist = {
         items = {
-            [6196] = true,
-            [2589] = true,
         },
         categories = {
-            BoE = false,          -- getiteminfo (bindType == 1)
-            BoP = false,          -- getiteminfo (bindType == 2)
-            QuestItems = false,   -- getiteminfo (bindType == 4)
-            Consumables = false,  -- getiteminfo (classID == 0)
-            Gear = false,         -- getiteminfo (equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP")
-            CraftingMats = false, -- getiteminfo (classID == 7)
+            BoE = false,
+            BoP = false,
+            QuestItems = false,
+            Consumables = false,
+            Gear = false,
+            CraftingMats = false,
+            Miscellaneous = false
         }
     },
     whitelist = {
         items = {
-            [5571] = true,
-            [4234] = true,
-            [2449] = true,
         },
         categories = {
-            BoE = false,          -- getiteminfo (bindType == 1)
-            BoP = false,          -- getiteminfo (bindType == 2)
-            QuestItems = false,   -- getiteminfo (bindType == 4)
-            Consumables = false,  -- getiteminfo (classID == 0)
-            Gear = false,         -- getiteminfo (equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP")
-            CraftingMats = false, -- getiteminfo (classID == 7)
+            BoE = false,
+            BoP = false,
+            QuestItems = false,
+            Consumables = false,
+            Gear = false,
+            CraftingMats = false,
+            Miscellaneous = false
         }
     }
 }
@@ -83,17 +80,25 @@ rarityData = {
     [5] = { name = "Legendary", color = { GetItemQualityColor(5) } },
 }
 
-local function EnsureDefaults(targetTable, defaultTable)
-    if not targetTable then
-        targetTable = {}
+local function EnsureDefaults(target, defaults)
+    if target == nil then
+        target = {}
     end
 
-    for key, value in pairs(defaultTable) do
-        if targetTable[key] == nil then
-            targetTable[key] = value
+    for key, defaultValue in pairs(defaults) do
+        local targetValue = target[key]
+
+        if type(defaultValue) == "table" then
+            if type(targetValue) ~= "table" then
+                target[key] = {}
+            end
+            EnsureDefaults(target[key], defaultValue)
+        elseif targetValue == nil then
+            target[key] = defaultValue
         end
     end
-    return targetTable
+
+    return target
 end
 
 local function EnsureLootiSettings()

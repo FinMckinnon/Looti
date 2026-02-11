@@ -1,3 +1,12 @@
+--[[
+    [Icon View + Label] Display currently seelcted item info
+    [Text Input] Currently seleccted Item ID / Input ItemID
+    [Button Contaier] Add / Remove buttons for the selected item
+    [Category Checkbox Container] Add / Remove categories from a filter
+
+    [Grid View] Current items in the filter (clickable to select)
+]] --
+
 local _, Looti = ...
 
 local frameWidth = 600
@@ -229,17 +238,6 @@ local function CreateActionButtons(parent, listType, itemIDInput, scrollList, it
 end
 
 local function CreateCategoryToggles(parent, listType)
-    if not LootiFilters[listType].categories then
-        LootiFilters[listType].categories = {
-            BoE = false,
-            BoP = false,
-            QuestItems = false,
-            Consumables = false,
-            Gear = false,
-            CraftingMats = false,
-        }
-    end
-
     for categoryKey, isEnabled in pairs(LootiFilters[listType].categories) do
         local categoryCheckbox = AceGUI:Create("CheckBox")
         categoryCheckbox:SetLabel(Looti.CATEGORY_LABELS[categoryKey])

@@ -15,6 +15,7 @@ local function isEquippableUpgrade(equipSlot, itemLevel)
     end
 
     -- Map equipment slots to inventory slot IDs
+    -- ToDo: Move this to a constants file
     local slotMap = {
         INVTYPE_HEAD = 1,
         INVTYPE_NECK = 2,
@@ -256,18 +257,52 @@ function UpdateNotificationPositions()
     end
 end
 
-local function isItemBlacklisted(itemID)
-    if not LootiFilters.blacklist or not next(LootiFilters.blacklist) then
-        return false
-    end
-    return LootiFilters.blacklist[itemID] == true
+local function isItemInCategory(categories, classID, bindType, itemEquipLoc)
+    --[[
+        classID mapping:
+        0  = Consumables (food, potions, elixirs, flasks, bandages, etc.)
+        3  = Gems
+        7  = Trade Goods (crafting materials)
+        9  = Recipes
+        13 = Keys (dungeon/quest keys)
+        15 = Miscellaneous (mounts, toys, reagent bags, etc.)
+        16 = Glyphs
+        18 = WoW Token
+        19 = Profession (profession tools and equipment)
+
+        bindType mapping:
+        0 = No binding
+        1 = Bind on Equip (BoE)
+        2 = Bind on Pickup (BoP)
+        4 = Quest Item
+
+        itemEquipLoc: Equipment slot identifier (e.g., INVTYPE_HEAD, INVTYPE_WEAPON)
+        Non-equippable items use INVTYPE_NON_EQUIP or INVTYPE_NON_EQUIP_IGNORE
+    ]]
+
+    return (categories.QuestItems and (bindType == 4 or classID == 13))
+        or (categories.Consumables and classID == 0)
+        or (categories.Gear and itemEquipLoc and itemEquipLoc ~= "" and not itemEquipLoc:match("^INVTYPE_NON_EQUIP"))
+        or (categories.CraftingMats and (classID == 7 or classID == 3 or classID == 9 or classID == 16 or classID == 19))
+        or (categories.Miscellaneous and (classID == 15 or classID == 18))
+        or (categories.BoE and bindType == 1)
+        or (categories.BoP and bindType == 2)
+        or false
 end
 
-local function isItemWhitelisted(itemID)
-    if not LootiFilters.whitelist or not next(LootiFilters.whitelist) then
+local function isItemInList(listType, itemID, classID, bindType, itemEquipLoc)
+    local list = LootiFilters[listType]
+    if not list or not next(list.items) then
         return false
     end
-    return LootiFilters.whitelist[itemID] == true
+
+    -- Direct item match
+    if list.items[itemID] then
+        return true
+    end
+
+    -- Category match
+    return isItemInCategory(list.categories, classID, bindType, itemEquipLoc)
 end
 
 local function ShouldShowNotification(itemRarity, isWhitelisted, isBlacklisted)
@@ -290,13 +325,14 @@ local function HandleLootMessage(frame, itemLink, itemQuantity)
         return
     end
 
-    local itemName, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, itemIcon = GetItemInfo(itemLink)
+    local itemName, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, itemIcon, _, classID, _, bindType = GetItemInfo(
+        itemLink)
     if not itemRarity then
         return
     end
 
-    local isWhitelisted = isItemWhitelisted(itemID)
-    local isBlacklisted = isItemBlacklisted(itemID)
+    local isWhitelisted = isItemInList("whitelist", itemID, classID, bindType, itemEquipLoc)
+    local isBlacklisted = isItemInList("blacklist", itemID, classID, bindType, itemEquipLoc)
 
     if ShouldShowNotification(itemRarity, isWhitelisted, isBlacklisted) then
         AddNotification(frame, {
