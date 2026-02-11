@@ -33,7 +33,17 @@ local function copyTable(dest, src)
     end
 end
 
+local function addToBlacklist(itemID)
+    LootiFilters.blacklist[itemID] = true
+end
+
+local function removeFromBlacklist(itemID)
+    LootiFilters.blacklist[itemID] = nil
+end
+
 _G["GetRarityColor"] = GetRarityColor
 _G["copyTable"] = copyTable
 _G["LOOTI_CHAT_LOG"] = LOOTI_CHAT_LOG
 _G["LOOTI_DEBUG_MSG"] = LOOTI_DEBUG_MSG
+_G["addToBlacklist"] = addToBlacklist
+_G["removeFromBlacklist"] = removeFromBlacklist

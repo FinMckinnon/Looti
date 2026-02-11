@@ -104,7 +104,7 @@ end
 local function handleLootSlotCleared(slot)
     local data = lootSlots[slot]
     if data then
-        handleLootMessage(notificationFrame, data.link, data.quantity)
+        HandleLootMessage(notificationFrame, data.link, data.quantity)
         lootSlots[slot] = nil
     end
 end
@@ -131,7 +131,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
         end
     elseif event == "CHAT_MSG_MONEY" then
         local message = ...
-        handleMoneyMessage(notificationFrame, message)
+        HandleMoneyMessage(notificationFrame, message)
     elseif event == "LOOT_OPENED" then
         handleLootOpened()
     elseif event == "LOOT_SLOT_CLEARED" then
@@ -140,7 +140,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
     elseif event == "LOOT_ITEM_ROLL_WON" then
         local itemLink, rollQuantity, _, _, _ = ...
         if itemLink then
-            handleLootMessage(notificationFrame, itemLink, rollQuantity or 1)
+            HandleLootMessage(notificationFrame, itemLink, rollQuantity or 1)
         end
     end
 end)

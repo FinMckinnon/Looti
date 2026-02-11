@@ -1,14 +1,15 @@
-## Interface: 120000
+## Interface: 120000, 50503, 50503, 20505, 38000, 50503, 20505
 ## Title: Looti
 ## Notes: Displays a notification with the item name and icon when you loot an item.
 ## Author: FinLaFin
 ## Version: 2.3
 ## IconTexture: Interface\AddOns\Looti\Media\looti_icon.tga
-## SavedVariables:  LootiNotificationSettings, LootiConfig
+## SavedVariables:  LootiNotificationSettings, LootiConfig, LootiFilters
 
 Libs/AceGUI-3.0/AceGUI-3.0.xml
 
 Looti_ini.lua
+Looti_Constants.lua
 utils.lua
 LootiNotificationsManager.lua
 LootiNotifications.lua
@@ -26,3 +27,4 @@ SettingsPanel/Tabs/Looti_advancedSettingsTab.lua
 SettingsPanel/Tabs/Looti_displaySettingsTab.lua
 SettingsPanel/Tabs/Looti_generalSettingsTab.lua
 SettingsPanel/Tabs/Looti_notificationBehaviorSettingsTab.lua
+SettingsPanel/Windows/Looti_FilterEditor.lua

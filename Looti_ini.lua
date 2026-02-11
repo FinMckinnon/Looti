@@ -1,9 +1,11 @@
 AceGUI = LibStub("AceGUI-3.0")
+local ADDON_NAME, Looti = ...
+_G[ADDON_NAME] = Looti or {}
 
 LootiConfigDefault = {
     showLootNotifications = true,
     showMoneyNotifications = true,
-    notificationThreshold = 3,
+    notificationThreshold = 0,
     scrollDirection = "up",
     displayBackground = true,
     displayDuration = 1,
@@ -21,48 +23,87 @@ LootiConfigDefault = {
     iconDisplay = "LEFT",
     notificationAlpha = 1,
     notificationScale = 1,
-    backgroundAlpha = 0.8
+    backgroundAlpha = 0.6
+}
+
+LootiFiltersDefault = {
+    blacklist = {
+        items = {
+        },
+        categories = {
+            BoE = false,
+            BoP = false,
+            QuestItems = false,
+            Consumables = false,
+            Gear = false,
+            CraftingMats = false,
+            Miscellaneous = false
+        }
+    },
+    whitelist = {
+        items = {
+        },
+        categories = {
+            BoE = false,
+            BoP = false,
+            QuestItems = false,
+            Consumables = false,
+            Gear = false,
+            CraftingMats = false,
+            Miscellaneous = false
+        }
+    }
 }
 
 LootiNotificationSettingsDefault = {
     SPACING = -35,
     NOTIFICATION_FRAME_WIDTH = 300,
-    NOTIFICATION_FRAME_HEIGHT =35,
+    NOTIFICATION_FRAME_HEIGHT = 35,
 }
 
-LootiNotificationSettings = LootiNotificationSettings or LootiNotificationSettingsDefault
 LootiConfig = LootiConfig or LootiConfigDefault
+LootiFilters = LootiFilters or LootiFiltersDefault
+LootiNotificationSettings = LootiNotificationSettings or LootiNotificationSettingsDefault
 
 currencyIcons = {
-    copper = "Interface\\Icons\\INV_misc_coin_05",  -- Copper
-    silver = "Interface\\Icons\\INV_Misc_Coin_03",  -- Silver
+    copper = "Interface\\Icons\\INV_misc_coin_05", -- Copper
+    silver = "Interface\\Icons\\INV_Misc_Coin_03", -- Silver
     gold = "Interface\\Icons\\INV_Misc_Coin_01"    -- Gold
 }
 
 rarityData = {
-    [0] = {name = "Poor", color = {GetItemQualityColor(0)}},   
-    [1] = {name = "Common", color = {GetItemQualityColor(1)}},  
-    [2] = {name = "Uncommon", color = {GetItemQualityColor(2)}},
-    [3] = {name = "Rare", color = {GetItemQualityColor(3)}},    
-    [4] = {name = "Epic", color = {GetItemQualityColor(4)}},    
-    [5] = {name = "Legendary", color = {GetItemQualityColor(5)}}, 
+    [0] = { name = "Poor", color = { GetItemQualityColor(0) } },
+    [1] = { name = "Common", color = { GetItemQualityColor(1) } },
+    [2] = { name = "Uncommon", color = { GetItemQualityColor(2) } },
+    [3] = { name = "Rare", color = { GetItemQualityColor(3) } },
+    [4] = { name = "Epic", color = { GetItemQualityColor(4) } },
+    [5] = { name = "Legendary", color = { GetItemQualityColor(5) } },
 }
 
-local function EnsureDefaults(targetTable, defaultTable)
-    if not targetTable then
-        targetTable = {}
+local function EnsureDefaults(target, defaults)
+    if target == nil then
+        target = {}
     end
 
-    for key, value in pairs(defaultTable) do
-        if targetTable[key] == nil then
-            targetTable[key] = value
+    for key, defaultValue in pairs(defaults) do
+        local targetValue = target[key]
+
+        if type(defaultValue) == "table" then
+            if type(targetValue) ~= "table" then
+                target[key] = {}
+            end
+            EnsureDefaults(target[key], defaultValue)
+        elseif targetValue == nil then
+            target[key] = defaultValue
         end
     end
-    return targetTable
+
+    return target
 end
 
 local function EnsureLootiSettings()
     LootiConfig = EnsureDefaults(LootiConfig, LootiConfigDefault)
+    LootiFilters = EnsureDefaults(LootiFilters, LootiFiltersDefault)
     LootiNotificationSettings = EnsureDefaults(LootiNotificationSettings, LootiNotificationSettingsDefault)
 end
 

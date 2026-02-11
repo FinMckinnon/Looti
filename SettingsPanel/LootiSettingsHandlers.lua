@@ -66,10 +66,15 @@ local function HandleBackgroundAlphaChange(value)
     tempSettingsData.backgroundAlpha = value
 end
 
+local function HandleOpenFilterListEditor(listType)
+    CreateFilterEditor(listType)
+end
+
 
 local function HandleReset(tempSettingsData)
     copyTable(LootiConfig, LootiConfigDefault)
     copyTable(tempSettingsData, LootiConfig)
+    copyTable(LootiFilters, LootiFiltersDefault)
     LOOTI_CHAT_LOG("Looti has been reset.", "update")
 end
 
@@ -77,7 +82,6 @@ local function HandleResetButtonClick(tempSettingsData)
     CreateConfirmationPopup("RESET_LOOTI_POP_UP", "Confirm Action", "Are you sure you want to reset Looti?", function()
         HandleReset(tempSettingsData)
     end)
-    
 end
 
 -- Function to save settings from tempSettingsData to LootiConfig
@@ -107,5 +111,6 @@ _G["settingsPanel"] = {
     HandleNotificationAlphaChange = HandleNotificationAlphaChange,
     HandleNotificationScaleChange = HandleNotificationScaleChange,
     HandleBackgroundAlphaChange = HandleBackgroundAlphaChange,
-    HandleResetButtonClick = HandleResetButtonClick
+    HandleResetButtonClick = HandleResetButtonClick,
+    HandleOpenFilterListEditor = HandleOpenFilterListEditor
 }
