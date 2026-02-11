@@ -11,6 +11,15 @@ To install Looti, download **Looti.zip** then place it into your Addons folder f
 
 <span style="font-size: 14px;">I want this project to be as community invovled as possible, so please feel free to comment or message me ideas!<br><br>Happy Looting!<br></span>
 
+## <span style="font-size: 16px;"><strong>Key Features at a Glance</strong></span>
+
+<span style="font-size: 14px;"><strong>Moveable & Customizable</strong> – Position notifications anywhere with full control over size, transparency, layout, and timings<br>
+<strong>Smart Filtering</strong> – Whitelist/blacklist items by ID or category (gear, consumables, crafting mats, BoE/BoP, and more)<br>
+<strong>Rarity Control</strong> – Set minimum item quality to show only what matters<br>
+<strong>Flexible Display</strong> – Toggle icons, quantities, scroll direction, and background visibility<br>
+
+***
+
 #### <span style="font-size: 18px;"><a href="https://imgur.com/V7hRa8v" target="_blank" rel="nofollow noopener">📺 See Looti in action!</a></span>
 
 ![Looti being used with loot!](https://media.forgecdn.net/attachments/1093/277/flixier-2025-02-10t15_24_39.png)
@@ -63,7 +72,7 @@ To install Looti, download **Looti.zip** then place it into your Addons folder f
 
 <span style="font-size: 14px;"><strong>Whitelist & Blacklist Support</strong> – Create custom filters using item IDs or categories to control exactly what you see.</span>
 
-<span style="font-size: 14px;"><strong>Automatically sort notifications by item type:</strong> – span>
+<span style="font-size: 14px;"><span>Automatically sort notifications by item type:</span>
 
 * <span style="font-size: 13px;">Quest Items & Keys</span>
 * <span style="font-size: 13px;">Consumables (Potions, Food, Bandages)</span>
