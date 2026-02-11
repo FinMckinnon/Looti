@@ -5,7 +5,7 @@ _G[ADDON_NAME] = Looti or {}
 LootiConfigDefault = {
     showLootNotifications = true,
     showMoneyNotifications = true,
-    notificationThreshold = 3,
+    notificationThreshold = 0,
     scrollDirection = "up",
     displayBackground = true,
     displayDuration = 1,
@@ -23,7 +23,7 @@ LootiConfigDefault = {
     iconDisplay = "LEFT",
     notificationAlpha = 1,
     notificationScale = 1,
-    backgroundAlpha = 0.8
+    backgroundAlpha = 0.6
 }
 
 LootiFiltersDefault = {

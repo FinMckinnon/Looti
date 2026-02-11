@@ -292,7 +292,7 @@ end
 
 local function isItemInList(listType, itemID, classID, bindType, itemEquipLoc)
     local list = LootiFilters[listType]
-    if not list or not next(list.items) then
+    if not list or not list.items then
         return false
     end
 
