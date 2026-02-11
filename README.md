@@ -67,7 +67,7 @@ To install Looti, download **Looti.zip** then place it into your Addons folder f
 * <span style="font-size: 13px;">Quest Items & Keys</span>
 * <span style="font-size: 13px;">Consumables (Potions, Food, Bandages)</span>
 * <span style="font-size: 13px;">Gear & Equipment</span>
-* <span style="font-size: 13px;">Crafting Materials (Trade Goods, Gems, Recipes, Glyphs)</span>
+* <span style="font-size: 13px;">Crafting Materials (Trade Goods, Gems, Recipes, ...)</span>
 * <span style="font-size: 13px;">Miscellaneous (Mounts, Toys, Pet Items)</span>
 * <span style="font-size: 13px;">Bind on Equip (BoE) & Bind on Pickup (BoP)</span>
 
