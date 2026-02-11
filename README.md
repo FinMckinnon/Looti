@@ -62,7 +62,8 @@ To install Looti, download **Looti.zip** then place it into your Addons folder f
 <span style="font-size: 18px;"><strong>Smart Filtering System</strong></span>
 
 <span style="font-size: 14px;"><strong>Whitelist & Blacklist Support</strong> – Create custom filters using item IDs or categories to control exactly what you see.</span>
-<span style="font-size: 14px;"><strong>Category-Based Filtering</strong> – Automatically sort notifications by item type:</span>
+
+<span style="font-size: 14px;"><strong>Automatically sort notifications by item type:</strong> – span>
 
 * <span style="font-size: 13px;">Quest Items & Keys</span>
 * <span style="font-size: 13px;">Consumables (Potions, Food, Bandages)</span>
