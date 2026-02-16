@@ -85,7 +85,7 @@ end)
 -- var for tracking loot slots when loot window is opened
 local lootSlots = {}
 
-local function handleLootOpened()
+local function handleLootReady()
     wipe(lootSlots)
     local numSlots = GetNumLootItems()
     for slot = 1, numSlots do
@@ -111,7 +111,7 @@ end
 
 -- Listener for loot/money events
 local frame = CreateFrame("Frame")
-frame:RegisterEvent("LOOT_OPENED")
+frame:RegisterEvent("LOOT_READY")
 frame:RegisterEvent("LOOT_SLOT_CLEARED")
 frame:RegisterEvent("CHAT_MSG_MONEY")
 frame:RegisterEvent("LOOT_ITEM_ROLL_WON")
@@ -132,8 +132,8 @@ frame:SetScript("OnEvent", function(self, event, ...)
     elseif event == "CHAT_MSG_MONEY" then
         local message = ...
         HandleMoneyMessage(notificationFrame, message)
-    elseif event == "LOOT_OPENED" then
-        handleLootOpened()
+    elseif event == "LOOT_READY" then
+        handleLootReady()
     elseif event == "LOOT_SLOT_CLEARED" then
         local slot = ...
         handleLootSlotCleared(slot)
