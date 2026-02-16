@@ -8,7 +8,7 @@ local function getQuantityText(quantity)
     return (quantity and quantity > 1) and "x" .. quantity or ""
 end
 
-local function isEquippableUpgrade(equipSlot, itemLevel)
+local function isEquippableUpgrade(itemLink, equipSlot, itemLevel)
     -- If item is not equippable, return false
     if not equipSlot or equipSlot == "" or equipSlot == "INVTYPE_NON_EQUIP" then
         return false
@@ -48,6 +48,10 @@ local function isEquippableUpgrade(equipSlot, itemLevel)
         return false
     end
 
+    -- Check if player can equip this item (handles class/armor/weapon/level restrictions)
+    if not IsEquippableItem(itemLink) then
+        return false
+    end
 
     -- Handle slots that can have multiple positions (rings, trinkets)
     if type(slots) == "table" then
@@ -83,13 +87,10 @@ local function setNotificationData(itemData, currencyData, text, icon, upgradeIc
     local contentText, contentIcon, r, g, b, isUpgrade
 
     if itemData then
-        local itemLevel = itemData.itemLevel
-        local itemEquipLoc = itemData.itemEquipLoc
-
         r, g, b = GetRarityColor(itemData.itemRarity)
         local quantityText = LootiConfig.showQuantity and getQuantityText(itemData.itemQuantity) or ""
         local gearItemText = LootiConfig.showItemLevel and "(Lvl " .. itemData.itemLevel .. ")" or ""
-        isUpgrade = isEquippableUpgrade(itemEquipLoc, itemLevel)
+        isUpgrade = isEquippableUpgrade(itemData.itemLink, itemData.itemEquipLoc, itemData.itemLevel)
         contentText = itemData.itemName .. " |cFFFFFFFF" .. quantityText .. " |cFFFFFFFF" .. gearItemText .. "|r"
         contentIcon = itemData.itemIcon
     else
