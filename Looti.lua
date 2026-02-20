@@ -138,8 +138,8 @@ frame:SetScript("OnEvent", function(self, event, ...)
         local slot = ...
         handleLootSlotCleared(slot)
     elseif event == "LOOT_ITEM_ROLL_WON" then
-        local itemLink, rollQuantity, _, _, _ = ...
-        if itemLink then
+        local itemLink, rollQuantity, _, _, _, rollerId = ...
+        if itemLink and rollerId == UnitGUID("player") then
             HandleLootMessage(notificationFrame, itemLink, rollQuantity or 1)
         end
     end
