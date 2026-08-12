@@ -1,4 +1,4 @@
-## Interface: 120007, 50504, 50504, 20506, 38002, 50504, 20506
+## Interface: 120100, 50504, 50504, 20506, 38002, 50504, 20506
 ## Title: Looti
 ## Notes: Displays a notification with the item name and icon when you loot an item.
 ## Author: FinLaFin
