@@ -17,12 +17,12 @@ L.Const.FRAME = {
 L.Const.UPGRADE_ICON = "Interface\\AddOns\\Looti\\Media\\green_up_arrow_icon.tga"
 
 L.Const.RARITY_NAMES = {
-    [0] = "Poor",
-    [1] = "Common",
-    [2] = "Uncommon",
-    [3] = "Rare",
-    [4] = "Epic",
-    [5] = "Legendary",
+    [0] = L.Text.RARITY_POOR,
+    [1] = L.Text.RARITY_COMMON,
+    [2] = L.Text.RARITY_UNCOMMON,
+    [3] = L.Text.RARITY_RARE,
+    [4] = L.Text.RARITY_EPIC,
+    [5] = L.Text.RARITY_LEGENDARY,
 }
 
 -- Equipment slots an item type can occupy. Rings and trinkets have two.
@@ -70,13 +70,13 @@ L.Const.BIND_ON_PICKUP = 2
 L.Const.BIND_QUEST = 4
 
 L.Const.CATEGORY_LABELS = {
-    BoE = "Bind on Equip",
-    BoP = "Bind on Pickup",
-    QuestItems = "Quest items",
-    Consumables = "Consumables",
-    Gear = "Gear",
-    CraftingMats = "Crafting materials",
-    Miscellaneous = "Miscellaneous",
+    BoE = L.Text.CATEGORY_BOE,
+    BoP = L.Text.CATEGORY_BOP,
+    QuestItems = L.Text.CATEGORY_QUEST,
+    Consumables = L.Text.CATEGORY_CONSUMABLES,
+    Gear = L.Text.CATEGORY_GEAR,
+    CraftingMats = L.Text.CATEGORY_CRAFTING,
+    Miscellaneous = L.Text.CATEGORY_MISC,
 }
 
 -- Order the categories are listed in, so the filter editor is stable.

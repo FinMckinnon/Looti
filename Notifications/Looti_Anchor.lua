@@ -21,7 +21,7 @@ L.Compat.SetBackdrop(frame, BACKDROP, 0, 0, 0, 0)
 
 local title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 title:SetPoint("TOP", frame, "TOP", 0, -12)
-title:SetText("Loot Notifications")
+title:SetText(L.Text.ANCHOR_TITLE)
 title:Hide()
 
 local doneButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")

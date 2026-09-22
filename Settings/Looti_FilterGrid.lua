@@ -42,7 +42,7 @@ local function AddRow(parent, itemID, onRemove)
     label:SetText(tostring(itemID))
     row:AddChild(label)
 
-    L.UI.Button(row, "Remove", 80, function()
+    L.UI.Button(row, L.Text.BUTTON_REMOVE, 80, function()
         onRemove(itemID)
     end)
 
@@ -67,7 +67,7 @@ function L.FilterGrid.Build(container, staged, onRemove)
 
     if #ids == 0 then
         local empty = L.AceGUI:Create("Label")
-        empty:SetText("No items in this list yet.")
+        empty:SetText(L.Text.ITEMS_EMPTY)
         empty:SetFullWidth(true)
         container:AddChild(empty)
         return

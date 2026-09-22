@@ -164,7 +164,7 @@ function L.Rows.Fill(row, itemData, currencyData)
         local quantity = config.showQuantity and QuantityText(itemData.itemQuantity) or ""
         local level = ""
         if config.showItemLevel and itemData.itemLevel then
-            level = "(Lvl " .. itemData.itemLevel .. ")"
+            level = L.Text.ITEM_LEVEL:format(itemData.itemLevel)
         end
 
         text = itemData.itemName .. " |cFFFFFFFF" .. quantity .. " |cFFFFFFFF" .. level .. "|r"

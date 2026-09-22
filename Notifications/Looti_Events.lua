@@ -16,6 +16,10 @@ local COIN_ICONS = {
 local lootCapture = {}
 local lootSessionOpen = false
 
+-- Chat output at ADDON_LOADED is not reliably visible, so an upgrade notice
+-- waits for the player to be in the world.
+local pendingUpgradeNotice = false
+
 -- The slot path and the chat backstop cover each other. Each loot raises a
 -- balance from one side and lowers it from the other; a notification is sent
 -- whenever the balance moves away from zero and withheld when it returns. That
@@ -194,6 +198,7 @@ end
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
+frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("LOOT_READY")
 frame:RegisterEvent("LOOT_OPENED")
 frame:RegisterEvent("LOOT_SLOT_CLEARED")
@@ -206,9 +211,14 @@ frame:SetScript("OnEvent", function(_, event, ...)
     if event == "ADDON_LOADED" then
         local loaded = ...
         if loaded == ADDON then
-            L.Db.Load()
+            pendingUpgradeNotice = L.Db.Load()
             L.Anchor.LoadPosition()
             L.Anchor.SetMoveMode(false)
+        end
+    elseif event == "PLAYER_LOGIN" then
+        if pendingUpgradeNotice then
+            pendingUpgradeNotice = false
+            L.Util.Print(L.Text.MSG_UPGRADED, "update")
         end
     elseif event == "LOOT_READY" or event == "LOOT_OPENED" then
         CaptureLootWindow()

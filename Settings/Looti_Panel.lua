@@ -26,7 +26,7 @@ end
 -- Writes the staging table back over the saved settings.
 local function Commit()
     for key, value in pairs(staging) do
-        if not L.Db.POSITION_KEYS[key] then
+        if not L.Db.INTERNAL_KEYS[key] then
             LootiConfig[key] = value
         end
     end
@@ -39,9 +39,9 @@ local function BuildFiltersTab(container, width)
     container:ReleaseChildren()
 
     local titles = {
-        whitelist = { "Whitelist", "Always notify, even below the minimum rarity." },
-        blacklist = { "Blacklist", "Never notify." },
-        watchlist = { "Watchlist", "An extra alert for items you are waiting on. Coming later." },
+        whitelist = { L.Text.LIST_WHITELIST, L.Text.HINT_WHITELIST },
+        blacklist = { L.Text.LIST_BLACKLIST, L.Text.HINT_BLACKLIST },
+        watchlist = { L.Text.LIST_WATCHLIST, L.Text.HINT_WATCHLIST_SOON },
     }
 
     for _, listType in ipairs(L.Const.FILTER_LISTS) do
@@ -50,11 +50,11 @@ local function BuildFiltersTab(container, width)
 
         local items, categories = L.Db.CountFilter(listType)
         local summary = L.AceGUI:Create("Label")
-        summary:SetText(items .. " items \194\183 " .. categories .. " categories")
+        summary:SetText(L.Text.FILTER_SUMMARY:format(items, categories))
         summary:SetRelativeWidth(0.55)
         section:AddChild(summary)
 
-        local button = L.UI.Button(section, "Edit...", 100, function()
+        local button = L.UI.Button(section, L.Text.BUTTON_EDIT, 100, function()
             L.FilterEditor.Open(listType)
         end)
 
@@ -83,8 +83,7 @@ end
 -- output: nothing
 -- Restores the defaults and redraws the tab on screen.
 function L.Actions.resetAll()
-    L.Popup.Confirm(RESET_DIALOG, "Reset Looti",
-        "Every setting and filter list goes back to its default.", function()
+    L.Popup.Confirm(RESET_DIALOG, L.Text.RESET_TITLE, L.Text.RESET_MESSAGE, function()
             L.Db.Reset()
             Stage()
 
@@ -92,7 +91,7 @@ function L.Actions.resetAll()
                 tabGroup:SelectTab(currentTab)
             end
 
-            L.Util.Print("Looti has been reset.", "update")
+            L.Util.Print(L.Text.MSG_RESET, "update")
         end)
 end
 
@@ -117,7 +116,7 @@ end
 -- Writes the staged settings back and closes the window.
 function L.Panel.Save()
     Commit()
-    L.Util.Print("Looti settings saved.", "update")
+    L.Util.Print(L.Text.MSG_SAVED, "update")
     L.Panel.Close()
 end
 
@@ -148,7 +147,7 @@ function L.Panel.Open()
     local AceGUI = L.AceGUI
     Stage()
 
-    window = L.UI.Window("Looti", "Loot notification settings",
+    window = L.UI.Window(L.Text.ADDON_NAME, L.Text.SETTINGS_SUBTITLE,
         L.Const.FRAME.PANEL_WIDTH, L.Const.FRAME.PANEL_HEIGHT, function(self)
             window, tabGroup = nil, nil
             AceGUI:Release(self)
@@ -171,15 +170,15 @@ function L.Panel.Open()
     footer:SetFullWidth(true)
     window:AddChild(footer)
 
-    L.UI.Button(footer, "Cancel", 140, function()
+    L.UI.Button(footer, L.Text.BUTTON_CANCEL, 140, function()
         L.Panel.Close()
     end)
 
-    L.UI.Button(footer, "Save", 140, function()
+    L.UI.Button(footer, L.Text.BUTTON_SAVE, 140, function()
         L.Panel.Save()
     end)
 
-    L.UI.Button(footer, "Test Looti", 140, function()
+    L.UI.Button(footer, L.Text.BUTTON_TEST, 140, function()
         L.RunPreview()
     end)
 end

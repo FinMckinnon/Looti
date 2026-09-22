@@ -4,15 +4,15 @@ local ADDON, L = ...
 L.FilterEditor = {}
 
 local LIST_TITLES = {
-    whitelist = "Whitelist",
-    blacklist = "Blacklist",
-    watchlist = "Watchlist",
+    whitelist = L.Text.LIST_WHITELIST,
+    blacklist = L.Text.LIST_BLACKLIST,
+    watchlist = L.Text.LIST_WATCHLIST,
 }
 
 local LIST_HINTS = {
-    whitelist = "Always notify, even below the minimum rarity.",
-    blacklist = "Never notify.",
-    watchlist = "An extra alert for items you are waiting on.",
+    whitelist = L.Text.HINT_WHITELIST,
+    blacklist = L.Text.HINT_BLACKLIST,
+    watchlist = L.Text.HINT_WATCHLIST,
 }
 
 local open = {}
@@ -34,7 +34,7 @@ local function Apply(listType)
     end
 
     L.Util.ReplaceContents(LootiFilters[listType], state.staged)
-    L.Util.Print(LIST_TITLES[listType] .. " saved.", "update")
+    L.Util.Print(L.Text.MSG_LIST_SAVED:format(LIST_TITLES[listType]), "update")
 end
 
 -- input: a filter list name
@@ -70,7 +70,7 @@ local function AddEntry(listType, text)
 
     local itemID = L.ItemCache.ItemID(text) or tonumber(text)
     if not itemID then
-        L.Util.Print("That is not an item id or an item link.", "error")
+        L.Util.Print(L.Text.MSG_BAD_ITEM, "error")
         return
     end
 
@@ -102,7 +102,7 @@ function L.FilterEditor.Open(listType)
 
     open[listType] = { window = window, staged = staged }
 
-    local addSection = L.UI.Section(window, "Add an item", "Paste an item link or type its id.")
+    local addSection = L.UI.Section(window, L.Text.GROUP_ADD_ITEM, L.Text.HINT_ADD_ITEM)
     local input = AceGUI:Create("EditBox")
     input:SetLabel("")
     input:SetRelativeWidth(0.7)
@@ -112,12 +112,12 @@ function L.FilterEditor.Open(listType)
     end)
     addSection:AddChild(input)
 
-    L.UI.Button(addSection, "Add", 80, function()
+    L.UI.Button(addSection, L.Text.BUTTON_ADD, 80, function()
         AddEntry(listType, input:GetText())
         input:SetText("")
     end)
 
-    local categorySection = L.UI.Section(window, "Categories", "Whole groups of items, in one go.")
+    local categorySection = L.UI.Section(window, L.Text.GROUP_CATEGORIES, L.Text.HINT_CATEGORIES)
     for _, key in ipairs(L.Const.CATEGORY_ORDER) do
         local toggle = L.UI.Toggle(categorySection, L.Const.CATEGORY_LABELS[key],
             staged.categories[key], function(value)
@@ -126,7 +126,7 @@ function L.FilterEditor.Open(listType)
         toggle:SetRelativeWidth(0.5)
     end
 
-    local itemSection = L.UI.Section(window, "Items", "Individual items, by id.")
+    local itemSection = L.UI.Section(window, L.Text.GROUP_ITEMS, L.Text.HINT_ITEMS)
     local scroll = AceGUI:Create("ScrollFrame")
     scroll:SetLayout("Flow")
     scroll:SetFullWidth(true)
@@ -137,11 +137,11 @@ function L.FilterEditor.Open(listType)
     RefreshItems(listType)
 
     local footer = L.UI.Section(window, "", nil)
-    L.UI.Button(footer, "Cancel", 120, function()
+    L.UI.Button(footer, L.Text.BUTTON_CANCEL, 120, function()
         Forget(listType)
         window:Hide()
     end)
-    L.UI.Button(footer, "Save", 120, function()
+    L.UI.Button(footer, L.Text.BUTTON_SAVE, 120, function()
         Apply(listType)
         Forget(listType)
         window:Hide()

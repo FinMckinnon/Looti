@@ -9,8 +9,8 @@ L.Popup = {}
 function L.Popup.Confirm(dialogID, title, message, onAccept)
     StaticPopupDialogs[dialogID] = {
         text = title .. "\n\n" .. message,
-        button1 = "Yes",
-        button2 = "Cancel",
+        button1 = L.Text.BUTTON_YES,
+        button2 = L.Text.BUTTON_CANCEL,
         timeout = 0,
         whileDead = true,
         hideOnEscape = true,
