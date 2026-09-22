@@ -2,29 +2,34 @@
 ## Title: Looti
 ## Notes: Displays a notification with the item name and icon when you loot an item.
 ## Author: FinLaFin
-## Version: 2.3
+## Version: 2.0
 ## IconTexture: Interface\AddOns\Looti\Media\looti_icon.tga
-## SavedVariables:  LootiNotificationSettings, LootiConfig, LootiFilters
+## SavedVariables: LootiConfig, LootiFilters
 
+Libs/LibStub/LibStub.lua
 Libs/AceGUI-3.0/AceGUI-3.0.xml
 
-Looti_ini.lua
-Looti_Constants.lua
-utils.lua
-LootiNotificationsManager.lua
-LootiNotifications.lua
-Looti.lua
+Core/Looti_Compat.lua
+Core/Looti_Const.lua
+Core/Looti_Util.lua
+Core/Looti_Db.lua
+Core/Looti_ItemCache.lua
 
-LootiTest.lua
+Features/Looti_Stubs.lua
 
-## GUI
-SettingsPanel\Components\Looti_popUpDialogue.lua
+Notifications/Looti_Anchor.lua
+Notifications/Looti_Row.lua
+Notifications/Looti_Queue.lua
+Notifications/Looti_Filter.lua
+Notifications/Looti_Chat.lua
+Notifications/Looti_Events.lua
 
-## Settings
-SettingsPanel/LootiSettingsHandlers.lua
-SettingsPanel/LootiSettingsPanel.lua
-SettingsPanel/Tabs/Looti_advancedSettingsTab.lua
-SettingsPanel/Tabs/Looti_displaySettingsTab.lua
-SettingsPanel/Tabs/Looti_generalSettingsTab.lua
-SettingsPanel/Tabs/Looti_notificationBehaviorSettingsTab.lua
-SettingsPanel/Windows/Looti_FilterEditor.lua
+Settings/Looti_Popup.lua
+Settings/Looti_Widgets.lua
+Settings/Looti_Schema.lua
+Settings/Looti_Render.lua
+Settings/Looti_FilterGrid.lua
+Settings/Looti_FilterEditor.lua
+Settings/Looti_Panel.lua
+
+Looti_Test.lua
