@@ -3,16 +3,12 @@ local ADDON, L = ...
 
 L.Queue = {}
 
--- The backlog is released over at most this many ticks, so a large loot cannot
--- leave its last notification many seconds behind the pickup.
-local MAX_DRAIN_TICKS = 5
 local FADE_IN_TIME = 0.5
 local FADE_OUT_TIME = 0.5
 
 local active = {}
 local waiting = {}
 local ticker
-local drainBatch = 1
 
 -- input: nothing
 -- output: nothing
@@ -20,7 +16,7 @@ local drainBatch = 1
 function L.Queue.UpdatePositions()
     local scrollUp = LootiConfig.scrollDirection == "up"
     local point = scrollUp and "BOTTOM" or "TOP"
-    local spacing = L.Const.FRAME.SPACING * LootiConfig.notificationScale
+    local spacing = -L.Rows.Height()
 
     for index, row in ipairs(active) do
         local offset = (index - 1) * spacing
@@ -69,14 +65,13 @@ end
 
 -- input: nothing
 -- output: nothing
--- Releases part of the backlog, holding the rate for the whole drain.
+-- Releases one waiting notification per tick.
 local function Drain()
     if #waiting == 0 then
         if ticker then
             ticker:Cancel()
             ticker = nil
         end
-        drainBatch = 1
         return
     end
 
@@ -86,15 +81,8 @@ local function Drain()
         return
     end
 
-    drainBatch = math.max(drainBatch, math.ceil(#waiting / MAX_DRAIN_TICKS))
-
-    for _ = 1, drainBatch do
-        local queued = table.remove(waiting, 1)
-        if not queued then
-            break
-        end
-        Show(queued.itemData, queued.currencyData)
-    end
+    local queued = table.remove(waiting, 1)
+    Show(queued.itemData, queued.currencyData)
 end
 
 -- input: item data and currency data, one of which is nil
@@ -105,8 +93,15 @@ function L.Queue.Add(itemData, currencyData)
         return
     end
 
-    if currencyData and not LootiConfig.showMoneyNotifications then
-        return
+    if currencyData then
+        local enabled = LootiConfig.showMoneyNotifications
+        if currencyData.isCurrency then
+            enabled = LootiConfig.showCurrencyNotifications
+        end
+
+        if not enabled then
+            return
+        end
     end
 
     if #active == 0 then

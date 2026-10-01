@@ -12,8 +12,12 @@ L.Db.RESET_BELOW = 2
 L.Db.ConfigDefault = {
     showLootNotifications = true,
     showMoneyNotifications = true,
+    showCurrencyNotifications = true,
+    showPushedItems = true,
+    showCraftedItems = true,
     notificationThreshold = 0,
     showText = true,
+    colourByRarity = true,
     showIcon = true,
     showQuantity = true,
     showItemLevel = true,
@@ -32,8 +36,11 @@ L.Db.ConfigDefault = {
     notificationFrameX = 0,
     notificationFrameY = 0,
     schemaVersion = 0,
-    -- Reserved for features that are not built yet, see Features/Looti_Stubs.lua.
-    watchlistEnabled = false,
+    -- Watchlist alerts.
+    watchlistSound = true,
+    watchlistStar = true,
+    watchlistHighlight = true,
+    -- Reserved for a feature that is not built yet, see Features/Looti_Stubs.lua.
     sessionTrackerEnabled = false,
 }
 

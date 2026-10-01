@@ -1,0 +1,21 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm install --no-save fengari
+
+      # The Lua tests print their result rather than setting an exit code.
+      - name: Loot parsing
+        run: node tests/run.js tests/loot.lua . | tee loot.log && grep -q "ALL PASSED" loot.log
+
+      - name: Settings window and rows
+        run: node tests/run.js tests/ui.lua . | tee ui.log && grep -q "ALL PASSED" ui.log

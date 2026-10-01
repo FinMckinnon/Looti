@@ -6,7 +6,6 @@ L.Const = {}
 L.Const.FRAME = {
     NOTIFICATION_WIDTH = 300,
     NOTIFICATION_HEIGHT = 35,
-    SPACING = -35,
     PANEL_WIDTH = 480,
     PANEL_HEIGHT = 675,
     EDITOR_WIDTH = 600,
@@ -16,13 +15,19 @@ L.Const.FRAME = {
 
 L.Const.UPGRADE_ICON = "Interface\\AddOns\\Looti\\Media\\green_up_arrow_icon.tga"
 
+-- Watchlist star (raid target 1), sound (SOUNDKIT.RAID_WARNING) and highlight colour.
+L.Const.WATCH_ICON = "Interface\\TargetingFrame\\UI-RaidTargetingIcon_1"
+L.Const.WATCH_SOUND = 8959
+L.Const.WATCH_HIGHLIGHT = { red = 1, green = 0.82, blue = 0, alpha = 0.3 }
+
+-- Rarity names in the client's language.
 L.Const.RARITY_NAMES = {
-    [0] = L.Text.RARITY_POOR,
-    [1] = L.Text.RARITY_COMMON,
-    [2] = L.Text.RARITY_UNCOMMON,
-    [3] = L.Text.RARITY_RARE,
-    [4] = L.Text.RARITY_EPIC,
-    [5] = L.Text.RARITY_LEGENDARY,
+    [0] = ITEM_QUALITY0_DESC,
+    [1] = ITEM_QUALITY1_DESC,
+    [2] = ITEM_QUALITY2_DESC,
+    [3] = ITEM_QUALITY3_DESC,
+    [4] = ITEM_QUALITY4_DESC,
+    [5] = ITEM_QUALITY5_DESC,
 }
 
 -- Equipment slots an item type can occupy. Rings and trinkets have two.

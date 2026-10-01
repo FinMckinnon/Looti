@@ -20,6 +20,14 @@ function L.Actions.moveAnchor()
     L.Anchor.SetMoveMode(true)
 end
 
+-- input: nothing
+-- output: nothing
+-- Puts the notifications back at their default position.
+function L.Actions.resetPosition()
+    L.Anchor.ResetPosition()
+    L.Util.Print(L.Text.MSG_POSITION_RESET, "update")
+end
+
 -- input: the staging table
 -- output: nothing
 -- Greys any widget whose gating toggle is currently off.
@@ -32,17 +40,38 @@ function L.Render.RefreshEnabled(staging)
     end
 end
 
+-- input: a section container and a schema entry of type "filterlist"
+-- output: nothing
+-- Shows how much one filter list holds, beside a button that opens its editor.
+local function RenderFilterList(section, entry)
+    local items, categories = L.Db.CountFilter(entry.list)
+
+    local summary = L.AceGUI:Create("Label")
+    summary:SetText(L.Text.FILTER_SUMMARY:format(items, categories))
+    summary:SetRelativeWidth(0.55)
+    section:AddChild(summary)
+
+    L.UI.Button(section, L.Text.BUTTON_EDIT, 100, function()
+        L.FilterEditor.Open(entry.list)
+    end)
+end
+
 -- input: a section container, a schema entry, and the staging table
--- output: the created widget, or nil for an action
+-- output: the created widget, or nil for an action or a filter list
 -- Creates one widget and wires its change callback into the staging table.
 local function RenderEntry(section, entry, staging)
     if entry.type == "action" then
-        L.UI.Button(section, entry.label, nil, function()
+        L.UI.Button(section, entry.label, entry.width, function()
             local handler = L.Actions[entry.action]
             if handler then
                 handler()
             end
         end)
+        return nil
+    end
+
+    if entry.type == "filterlist" then
+        RenderFilterList(section, entry)
         return nil
     end
 

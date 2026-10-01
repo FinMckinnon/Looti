@@ -2,7 +2,7 @@
 local ADDON, L = ...
 
 -- key       matches a LootiConfig key exactly
--- type      "toggle", "range", "select" or "action"
+-- type      "toggle", "range", "select", "action" or "filterlist"
 -- tab       which tab the entry appears on
 -- group     section heading; a change of value opens a new section
 -- hint      muted line under the section heading, on the first entry of a group
@@ -10,27 +10,37 @@ local ADDON, L = ...
 -- min/max/step   range only
 -- unit      range only, appended to the value in the label
 -- zeroLabel range only, shown in place of a value of zero
--- names     range only, value to name mapping shown beside the number
+-- rarity    range only, the value is an item rarity; its coloured name shows under the slider
 -- options/order  select only
 -- enabledBy the key of a toggle that must be on for this to be usable
 -- action    action only, the name of a handler in L.Actions
+-- width     action only, the button's share of the row from 0 to 1; full row if unset
+-- list      filterlist only, which filter list the entry summarises and edits
 L.Schema = {
     { key = "showLootNotifications", type = "toggle", tab = "general",
       group = L.Text.GROUP_NOTIFICATIONS, hint = L.Text.HINT_NOTIFICATIONS,
       label = L.Text.LABEL_LOOT_NOTIFICATIONS },
     { key = "showMoneyNotifications", type = "toggle", tab = "general",
       group = L.Text.GROUP_NOTIFICATIONS, label = L.Text.LABEL_MONEY_NOTIFICATIONS },
+    { key = "showCurrencyNotifications", type = "toggle", tab = "general",
+      group = L.Text.GROUP_NOTIFICATIONS, label = L.Text.LABEL_CURRENCY_NOTIFICATIONS },
+    { key = "showPushedItems", type = "toggle", tab = "general",
+      group = L.Text.GROUP_NOTIFICATIONS, label = L.Text.LABEL_PUSHED_ITEMS },
+    { key = "showCraftedItems", type = "toggle", tab = "general",
+      group = L.Text.GROUP_NOTIFICATIONS, label = L.Text.LABEL_CRAFTED_ITEMS },
 
     { key = "notificationThreshold", type = "range", tab = "general",
       group = L.Text.GROUP_MINIMUM_RARITY,
       hint = L.Text.HINT_MINIMUM_RARITY,
-      label = L.Text.LABEL_MINIMUM_RARITY, min = 0, max = 5, step = 1,
-      names = L.Const.RARITY_NAMES },
+      label = L.Text.LABEL_MINIMUM_RARITY, min = 0, max = 5, step = 1, rarity = true },
 
     { type = "action", tab = "general",
       group = L.Text.GROUP_RESET,
       hint = L.Text.HINT_RESET,
-      label = L.Text.BUTTON_RESET, action = "resetAll" },
+      label = L.Text.BUTTON_RESET, action = "resetAll", width = 0.5 },
+    { type = "action", tab = "general",
+      group = L.Text.GROUP_RESET,
+      label = L.Text.BUTTON_RESET_POSITION, action = "resetPosition", width = 0.5 },
 
     { key = "showIcon", type = "toggle", tab = "content",
       group = L.Text.GROUP_EACH_SHOWS,
@@ -38,6 +48,8 @@ L.Schema = {
       label = L.Text.LABEL_ITEM_ICON },
     { key = "showText", type = "toggle", tab = "content",
       group = L.Text.GROUP_EACH_SHOWS, label = L.Text.LABEL_ITEM_NAME },
+    { key = "colourByRarity", type = "toggle", tab = "content",
+      group = L.Text.GROUP_EACH_SHOWS, label = L.Text.LABEL_RARITY_COLOUR, enabledBy = "showText" },
     { key = "showQuantity", type = "toggle", tab = "content",
       group = L.Text.GROUP_EACH_SHOWS, label = L.Text.LABEL_QUANTITY },
     { key = "showItemLevel", type = "toggle", tab = "content",
@@ -46,7 +58,7 @@ L.Schema = {
       group = L.Text.GROUP_EACH_SHOWS, label = L.Text.LABEL_UPGRADE_ARROW },
 
     { key = "iconSize", type = "range", tab = "content",
-      group = L.Text.GROUP_ICON_SIZE, hint = L.Text.HINT_ICON_SIZE,
+      group = L.Text.GROUP_ICON_SIZE,
       label = L.Text.LABEL_ICON_SIZE, min = 12, max = 64, step = 2, unit = L.Text.UNIT_PIXELS },
 
     { type = "action", tab = "layout",
@@ -74,7 +86,7 @@ L.Schema = {
       min = 0, max = 1, step = 0.1, enabledBy = "displayBackground" },
 
     { key = "notificationScale", type = "range", tab = "layout",
-      group = L.Text.GROUP_APPEARANCE, hint = L.Text.HINT_APPEARANCE,
+      group = L.Text.GROUP_APPEARANCE,
       label = L.Text.LABEL_SCALE, min = 0.5, max = 2, step = 0.1 },
     { key = "notificationAlpha", type = "range", tab = "layout",
       group = L.Text.GROUP_APPEARANCE, label = L.Text.LABEL_OPACITY,
@@ -90,10 +102,24 @@ L.Schema = {
     { key = "maximumNotifications", type = "range", tab = "timing",
       group = L.Text.GROUP_QUEUE, label = L.Text.LABEL_MOST_ON_SCREEN,
       min = 0, max = 10, step = 1, zeroLabel = L.Text.VALUE_NO_LIMIT },
+
+    { type = "filterlist", tab = "filters", list = "whitelist",
+      group = L.Text.LIST_WHITELIST, hint = L.Text.HINT_WHITELIST },
+
+    { type = "filterlist", tab = "filters", list = "blacklist",
+      group = L.Text.LIST_BLACKLIST, hint = L.Text.HINT_BLACKLIST },
+
+    { type = "filterlist", tab = "filters", list = "watchlist",
+      group = L.Text.LIST_WATCHLIST, hint = L.Text.HINT_WATCHLIST },
+    { key = "watchlistSound", type = "toggle", tab = "filters",
+      group = L.Text.LIST_WATCHLIST, label = L.Text.LABEL_WATCH_SOUND },
+    { key = "watchlistStar", type = "toggle", tab = "filters",
+      group = L.Text.LIST_WATCHLIST, label = L.Text.LABEL_WATCH_STAR },
+    { key = "watchlistHighlight", type = "toggle", tab = "filters",
+      group = L.Text.LIST_WATCHLIST, label = L.Text.LABEL_WATCH_HIGHLIGHT },
 }
 
--- Tabs in the order they appear. The filters tab is built by hand rather than
--- from the schema, because it lists filter lists instead of settings.
+-- Tabs in the order they appear.
 L.SchemaTabs = {
     { value = "general", text = L.Text.TAB_GENERAL },
     { value = "content", text = L.Text.TAB_CONTENT },

@@ -6,6 +6,12 @@ L.FilterGrid = {}
 local ICON_SIZE = 24
 local ROW_HEIGHT = 32
 
+-- Rows shown before the list scrolls.
+local MAX_VISIBLE_ROWS = 5
+
+-- Gap AceGUI's Flow layout leaves under every row.
+local ROW_GAP = 3
+
 -- input: a table of item ids
 -- output: a sorted array of those ids
 -- Puts the item ids into a stable order.
@@ -57,10 +63,23 @@ local function AddRow(parent, itemID, onRemove)
     end)
 end
 
+-- input: the scroll container, already laid out
+-- output: nothing
+-- Sizes the list to its rows, up to MAX_VISIBLE_ROWS rows.
+local function FitHeight(container)
+    local rowsHeight = container.content:GetHeight() or 0
+
+    local first = container.children[1]
+    local rowPitch = first and (first.frame:GetHeight() + ROW_GAP) or rowsHeight
+
+    container:SetHeight(math.min(rowsHeight, rowPitch * MAX_VISIBLE_ROWS))
+end
+
 -- input: a scroll container, a staged filter list, and a remove callback
 -- output: nothing
--- Rebuilds the item rows from a staged filter list.
+-- Rebuilds the item rows from a staged filter list and sizes the list to them.
 function L.FilterGrid.Build(container, staged, onRemove)
+    container:PauseLayout()
     container:ReleaseChildren()
 
     local ids = SortedIDs(staged.items)
@@ -70,10 +89,14 @@ function L.FilterGrid.Build(container, staged, onRemove)
         empty:SetText(L.Text.ITEMS_EMPTY)
         empty:SetFullWidth(true)
         container:AddChild(empty)
-        return
+    else
+        for _, itemID in ipairs(ids) do
+            AddRow(container, itemID, onRemove)
+        end
     end
 
-    for _, itemID in ipairs(ids) do
-        AddRow(container, itemID, onRemove)
-    end
+    container:ResumeLayout()
+    container:DoLayout()
+
+    FitHeight(container)
 end

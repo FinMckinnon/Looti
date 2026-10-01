@@ -1,35 +1,41 @@
-name: Create Custom ZIP for Release
+name: Release zip
 
 on:
   release:
     types:
       - published
 
+permissions:
+  contents: write
+
 jobs:
+  test:
+    uses: ./.github/workflows/tests.yml
+
   build:
+    needs: test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Rename folder and create custom ZIP
+      # v4.0, 4.0 and 4.0-beta1 all match "## Version: 4.0".
+      - name: Check the tag matches the .toc version
         run: |
-          # Create a new directory with the desired folder name
-          mkdir "Looti"
-
-          # Copy all files from the current directory into the new folder
-          find . -maxdepth 1 ! -name .git ! -name .github -exec cp -r {} "Looti/" \;
-
-          # Zip the folder
-          zip -r "Looti.zip" "Looti"
-
-      - name: Upload custom ZIP as release asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./Looti.zip
-          asset_name: Looti.zip
-          asset_content_type: application/zip
+          version="${TAG#v}"
+          grep -qx "## Version: ${version%%-*}" Looti.toc
         env:
-          GITHUB_TOKEN: ${{ secrets.LOOTI_PAT_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+
+      - name: Build zip
+        run: |
+          # Copy only the files the game loads, plus the licence and readme.
+          # Tests, editor settings and workflows stay out of the release.
+          mkdir Looti
+          cp -r Looti.toc Looti_Test.lua Core Features Libs Locale Media Notifications Settings LICENSE README.md Looti/
+          zip -r Looti.zip Looti
+
+      - name: Attach zip to the release
+        run: gh release upload "$TAG" Looti.zip --clobber
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          GH_TOKEN: ${{ github.token }}

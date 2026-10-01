@@ -23,6 +23,53 @@ function L.ItemCache.ItemID(item)
     return tonumber(item:match("item:(%d+)"))
 end
 
+-- input: text the player typed or pasted
+-- output: the item id, or nil when the text is not a known item
+-- Reads an item link, an item id, or an exact item name. Names resolve only
+-- for items the client has cached.
+function L.ItemCache.ItemIDFromText(text)
+    text = strtrim(text or "")
+    if text == "" then
+        return nil
+    end
+
+    local itemID = L.ItemCache.ItemID(text)
+    if itemID then
+        return itemID
+    end
+
+    if text:match("^%d+$") then
+        return tonumber(text)
+    end
+
+    local name = text:match("^%[(.+)%]$") or text
+
+    itemID = C_Item.GetItemInfoInstant(name)
+    if itemID then
+        return itemID
+    end
+
+    local _, link = L.Compat.GetItemInfo(name)
+    return L.ItemCache.ItemID(link)
+end
+
+-- input: text the player typed or pasted
+-- output: a list of item ids, empty when nothing in the text is a known item
+-- Reads every item link in the text, or a single id or name when there are none.
+function L.ItemCache.ItemIDsFromText(text)
+    local itemIDs = {}
+
+    for itemID in (text or ""):gmatch("|Hitem:(%d+)") do
+        itemIDs[#itemIDs + 1] = tonumber(itemID)
+    end
+
+    if #itemIDs == 0 then
+        itemIDs[1] = L.ItemCache.ItemIDFromText(text)
+    end
+
+    return itemIDs
+end
+
 -- input: an item id
 -- output: nothing
 -- Runs and clears every callback waiting on one item.

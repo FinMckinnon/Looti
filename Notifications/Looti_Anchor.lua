@@ -11,7 +11,7 @@ local BACKDROP = {
     insets = { left = 10, right = 10, top = 10, bottom = 10 },
 }
 
-local frame = CreateFrame("Frame", "notificationFrame", UIParent, L.Compat.BACKDROP_TEMPLATE)
+local frame = CreateFrame("Frame", "LootiAnchorFrame", UIParent, L.Compat.BACKDROP_TEMPLATE)
 frame:SetSize(L.Const.FRAME.NOTIFICATION_WIDTH, L.Const.FRAME.NOTIFICATION_HEIGHT + 2)
 frame:SetClampedToScreen(true)
 frame:SetFrameStrata("BACKGROUND")
@@ -66,6 +66,16 @@ function L.Anchor.LoadPosition()
 
     frame:ClearAllPoints()
     frame:SetPoint("CENTER", UIParent, "CENTER", x, y)
+end
+
+-- input: nothing
+-- output: nothing
+-- Saves the default position and moves the frame there.
+function L.Anchor.ResetPosition()
+    LootiConfig.notificationFrameX = L.Db.ConfigDefault.notificationFrameX
+    LootiConfig.notificationFrameY = L.Db.ConfigDefault.notificationFrameY
+
+    L.Anchor.LoadPosition()
 end
 
 -- input: nothing

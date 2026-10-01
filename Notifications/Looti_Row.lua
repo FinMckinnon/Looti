@@ -58,7 +58,42 @@ local function BuildRow()
     row.upgrade = row:CreateTexture(nil, "ARTWORK")
     row.upgrade:SetTexture(L.Const.UPGRADE_ICON)
 
+    row.star = row:CreateTexture(nil, "ARTWORK")
+    row.star:SetTexture(L.Const.WATCH_ICON)
+
+    row.highlight = row:CreateTexture(nil, "ARTWORK", nil, -8)
+    row.highlight:SetAllPoints(row)
+
     return row
+end
+
+-- input: a row and the badge textures to show, in order
+-- output: nothing
+-- Anchors the badges in order after the text, or in from the right edge when
+-- the text is hidden, stepping past the icon when it is on that side.
+local function PlaceBadges(row, badges)
+    local config = LootiConfig
+    local margin = L.Const.FRAME.MARGIN
+    local iconOnRight = config.showIcon and config.iconDisplay == "RIGHT"
+    local previous
+
+    for _, badge in ipairs(badges) do
+        badge:ClearAllPoints()
+
+        if config.showText then
+            local start = iconOnRight and row.icon or row.text
+            badge:SetPoint("LEFT", previous or start, "RIGHT", margin, 0)
+        elseif previous then
+            badge:SetPoint("RIGHT", previous, "LEFT", -margin, 0)
+        elseif iconOnRight then
+            badge:SetPoint("RIGHT", row.icon, "LEFT", -margin, 0)
+        else
+            badge:SetPoint("RIGHT", row, "RIGHT", -margin, 0)
+        end
+
+        badge:Show()
+        previous = badge
+    end
 end
 
 -- input: a row
@@ -69,7 +104,7 @@ local function ApplyLayout(row)
     local margin = L.Const.FRAME.MARGIN
     local scale = config.notificationScale
 
-    row:SetSize(L.Const.FRAME.NOTIFICATION_WIDTH * scale, L.Const.FRAME.NOTIFICATION_HEIGHT * scale)
+    row:SetSize(L.Const.FRAME.NOTIFICATION_WIDTH * scale, L.Rows.Height())
 
     if config.displayBackground then
         L.Compat.SetBackdrop(row, BACKDROP, 0, 0, 0, config.backgroundAlpha)
@@ -79,11 +114,12 @@ local function ApplyLayout(row)
 
     row.text:ClearAllPoints()
     row.icon:ClearAllPoints()
-    row.upgrade:ClearAllPoints()
 
     row.text:SetShown(config.showText)
     row.icon:SetShown(config.showIcon)
     row.upgrade:Hide()
+    row.star:Hide()
+    row.highlight:Hide()
 
     local iconSize = config.iconSize
     local initialMargin = iconSize + (margin * 2)
@@ -115,11 +151,23 @@ local function ApplyLayout(row)
     row.upgrade:SetAlpha(config.notificationAlpha * 0.75)
     row.upgrade:SetScale(scale)
 
-    if config.showText then
-        row.upgrade:SetPoint("LEFT", row.text, "RIGHT", margin, 0)
-    else
-        row.upgrade:SetPoint("RIGHT", row, "RIGHT", -margin, 0)
-    end
+    row.star:SetSize(iconSize / 2, iconSize / 2)
+    row.star:SetAlpha(config.notificationAlpha)
+    row.star:SetScale(scale)
+
+    local glow = L.Const.WATCH_HIGHLIGHT
+    local glowAlpha = glow.alpha * config.notificationAlpha
+    row.highlight:SetColorTexture(glow.red, glow.green, glow.blue, glowAlpha)
+end
+
+-- input: nothing
+-- output: the height of one notification in pixels
+-- Fits the icon and its margins, never below the default height, at the current scale.
+function L.Rows.Height()
+    local config = LootiConfig
+    local iconHeight = config.iconSize + L.Const.FRAME.MARGIN * 2
+
+    return math.max(L.Const.FRAME.NOTIFICATION_HEIGHT, iconHeight) * config.notificationScale
 end
 
 -- input: nothing
@@ -152,29 +200,48 @@ end
 
 -- input: a row, item data, and currency data
 -- output: nothing
--- Writes one notification's text, icon and upgrade arrow into a row.
+-- Writes one notification's text, icon, badges and highlight into a row.
 function L.Rows.Fill(row, itemData, currencyData)
     local config = LootiConfig
     local text, icon, red, green, blue
     local showUpgrade = false
+    local watched = itemData and itemData.itemWatched
 
     if itemData then
-        red, green, blue = L.Compat.QualityColor(itemData.itemRarity)
-
-        local quantity = config.showQuantity and QuantityText(itemData.itemQuantity) or ""
-        local level = ""
-        if config.showItemLevel and itemData.itemLevel then
-            level = L.Text.ITEM_LEVEL:format(itemData.itemLevel)
+        if config.colourByRarity then
+            red, green, blue = L.Compat.QualityColor(itemData.itemRarity)
+        else
+            red, green, blue = 1, 1, 1
         end
 
-        text = itemData.itemName .. " |cFFFFFFFF" .. quantity .. " |cFFFFFFFF" .. level .. "|r"
+        local parts = { itemData.itemName }
+
+        local quantity = config.showQuantity and QuantityText(itemData.itemQuantity) or ""
+        if quantity ~= "" then
+            parts[#parts + 1] = "|cFFFFFFFF" .. quantity .. "|r"
+        end
+
+        if config.showItemLevel and itemData.itemLevel then
+            parts[#parts + 1] = "|cFFFFFFFF" .. L.Text.ITEM_LEVEL:format(itemData.itemLevel) .. "|r"
+        end
+
+        text = table.concat(parts, " ")
         icon = itemData.itemIcon
 
         showUpgrade = config.showItemLevelUpgradeIcon
             and IsUpgrade(itemData.itemLink, itemData.itemEquipLoc, itemData.itemLevel)
     else
         red, green, blue = 1, 1, 1
+        if currencyData.quality and config.colourByRarity then
+            red, green, blue = L.Compat.QualityColor(currencyData.quality)
+        end
+
         text, icon = currencyData.text, currencyData.icon
+
+        local quantity = config.showQuantity and QuantityText(currencyData.quantity) or ""
+        if quantity ~= "" then
+            text = text .. " |cFFFFFFFF" .. quantity .. "|r"
+        end
     end
 
     if config.showText then
@@ -182,9 +249,18 @@ function L.Rows.Fill(row, itemData, currencyData)
         row.text:SetText(text)
     end
 
-    if config.showIcon and icon then
+    if config.showIcon then
         row.icon:SetTexture(icon)
     end
 
-    row.upgrade:SetShown(showUpgrade)
+    local badges = {}
+    if watched and config.watchlistStar then
+        badges[#badges + 1] = row.star
+    end
+    if showUpgrade then
+        badges[#badges + 1] = row.upgrade
+    end
+    PlaceBadges(row, badges)
+
+    row.highlight:SetShown((watched and config.watchlistHighlight) and true or false)
 end

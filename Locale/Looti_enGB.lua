@@ -10,7 +10,6 @@ local ADDON, L = ...
 L.Text = {
     -- Windows
     ADDON_NAME = "Looti",
-    SETTINGS_SUBTITLE = "Loot notification settings",
     ANCHOR_TITLE = "Loot Notifications",
 
     -- Buttons
@@ -23,12 +22,15 @@ L.Text = {
     BUTTON_REMOVE = "Remove",
     BUTTON_MOVE_ANCHOR = "Move notification area",
     BUTTON_RESET = "Reset all settings...",
+    BUTTON_RESET_POSITION = "Reset position",
 
     -- Chat messages
     MSG_SAVED = "Looti settings saved.",
     MSG_RESET = "Looti has been reset.",
+    MSG_POSITION_RESET = "Notifications are back in their default position.",
     MSG_LIST_SAVED = "%s saved.",
-    MSG_BAD_ITEM = "That is not an item id or an item link.",
+    MSG_BAD_ITEM = "Could not find that item. Names only work for items your client has seen, "
+        .. "such as ones in your bags. Otherwise shift-click the item or use its id.",
     MSG_UPGRADED = "Looti has changed how it stores settings, so yours are back at "
         .. "their defaults. Your filter lists have been kept. Type /looti to set "
         .. "things up again.",
@@ -47,13 +49,13 @@ L.Text = {
     GROUP_NOTIFICATIONS = "Notifications",
     HINT_NOTIFICATIONS = "Which alerts Looti shows.",
     GROUP_MINIMUM_RARITY = "Minimum rarity",
-    HINT_MINIMUM_RARITY = "Hide loot below this quality. Whitelisted items always show.",
+    HINT_MINIMUM_RARITY = "Hide loot below this quality. Whitelisted and watched items "
+        .. "always show.",
     GROUP_RESET = "Reset",
-    HINT_RESET = "Every setting and filter list back to default. Asks first.",
+    HINT_RESET = "Reset all settings or notification position.",
     GROUP_EACH_SHOWS = "Each notification shows",
     HINT_EACH_SHOWS = "Turn off anything you do not want in the line.",
     GROUP_ICON_SIZE = "Icon size",
-    HINT_ICON_SIZE = "Notification height follows it.",
     GROUP_POSITION = "Position",
     HINT_POSITION = "Where notifications appear on screen.",
     GROUP_ALIGNMENT = "Alignment",
@@ -61,7 +63,6 @@ L.Text = {
     GROUP_BACKGROUND = "Background",
     HINT_BACKGROUND = "A dark panel behind each notification.",
     GROUP_APPEARANCE = "Size and transparency",
-    HINT_APPEARANCE = "Of the whole notification.",
     GROUP_ON_SCREEN = "On screen",
     HINT_ON_SCREEN = "How long each notification stays before it fades.",
     GROUP_QUEUE = "Queue",
@@ -70,9 +71,13 @@ L.Text = {
     -- Setting labels
     LABEL_LOOT_NOTIFICATIONS = "Loot notifications",
     LABEL_MONEY_NOTIFICATIONS = "Money notifications",
+    LABEL_CURRENCY_NOTIFICATIONS = "Currency notifications",
+    LABEL_PUSHED_ITEMS = "Bought and rewarded items (\"You receive item\")",
+    LABEL_CRAFTED_ITEMS = "Crafted items (\"You create\")",
     LABEL_MINIMUM_RARITY = "Minimum rarity",
     LABEL_ITEM_ICON = "Item icon",
     LABEL_ITEM_NAME = "Item name",
+    LABEL_RARITY_COLOUR = "Item name in its rarity colour (off: white)",
     LABEL_QUANTITY = "Quantity (x2, x3, ...)",
     LABEL_ITEM_LEVEL = "Item level",
     LABEL_UPGRADE_ARROW = "Upgrade arrow when better than equipped",
@@ -87,12 +92,15 @@ L.Text = {
     LABEL_DURATION = "Duration",
     LABEL_DELAY = "Delay between notifications",
     LABEL_MOST_ON_SCREEN = "Most on screen at once",
+    LABEL_WATCH_SOUND = "Play a sound",
+    LABEL_WATCH_STAR = "Star beside the item",
+    LABEL_WATCH_HIGHLIGHT = "Highlight the notification",
 
     -- Dropdown options and special slider values
     OPTION_ABOVE_LAST = "Above the last one",
     OPTION_BELOW_LAST = "Below the last one",
     OPTION_LEFT = "Left",
-    OPTION_CENTER = "Center",
+    OPTION_CENTER = "Centre",
     OPTION_RIGHT = "Right",
     VALUE_NO_LIMIT = "No limit",
     UNIT_PIXELS = " px",
@@ -104,13 +112,13 @@ L.Text = {
     LIST_WATCHLIST = "Watchlist",
     HINT_WHITELIST = "Always notify, even below the minimum rarity.",
     HINT_BLACKLIST = "Never notify.",
-    HINT_WATCHLIST = "An extra alert for items you are waiting on.",
-    HINT_WATCHLIST_SOON = "An extra alert for items you are waiting on. Coming later.",
+    HINT_WATCHLIST = "Always shows with extra alerts.",
     FILTER_SUMMARY = "%d items \194\183 %d categories",
 
     -- Filter editor
     GROUP_ADD_ITEM = "Add an item",
-    HINT_ADD_ITEM = "Paste an item link or type its id.",
+    HINT_ADD_ITEM = "Click in the box and shift-click one or more items from your bags or chat, "
+        .. "or type one id or exact name, then press Add.",
     GROUP_CATEGORIES = "Categories",
     HINT_CATEGORIES = "Whole groups of items, in one go.",
     GROUP_ITEMS = "Items",
@@ -120,14 +128,6 @@ L.Text = {
     -- Reset confirmation
     RESET_TITLE = "Reset Looti",
     RESET_MESSAGE = "Every setting and filter list goes back to its default.",
-
-    -- Item rarities
-    RARITY_POOR = "Poor",
-    RARITY_COMMON = "Common",
-    RARITY_UNCOMMON = "Uncommon",
-    RARITY_RARE = "Rare",
-    RARITY_EPIC = "Epic",
-    RARITY_LEGENDARY = "Legendary",
 
     -- Filter categories
     CATEGORY_BOE = "Bind on Equip",

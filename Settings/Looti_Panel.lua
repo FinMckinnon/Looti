@@ -5,6 +5,10 @@ L.Panel = {}
 
 local RESET_DIALOG = "LOOTI_RESET_CONFIRM"
 
+-- Height kept under the tabs for the footer row, and the width of its buttons.
+local FOOTER_HEIGHT = 32
+local FOOTER_BUTTON_WIDTH = 120
+
 local window
 local tabGroup
 local staging = {}
@@ -32,51 +36,13 @@ local function Commit()
     end
 end
 
--- input: a container for the filters tab and a column width
--- output: nothing
--- Lists each filter list with its contents and an edit button.
-local function BuildFiltersTab(container, width)
-    container:ReleaseChildren()
-
-    local titles = {
-        whitelist = { L.Text.LIST_WHITELIST, L.Text.HINT_WHITELIST },
-        blacklist = { L.Text.LIST_BLACKLIST, L.Text.HINT_BLACKLIST },
-        watchlist = { L.Text.LIST_WATCHLIST, L.Text.HINT_WATCHLIST_SOON },
-    }
-
-    for _, listType in ipairs(L.Const.FILTER_LISTS) do
-        local title, hint = titles[listType][1], titles[listType][2]
-        local section = L.UI.Section(container, title, hint, width)
-
-        local items, categories = L.Db.CountFilter(listType)
-        local summary = L.AceGUI:Create("Label")
-        summary:SetText(L.Text.FILTER_SUMMARY:format(items, categories))
-        summary:SetRelativeWidth(0.55)
-        section:AddChild(summary)
-
-        local button = L.UI.Button(section, L.Text.BUTTON_EDIT, 100, function()
-            L.FilterEditor.Open(listType)
-        end)
-
-        if listType == "watchlist" and not L.Features.watchlist then
-            button:SetDisabled(true)
-        end
-    end
-end
-
 -- input: a container and a tab id
 -- output: nothing
 -- Fills one tab with its contents.
 local function BuildTab(container, tabId)
     currentTab = tabId
 
-    local width = L.Const.FRAME.PANEL_WIDTH - 60
-
-    if tabId == "filters" then
-        BuildFiltersTab(container, width)
-    else
-        L.Render.Tab(container, staging, tabId, width)
-    end
+    L.Render.Tab(container, staging, tabId)
 end
 
 -- input: nothing
@@ -86,6 +52,8 @@ function L.Actions.resetAll()
     L.Popup.Confirm(RESET_DIALOG, L.Text.RESET_TITLE, L.Text.RESET_MESSAGE, function()
             L.Db.Reset()
             Stage()
+
+            L.Anchor.LoadPosition()
 
             if tabGroup and currentTab then
                 tabGroup:SelectTab(currentTab)
@@ -113,11 +81,10 @@ end
 
 -- input: nothing
 -- output: nothing
--- Writes the staged settings back and closes the window.
+-- Writes the staged settings back, leaving the window open.
 function L.Panel.Save()
     Commit()
     L.Util.Print(L.Text.MSG_SAVED, "update")
-    L.Panel.Close()
 end
 
 -- input: a tab id
@@ -147,38 +114,49 @@ function L.Panel.Open()
     local AceGUI = L.AceGUI
     Stage()
 
-    window = L.UI.Window(L.Text.ADDON_NAME, L.Text.SETTINGS_SUBTITLE,
+    window = L.UI.Window(L.Text.ADDON_NAME, nil,
         L.Const.FRAME.PANEL_WIDTH, L.Const.FRAME.PANEL_HEIGHT, function(self)
             window, tabGroup = nil, nil
             AceGUI:Release(self)
         end)
 
+    window:EnableResize(false)
+
     tabGroup = AceGUI:Create("TabGroup")
-    tabGroup:SetLayout("Flow")
+    tabGroup:SetLayout("Fill")
     tabGroup:SetFullWidth(true)
-    tabGroup:SetFullHeight(true)
+
+    tabGroup:SetAutoAdjustHeight(false)
+    tabGroup:SetHeight(L.UI.ContentHeight(window) - FOOTER_HEIGHT)
+
     tabGroup:SetTabs(L.SchemaTabs)
     tabGroup:SetCallback("OnGroupSelected", function(container, _, tabId)
-        BuildTab(container, tabId)
+        container:ReleaseChildren()
+        local scroll = L.UI.Scroll(container)
+
+        scroll:PauseLayout()
+        BuildTab(scroll, tabId)
+        scroll:ResumeLayout()
+        scroll:DoLayout()
     end)
     window:AddChild(tabGroup)
 
     tabGroup:SelectTab(L.SchemaTabs[1].value)
 
     local footer = AceGUI:Create("SimpleGroup")
-    footer:SetLayout("Flow")
+    footer:SetLayout("LootiCentredRow")
     footer:SetFullWidth(true)
     window:AddChild(footer)
 
-    L.UI.Button(footer, L.Text.BUTTON_CANCEL, 140, function()
+    L.UI.Button(footer, L.Text.BUTTON_CANCEL, FOOTER_BUTTON_WIDTH, function()
         L.Panel.Close()
     end)
 
-    L.UI.Button(footer, L.Text.BUTTON_SAVE, 140, function()
+    L.UI.Button(footer, L.Text.BUTTON_SAVE, FOOTER_BUTTON_WIDTH, function()
         L.Panel.Save()
     end)
 
-    L.UI.Button(footer, L.Text.BUTTON_TEST, 140, function()
+    L.UI.Button(footer, L.Text.BUTTON_TEST, FOOTER_BUTTON_WIDTH, function()
         L.RunPreview()
     end)
 end

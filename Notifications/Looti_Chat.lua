@@ -55,8 +55,8 @@ function L.Chat.FormatToPattern(fmt, anchored)
 
     local pattern = fmt:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
 
-    pattern = pattern:gsub("%%%%%d%$s", "(.+)")
-    pattern = pattern:gsub("%%%%%d%$d", "(%%d+)")
+    pattern = pattern:gsub("%%%%%d+%%%$s", "(.+)")
+    pattern = pattern:gsub("%%%%%d+%%%$d", "(%%d+)")
     pattern = pattern:gsub("%%%%d", "(%%d+)")
     pattern = pattern:gsub("%%%%s", "(.+)")
 
@@ -68,62 +68,13 @@ function L.Chat.FormatToPattern(fmt, anchored)
 end
 
 -- input: a client format string
--- output: the literal text before its first placeholder, or nil
--- Reads the fixed opening a message must have to be about the player.
-local function LiteralPrefix(fmt)
-    if type(fmt) ~= "string" then
-        return nil
-    end
-
-    local prefix = fmt:match("^(.-)%%")
-    if not prefix or prefix == "" then
-        return nil
-    end
-
-    return prefix
-end
-
--- input: a list of client format strings
--- output: a list of the literal openings they have
--- Collects the openings that mark a message as the player's own.
-local function SelfPrefixes(formats)
-    local prefixes = {}
-
-    for _, fmt in ipairs(formats) do
-        local prefix = LiteralPrefix(fmt)
-        if prefix then
-            prefixes[#prefixes + 1] = prefix
-        end
-    end
-
-    return prefixes
-end
-
--- input: a message and a list of literal openings
--- output: true when the message starts with one of them
--- Rejects other players' messages with one plain compare, before any matching.
-local function IsAboutPlayer(message, prefixes)
-    if #prefixes == 0 then
-        return true
-    end
-
-    for _, prefix in ipairs(prefixes) do
-        if message:find(prefix, 1, true) == 1 then
-            return true
-        end
-    end
-
-    return false
-end
-
--- input: a client format string and whether to anchor it
 -- output: a list of patterns
--- Builds one pattern per grammar alternative of a format string.
-local function PatternsFor(fmt, anchored)
+-- Builds one anchored pattern per grammar alternative of a format string.
+local function PatternsFor(fmt)
     local patterns = {}
 
     for _, form in ipairs(ExpandForms(fmt)) do
-        local pattern = L.Chat.FormatToPattern(form, anchored)
+        local pattern = L.Chat.FormatToPattern(form, true)
         if pattern then
             patterns[#patterns + 1] = pattern
         end
@@ -132,52 +83,87 @@ local function PatternsFor(fmt, anchored)
     return patterns
 end
 
--- Loot lines are anchored so another player's loot cannot match. The multiple
--- form is tried first because the single form is a prefix of it.
-local lootForms = {
-    { patterns = PatternsFor(LOOT_ITEM_SELF_MULTIPLE, true), hasQuantity = true },
-    { patterns = PatternsFor(LOOT_ITEM_SELF, true), hasQuantity = false },
+-- Each entry names a message's format strings, the ones carrying a quantity
+-- first and the plain form last. Only the player's own lines are listed.
+-- setting names the LootiConfig key that gates the line.
+local LOOT_FORMATS = {
+    { "LOOT_ITEM_SELF_MULTIPLE", "LOOT_ITEM_SELF" },
+    { "LOOT_ITEM_PUSHED_SELF_MULTIPLE", "LOOT_ITEM_PUSHED_SELF", setting = "showPushedItems" },
+    { "LOOT_ITEM_BONUS_ROLL_SELF_MULTIPLE", "LOOT_ITEM_BONUS_ROLL_SELF" },
+    { "LOOT_ITEM_CREATED_SELF_MULTIPLE", "LOOT_ITEM_CREATED_SELF", setting = "showCraftedItems" },
 }
 
--- Only the player's own loot and money lines are read. Everyone else's arrive
--- on the same events, and in a raid that is most of them.
-local lootSelfPrefixes = SelfPrefixes({ LOOT_ITEM_SELF_MULTIPLE, LOOT_ITEM_SELF })
-local moneySelfPrefixes = SelfPrefixes({
-    YOU_LOOT_MONEY, YOU_LOOT_MONEY_GUILD, LOOT_MONEY_SPLIT, LOOT_MONEY_SPLIT_GUILD,
-})
+local CURRENCY_FORMATS = {
+    { "CURRENCY_GAINED_MULTIPLE_OVERFLOW", "CURRENCY_GAINED_MULTIPLE_BONUS",
+      "CURRENCY_GAINED_MULTIPLE", "CURRENCY_GAINED" },
+}
+
+local MONEY_FORMATS = {
+    { "YOU_LOOT_MONEY_GUILD", "YOU_LOOT_MONEY" },
+    { "LOOT_MONEY_SPLIT_GUILD", "LOOT_MONEY_SPLIT_MOD", "LOOT_MONEY_SPLIT" },
+}
+
+-- input: a list of format groups, as above
+-- output: the forms to try in order
+-- Builds each format's patterns and its fixed opening, which is compared
+-- before any pattern is tried. Strings a client flavour lacks are skipped.
+local function BuildForms(groups)
+    local forms = {}
+
+    for _, group in ipairs(groups) do
+        for index, name in ipairs(group) do
+            local fmt = _G[name]
+            if type(fmt) == "string" then
+                local prefix = fmt:match("^(.-)%%")
+                forms[#forms + 1] = {
+                    patterns = PatternsFor(fmt),
+                    prefix = prefix ~= "" and prefix or nil,
+                    hasQuantity = index < #group,
+                    setting = group.setting,
+                }
+            end
+        end
+    end
+
+    return forms
+end
+
+local lootForms = BuildForms(LOOT_FORMATS)
+local currencyForms = BuildForms(CURRENCY_FORMATS)
+local moneyForms = BuildForms(MONEY_FORMATS)
 
 -- Amounts appear in the middle of a money message, so these are unanchored.
 local moneyUnits = {
-    { patterns = PatternsFor(GOLD_AMOUNT, false), value = COPPER_PER_GOLD },
-    { patterns = PatternsFor(SILVER_AMOUNT, false), value = COPPER_PER_SILVER },
-    { patterns = PatternsFor(COPPER_AMOUNT, false), value = 1 },
+    { patterns = {}, value = COPPER_PER_GOLD },
+    { patterns = {}, value = COPPER_PER_SILVER },
+    { patterns = {}, value = 1 },
 }
 
--- input: captured text from a loot message
--- output: the item link, or nil
--- Reads a leading item link, rejecting a capture that is anything else.
-local function LeadingItemLink(text)
-    if type(text) ~= "string" then
-        return nil
+for index, fmt in ipairs({ GOLD_AMOUNT, SILVER_AMOUNT, COPPER_AMOUNT }) do
+    for _, form in ipairs(ExpandForms(fmt)) do
+        local patterns = moneyUnits[index].patterns
+        patterns[#patterns + 1] = L.Chat.FormatToPattern(form, false)
     end
-
-    return text:match("^(|c%x+|H.-|h%[.-%]|h|r)") or text:match("^(|H.-|h%[.-%]|h|r)")
 end
 
 -- input: a chat message
--- output: the item link and quantity, or nil
--- Reads a link and count out of a message announcing the player's own loot.
-function L.Chat.ParseLoot(message)
-    if type(message) ~= "string" or not IsAboutPlayer(message, lootSelfPrefixes) then
-        return nil
-    end
+-- output: true when the message is text the addon may read
+-- Rejects anything that is not a string, and secret values on 12.0 and later.
+local function IsReadable(message)
+    return type(message) == "string" and not (issecretvalue and issecretvalue(message))
+end
 
-    for _, form in ipairs(lootForms) do
-        for _, pattern in ipairs(form.patterns) do
-            local captured, count = message:match(pattern)
-            local link = LeadingItemLink(captured)
-            if link then
-                return link, form.hasQuantity and (tonumber(count) or 1) or 1
+-- input: a chat message and the forms to try
+-- output: the matching form and its captures, or nil
+-- Tries each form whose fixed opening the message has.
+local function MatchForm(message, forms)
+    for _, form in ipairs(forms) do
+        if not form.prefix or message:find(form.prefix, 1, true) == 1 then
+            for _, pattern in ipairs(form.patterns) do
+                local first, second = message:match(pattern)
+                if first then
+                    return form, first, second
+                end
             end
         end
     end
@@ -185,11 +171,54 @@ function L.Chat.ParseLoot(message)
     return nil
 end
 
+-- input: captured text from a message
+-- output: the link, or nil
+-- Reads a leading item or currency link, in the |cff or |cnIQ colour format.
+local function LeadingLink(text)
+    return text:match("^(|c.-|H.-|h%[.-%]|h|r)") or text:match("^(|H.-|h%[.-%]|h|r)")
+end
+
+-- input: a chat message and the forms to try
+-- output: the link, the quantity, and the LootiConfig key that gates the line, or nil
+-- Reads a link and count out of one of the player's own messages.
+local function ParseLink(message, forms)
+    if not IsReadable(message) then
+        return nil
+    end
+
+    local form, captured, count = MatchForm(message, forms)
+    local link = form and LeadingLink(captured)
+    if not link then
+        return nil
+    end
+
+    return link, form.hasQuantity and (tonumber(count) or 1) or 1, form.setting
+end
+
+-- input: a chat message
+-- output: the item link, the quantity, and the LootiConfig key that gates the line, or nil
+-- Reads the player's own loot, pushed item, bonus roll or crafted item line.
+function L.Chat.ParseLoot(message)
+    return ParseLink(message, lootForms)
+end
+
+-- input: a chat message
+-- output: the currency link and quantity, or nil
+-- Reads the player's own currency line.
+function L.Chat.ParseCurrency(message)
+    return ParseLink(message, currencyForms)
+end
+
 -- input: a chat message
 -- output: the total in copper, zero when the message holds no amount
--- Adds up every gold, silver and copper amount in a money message.
+-- Adds up the gold, silver and copper in the player's own money message.
 function L.Chat.ParseMoney(message)
-    if type(message) ~= "string" or not IsAboutPlayer(message, moneySelfPrefixes) then
+    if not IsReadable(message) then
+        return 0
+    end
+
+    local form, amount = MatchForm(message, moneyForms)
+    if not form or not amount:match("^%d") then
         return 0
     end
 
@@ -197,9 +226,9 @@ function L.Chat.ParseMoney(message)
 
     for _, unit in ipairs(moneyUnits) do
         for _, pattern in ipairs(unit.patterns) do
-            local amount = tonumber(message:match(pattern))
-            if amount then
-                total = total + (amount * unit.value)
+            local value = tonumber(amount:match(pattern))
+            if value then
+                total = total + (value * unit.value)
                 break
             end
         end

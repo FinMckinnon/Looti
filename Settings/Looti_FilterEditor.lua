@@ -57,24 +57,30 @@ local function RefreshItems(listType)
         state.staged.items[itemID] = nil
         RefreshItems(listType)
     end)
+
+    state.window:DoLayout()
 end
 
 -- input: a filter list name and the text typed into the add field
 -- output: nothing
--- Adds an item id or link to the staged copy.
+-- Adds every linked item in the text, or one item given by id or name, to the
+-- staged copy.
 local function AddEntry(listType, text)
     local state = State(listType)
     if not state then
         return
     end
 
-    local itemID = L.ItemCache.ItemID(text) or tonumber(text)
-    if not itemID then
+    local itemIDs = L.ItemCache.ItemIDsFromText(text)
+    if #itemIDs == 0 then
         L.Util.Print(L.Text.MSG_BAD_ITEM, "error")
         return
     end
 
-    state.staged.items[itemID] = true
+    for _, itemID in ipairs(itemIDs) do
+        state.staged.items[itemID] = true
+    end
+
     RefreshItems(listType)
 end
 
@@ -106,6 +112,7 @@ function L.FilterEditor.Open(listType)
     local input = AceGUI:Create("EditBox")
     input:SetLabel("")
     input:SetRelativeWidth(0.7)
+    input:DisableButton(true)
     input:SetCallback("OnEnterPressed", function(self, _, text)
         AddEntry(listType, text)
         self:SetText("")
@@ -130,7 +137,6 @@ function L.FilterEditor.Open(listType)
     local scroll = AceGUI:Create("ScrollFrame")
     scroll:SetLayout("Flow")
     scroll:SetFullWidth(true)
-    scroll:SetFullHeight(true)
     itemSection:AddChild(scroll)
 
     open[listType].scroll = scroll

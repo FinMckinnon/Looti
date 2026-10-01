@@ -1,22 +1,17 @@
--- Feature-detected wrappers for client API that is absent on some flavours.
+-- Wrappers for client API, feature-detected where a flavour may lack it.
 local ADDON, L = ...
 
 L.Compat = {}
 
-local getItemInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
-local getQualityColor = (C_Item and C_Item.GetItemQualityColor) or GetItemQualityColor
-local isEquippable = (C_Item and C_Item.IsEquippableItem) or IsEquippableItem
-local getCurrentItemLevel = C_Item and C_Item.GetCurrentItemLevel
 local itemLocation = ItemLocation
 
--- Backdrops arrived as a template in 9.0 and were backported; older clients have none.
-L.Compat.BACKDROP_TEMPLATE = BackdropTemplateMixin and "BackdropTemplate" or nil
+L.Compat.BACKDROP_TEMPLATE = "BackdropTemplate"
 
 -- input: an item link or item id
 -- output: every GetItemInfo return, or nil when the client has not cached it
--- Calls whichever GetItemInfo this client exposes.
+-- Calls C_Item.GetItemInfo.
 function L.Compat.GetItemInfo(item)
-    return getItemInfo(item)
+    return C_Item.GetItemInfo(item)
 end
 
 -- input: an item rarity number
@@ -27,7 +22,7 @@ function L.Compat.QualityColor(rarity)
         return 1, 1, 1
     end
 
-    local r, g, b = getQualityColor(rarity)
+    local r, g, b = C_Item.GetItemQualityColor(rarity)
     return r or 1, g or 1, b or 1
 end
 
@@ -39,7 +34,7 @@ function L.Compat.IsEquippableItem(link)
         return false
     end
 
-    return isEquippable(link) and true or false
+    return C_Item.IsEquippableItem(link) and true or false
 end
 
 -- input: an inventory slot id
@@ -51,39 +46,31 @@ function L.Compat.EquippedItemLevel(slotID)
         return nil
     end
 
-    if getCurrentItemLevel and itemLocation then
+    if itemLocation then
         local location = itemLocation:CreateFromEquipmentSlot(slotID)
-        local level = getCurrentItemLevel(location)
+        local level = C_Item.GetCurrentItemLevel(location)
         if level and level > 0 then
             return level
         end
     end
 
-    return select(4, getItemInfo(link))
+    return select(4, C_Item.GetItemInfo(link))
 end
 
 -- input: a frame, a backdrop table, and optional colour components
 -- output: nothing
--- Applies a backdrop where the client supports one, otherwise does nothing.
+-- Applies a backdrop, and its colour when one is given.
 function L.Compat.SetBackdrop(frame, backdrop, red, green, blue, alpha)
-    if not frame.SetBackdrop then
-        return
-    end
-
     frame:SetBackdrop(backdrop)
 
-    if backdrop and frame.SetBackdropColor and red then
+    if backdrop and red then
         frame:SetBackdropColor(red, green, blue, alpha)
     end
 end
 
 -- input: a frame, a minimum width, a minimum height
 -- output: nothing
--- Clamps a frame's minimum size using whichever method this client exposes.
+-- Clamps a frame's minimum size.
 function L.Compat.SetMinSize(frame, width, height)
-    if frame.SetResizeBounds then
-        frame:SetResizeBounds(width, height)
-    elseif frame.SetMinResize then
-        frame:SetMinResize(width, height)
-    end
+    frame:SetResizeBounds(width, height)
 end

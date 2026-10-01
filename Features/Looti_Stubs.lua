@@ -1,19 +1,18 @@
--- Disabled entry points for the watchlist and session tracker.
+-- The watchlist sound, and the disabled entry point for the session tracker.
 local ADDON, L = ...
 
 L.Features = {}
 
 -- Hardcoded rather than read from the saved variables, so editing the saved
 -- variables file cannot switch on code that is not written yet.
-L.Features.watchlist = false
 L.Features.sessionTracker = false
 
--- input: item data for a notification that is about to be shown
+-- input: item data for a notification that is being shown, or nil for money
 -- output: nothing
--- Reserved for the extra watchlist alert.
+-- Plays the watchlist sound when a watched item appears.
 function L.Features.OnNotify(itemData)
-    if not L.Features.watchlist then
-        return
+    if itemData and itemData.itemWatched and LootiConfig.watchlistSound then
+        PlaySound(L.Const.WATCH_SOUND, "Master")
     end
 end
 

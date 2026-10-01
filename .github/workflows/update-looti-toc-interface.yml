@@ -1,4 +1,4 @@
-name: Update TOC Interface version(s)
+name: Update TOC Interface versions
 
 on:
   schedule:
@@ -12,22 +12,29 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
+      # One flavor per client, in the updater's names. The Interface line is written in this order.
+      # classic_era is not a valid name: it matches "classic" and returns the MoP version.
       - name: Update TOC Interface versions
         uses: p3lim/toc-interface-updater@v4
         with:
           flavor: |
             retail
-            classic_era
-            classic
-            tbc
-            wrath
+            vanilla
             mists
-            anniversary
+            wrath
+            tbc
+            forever
+
+      # Six numeric versions, one per client (first two digits unique), or no pull request.
+      - name: Check Interface line
+        run: |
+          versions=$(grep -m1 '^## Interface:' Looti.toc | cut -d: -f2 | tr -d ' ' | tr ',' '\n')
+          echo "$versions"
+          [ "$(grep -cE '^[0-9]{5,6}$' <<< "$versions")" -eq 6 ]
+          [ "$(cut -c1-2 <<< "$versions" | sort -u | wc -l)" -eq 6 ]
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v8
