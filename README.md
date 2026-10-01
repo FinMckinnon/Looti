@@ -1,12 +1,4 @@
-# Looti Addon
-
-The Looti addon is a simple scrolling loot notification tool for looted items, currency and money. Works on Retail, every Classic version and WoW Forever.
-
-## Installation
-
-To install Looti, download **Looti.zip** then place it into your Addons folder for your World of Warcraft installation, regularly at `C:\Program Files (x86)\World of Warcraft\#GAMEVERSION#\Interface\AddOns` where GAMEVERSION represents your Game Version of World of Warcraft.
-
-## **Looti - Loot Notification System**
+# Looti - Loot Notification System
 
 <span style="font-size: 14px;">Looti is a <strong>lightweight, highly customisable loot notification addon for World of Warcraft</strong>. It shows <strong>clean, scrolling on-screen loot alerts</strong> for every item, currency and coin you loot, so you can see your drops without reading chat. Use the <strong>minimum rarity slider</strong> to hide junk, <strong>whitelist and blacklist</strong> items or whole categories, and put the drops you're farming on the <strong>watchlist</strong> to get a sound, a star and a highlight the moment they drop.&nbsp;</span>
 
@@ -22,6 +14,13 @@ To install Looti, download **Looti.zip** then place it into your Addons folder f
 <strong>Rarity Control</strong> – Set minimum item quality to show only what matters<br>
 <strong>Flexible Display</strong> – Toggle icons, quantities, item level, rarity colours, scroll direction, and background visibility<br>
 <strong>Every Version</strong> – Retail, Classic Era & Hardcore, Mists of Pandaria Classic, Anniversary and WoW Forever, in every client language<br>
+
+
+## Installation
+
+Download: [CurseForge](https://www.curseforge.com/wow/addons/looti) | [GitHub releases](https://github.com/FinMckinnon/Looti/releases)
+
+To install Looti, download **Looti.zip** then place it into your Addons folder for your World of Warcraft installation, regularly at `C:\Program Files (x86)\World of Warcraft\#GAMEVERSION#\Interface\AddOns` where GAMEVERSION represents your Game Version of World of Warcraft.
 
 ---
 
