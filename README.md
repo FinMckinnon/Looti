@@ -12,7 +12,7 @@
 <strong>Watchlist</strong> – Add the items you're farming and get a sound, a star and a highlight when they drop<br>
 <strong>Smart Filtering</strong> – Whitelist/blacklist items by ID, link, name or category (gear, consumables, crafting mats, BoE/BoP, and more)<br>
 <strong>Rarity Control</strong> – Set minimum item quality to show only what matters<br>
-<strong>Flexible Display</strong> – Toggle icons, quantities, item level, rarity colours, scroll direction, and background visibility<br>
+<strong>Flexible Display</strong> – Toggle icons, quantities, bag totals, item level, rarity colours, text outlines, scroll direction, and background visibility<br>
 <strong>Every Version</strong> – Retail, Classic Era & Hardcore, Mists of Pandaria Classic, Anniversary and WoW Forever, in every client language<br>
 
 
@@ -58,9 +58,13 @@ To install Looti, download **Looti.zip** then place it into your Addons folder f
 - <span style="font-size: 14px;"><strong>Scroll Direction</strong> – Choose whether notifications scroll up or down.</span>
 - <span style="font-size: 14px;"><strong>Background Transparency</strong> – Keep it clean or add a backdrop for visibility.</span>
 - <span style="font-size: 14px;"><strong>Toggle Quantities</strong> – Display item counts for multi-stack loot.</span>
+- <span style="font-size: 14px;"><strong>Bag Totals</strong> – See how many you now have in your bags next to what you looted, like Copper Ore x3 (27).</span>
 - <span style="font-size: 14px;"><strong>Toggle Icons</strong> – Remove item icons for a minimalist look, or change their size.</span>
+- <span style="font-size: 14px;"><strong>Hide Icon Borders</strong> – Zoom icons past the default Blizzard border, with a thin black border in its place.</span>
+- <span style="font-size: 14px;"><strong>Text Outline</strong> – Add a normal or thick outline so the text stands out against busy backgrounds.</span>
 - <span style="font-size: 14px;"><strong>Item Level & Upgrades</strong> – Show the item level on gear, with a green arrow when it's better than what you have equipped.</span>
 - <span style="font-size: 14px;"><strong>Rarity Colours</strong> – Show item names in their rarity colour, or plain white.</span>
+- <span style="font-size: 14px;"><strong>Crafting Quality (Retail)</strong> – Reagents and crafted items show their quality icon next to the name.</span>
 - <span style="font-size: 14px;"><strong>Customise Transparency </strong>– Stay focussed on the game while still being able to see your loot.</span>
 - <span style="font-size: 14px;"><strong>Changeable Scale - </strong>Make your loot notifications as big or small as you need<strong>.&nbsp;</strong></span>
 
@@ -72,6 +76,7 @@ To install Looti, download **Looti.zip** then place it into your Addons folder f
 - <span style="font-size: 14px;"><strong>Delay Between Notifications</strong> – Adjust the timing between each alert.</span>
 - <span style="font-size: 14px;"><strong>Max Notifications on Screen</strong> – Prevent clutter by limiting the number of visible alerts.</span>
 - <span style="font-size: 14px;"><strong>Notification Layout</strong> – Customize icon and text positioning to match your UI style.</span>
+- <span style="font-size: 14px;"><strong>Mouseover Tooltips</strong> – Hover a notification to see the item tooltip, and optionally freeze every notification while you read it.</span>
 
 ---
 

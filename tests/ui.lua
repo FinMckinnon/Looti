@@ -100,6 +100,7 @@ check(released[#released] == window, "window released after close")
 
 
 print("Move notification area")
+check(L.Anchor.frame.mouse == false, "notification area ignores the mouse outside move mode")
 created = {}
 L.Panel.Open()
 local moveWindow = created[1]
@@ -108,8 +109,7 @@ moveTabs:SelectTab("layout")
 local moveButton = Find(moveTabs.children[1], function(w) return w.type == "Button" and w.text == L.Text.BUTTON_MOVE_ANCHOR end)[1]
 local ok, err = pcall(moveButton.Fire, moveButton, "OnClick")
 check(ok, "clicking Move runs without error " .. tostring(err or ""))
-check(not L.Panel.IsOpen(), "settings window closed")
-check(released[#released] == moveWindow, "window released")
+check(L.Panel.IsOpen(), "settings window stays open")
 check(L.Anchor.IsMoveMode(), "anchor in move mode")
 L.Anchor.SetMoveMode(false)
 
@@ -179,6 +179,45 @@ local plain = L.Rows.Acquire(); L.Rows.Fill(plain, gear, nil)
 check(plain.text.textColor[1] == 1 and plain.text.textColor[2] == 1 and plain.text.textColor[3] == 1, "name white when off")
 LootiConfig.colourByRarity = true
 
+M.bagCounts[1003] = 4
+local counted = L.Rows.Acquire(); L.Rows.Fill(counted, gear, nil)
+check(counted.text.text:find("|cFFAAAAAA(4)|r", 1, true), "bag count after the name: " .. counted.text.text)
+LootiConfig.showBagCount = false
+local uncounted = L.Rows.Acquire(); L.Rows.Fill(uncounted, gear, nil)
+check(not uncounted.text.text:find("(4)", 1, true), "bag count hidden when off")
+LootiConfig.showBagCount = true
+M.bagCounts[1003] = nil
+
+check(counted.text.font[3] == "", "no outline by default")
+LootiConfig.textOutline = "THICKOUTLINE"
+local outlined = L.Rows.Acquire()
+check(outlined.text.font[3] == "THICKOUTLINE", "thick outline applied")
+LootiConfig.textOutline = "NONE"
+
+check(counted.icon.texCoord[1] == 0 and not counted.iconBorder.shown, "icon not zoomed and no border by default")
+LootiConfig.iconZoom = true
+local framed = L.Rows.Acquire()
+check(framed.icon.texCoord[1] == 0.08 and framed.icon.texCoord[2] == 0.92, "icon zoomed in")
+check(framed.iconBorder.shown and framed.iconBorder.points[1][2] == framed.icon, "border shown around the icon")
+LootiConfig.iconZoom = false
+
+local reagent = present(1005)
+local tiered = L.Rows.Acquire(); L.Rows.Fill(tiered, reagent, nil)
+check(tiered.text.text:find("Hated But Wanted|A:Tier2|a", 1, true), "crafting quality icon after the name: " .. tiered.text.text)
+LootiConfig.showCraftingQuality = false
+L.Rows.Fill(tiered, reagent, nil)
+check(not tiered.text.text:find("|A:", 1, true), "crafting quality hidden when off")
+LootiConfig.showCraftingQuality = true
+local realTrade = C_TradeSkillUI
+C_TradeSkillUI = nil
+L.Rows.Fill(tiered, reagent, nil)
+check(tiered.text.text == "Hated But Wanted", "no crafting quality API (Classic): plain name")
+C_TradeSkillUI = realTrade
+
+local previewed = present(1003)
+previewed.previewBagCount = 47
+L.Rows.Fill(tiered, previewed, nil)
+check(tiered.text.text:find("(47)", 1, true), "preview bag count shown")
 
 print("Item names in the add box")
 check(L.ItemCache.ItemIDFromText("Sword") == 1003 and L.ItemCache.ItemIDFromText("[Sword]") == 1003, "name and bracketed name resolve")
@@ -272,6 +311,48 @@ check(#rowsOnScreen >= 2 and gap == 74 and rowsOnScreen[1].h == 74, "rows are 74
 LootiConfig.iconSize, LootiConfig.notificationScale = 16, 2
 check(L.Rows.Height() == 70, "small icon keeps the 35px default, scaled x2: " .. L.Rows.Height())
 LootiConfig.iconSize, LootiConfig.notificationScale = 32, 1
+
+print("Hover")
+local timers = {}
+local function RunTimers() local due = timers; timers = {}; for _, fn in ipairs(due) do fn() end end
+local realAfter, realGetTime = C_Timer.After, GetTime
+local now = 0
+C_Timer.After = function(_, fn) timers[#timers + 1] = fn end
+GetTime = function() return now end
+local hoverRow
+local realAcq = L.Rows.Acquire
+L.Rows.Acquire = function(...) local r, g = realAcq(...); hoverRow = r; return r, g end
+check(not LootiConfig.showTooltip and not LootiConfig.pauseOnHover, "mouseover off by default")
+local idle = L.Rows.Acquire()
+check(idle.mouse == false, "row ignores the mouse when the tooltip is off")
+hoverRow = nil
+LootiConfig.showTooltip, LootiConfig.pauseOnHover = true, true
+L.Queue.Add(gear, nil)
+for _ = 1, 50 do if hoverRow then break end tick() end
+L.Rows.Acquire = realAcq
+check(hoverRow and hoverRow.mouse == true, "row reads the mouse")
+hoverRow.scripts.OnEnter(hoverRow)
+check(GameTooltip.owner == hoverRow and GameTooltip.link == gear.itemLink, "tooltip shows the item")
+now = 3
+RunTimers()
+check(not hoverRow.expired and not hoverRow.fading, "clock frozen while hovered")
+local arrived = 0
+L.Rows.Acquire = function(...) arrived = arrived + 1; return realAcq(...) end
+L.Queue.Add(junk, nil)
+tick(); tick()
+L.Rows.Acquire = realAcq
+check(arrived == 0, "queue paused while hovered")
+hoverRow.scripts.OnLeave(hoverRow)
+check(not hoverRow.fading and hoverRow.remaining == LootiConfig.displayDuration, "full time left after a 3s hover: " .. tostring(hoverRow.remaining))
+RunTimers()
+check(hoverRow.expired and hoverRow.fading, "fades once its time runs out")
+hoverRow.scripts.OnEnter(hoverRow)
+check(not hoverRow.fading, "hovering mid-fade brings it back")
+hoverRow.scripts.OnLeave(hoverRow)
+for _ = 1, 5 do RunTimers() end
+check(hoverRow.shown == false, "retired after the fade")
+LootiConfig.showTooltip, LootiConfig.pauseOnHover = false, false
+C_Timer.After, GetTime = realAfter, realGetTime
 C_Timer.NewTicker = realTicker
 
 print("Sound")

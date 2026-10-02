@@ -148,7 +148,7 @@ function L.Panel.Open()
     footer:SetFullWidth(true)
     window:AddChild(footer)
 
-    L.UI.Button(footer, L.Text.BUTTON_CANCEL, FOOTER_BUTTON_WIDTH, function()
+    L.UI.Button(footer, L.Text.BUTTON_CLOSE, FOOTER_BUTTON_WIDTH, function()
         L.Panel.Close()
     end)
 

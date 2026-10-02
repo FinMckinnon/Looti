@@ -92,15 +92,16 @@ local function BuildItemData(link, quantity, forceWatched)
     }
 end
 
--- input: an item link, a quantity, and true to treat the item as watched
+-- input: an item link, a quantity, true to treat the item as watched, and a preview bag count
 -- output: nothing
 -- Queues a notification for one item once its details are known.
-function L.Events.Present(link, quantity, forceWatched)
+function L.Events.Present(link, quantity, forceWatched, previewBagCount)
     local itemData = BuildItemData(link, quantity, forceWatched)
     if not itemData then
         return
     end
 
+    itemData.previewBagCount = previewBagCount
     L.Queue.Add(itemData, nil)
     L.Features.OnRecord(itemData, nil)
 end
@@ -225,6 +226,7 @@ local function HandleCurrency(message)
         icon = info.iconFileID,
         quality = info.quality,
         quantity = quantity,
+        currencyID = currencyID,
         isCurrency = true,
     })
 end
@@ -240,6 +242,7 @@ frame:RegisterEvent("CHAT_MSG_LOOT")
 frame:RegisterEvent("CHAT_MSG_MONEY")
 frame:RegisterEvent("CHAT_MSG_CURRENCY")
 frame:RegisterEvent("LOOT_ITEM_ROLL_WON")
+frame:RegisterEvent("BAG_UPDATE_DELAYED")
 
 frame:SetScript("OnEvent", function(_, event, ...)
     if event == "ADDON_LOADED" then
@@ -275,5 +278,8 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- fires only for the player's own win.
         local itemLink, rollQuantity = ...
         L.Events.NotifyLoot(itemLink, rollQuantity or 1)
+    elseif event == "BAG_UPDATE_DELAYED" then
+        -- Looted items reach the bags after the chat line, so recount what is on screen.
+        L.Queue.RefreshAll()
     end
 end)

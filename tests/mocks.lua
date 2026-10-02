@@ -1,6 +1,6 @@
 -- Mock WoW client and AceGUI, enough to load Looti outside the game.
 -- Returns the addon table, the frames created, the sounds played, and a check helper.
-local M = { failures = 0, allFrames = {}, played = {} }
+local M = { failures = 0, allFrames = {}, played = {}, bagCounts = {} }
 
 function M.check(cond, msg)
     if cond then print("  ok   " .. msg) else M.failures = M.failures + 1; print("  FAIL " .. msg) end
@@ -25,6 +25,10 @@ local function Region(kind, parent)
     function r:SetColorTexture(...) self.color = { ... } end
     function r:SetText(t) self.text = t end
     function r:SetTextColor(...) self.textColor = { ... } end
+    function r:SetFont(...) self.font = { ... } end
+    function r:SetTexCoord(...) self.texCoord = { ... } end
+    function r:SetAlpha(a) self.alpha = a end
+    function r:EnableMouse(v) self.mouse = v end
     function r:SetHeight(h) self.h = h end
     function r:SetWidth(w) self.w = w end
     function r:GetHeight() return self.h or 0 end
@@ -33,7 +37,9 @@ local function Region(kind, parent)
     function r:CreateTexture(...) local t = Region("Texture", self); t.args = { ... }; return t end
     function r:CreateFontString() return Region("FontString", self) end
     function r:RegisterEvent(e) self.events = self.events or {}; self.events[e] = true end
-    function r:SetScript(name, fn) self.scripts = self.scripts or {}; self.scripts[name] = fn end
+    -- The client turns the mouse on when a mouse handler is set.
+    local MOUSE_SCRIPTS = { OnEnter = true, OnLeave = true, OnMouseDown = true, OnMouseUp = true, OnClick = true }
+    function r:SetScript(name, fn) self.scripts = self.scripts or {}; self.scripts[name] = fn; if fn and MOUSE_SCRIPTS[name] then self.mouse = true end end
     function r:GetChildren() return table.unpack(self.children or {}) end
     return setmetatable(r, FALLBACK)
 end
@@ -43,7 +49,15 @@ UIParent = Region("Frame")
 DEFAULT_CHAT_FRAME = { AddMessage = function(_, m) print("  chat: " .. m) end }
 SlashCmdList = {}
 C_Timer = { After = noop, NewTicker = function() return { Cancel = noop } end }
-UIFrameFadeIn, UIFrameFadeOut = noop, noop
+UIFrameFadeIn, UIFrameFadeOut, UIFrameFadeRemoveFrame = noop, noop, noop
+GameFontHighlight = { GetFont = function() return "Fonts\\FRIZQT__.TTF", 12, "" end }
+GameTooltip = Region("GameTooltip")
+CreateAtlasMarkupWithAtlasSize = function(atlas) return "|A:" .. atlas .. "|a" end
+C_TradeSkillUI = { GetItemReagentQualityInfo = function(item) if tostring(item):match("item:1005") then return { iconChat = "Tier2" } end end }
+function GameTooltip:SetOwner(owner) self.owner = owner end
+function GameTooltip:IsOwned(f) return self.owner == f end
+function GameTooltip:SetHyperlink(l) self.link = l end
+function GameTooltip:SetCurrencyByID(id) self.currency = id end
 GetTime = function() return 0 end
 wipe = function(t) for k in pairs(t) do t[k] = nil end return t end
 strtrim = function(s) return (s:gsub("^%s+", ""):gsub("%s+$", "")) end
@@ -74,6 +88,7 @@ C_Item = {
     GetItemQualityColor = function(q) return q / 10, 0.5, 1 - q / 10 end,
     IsEquippableItem = function(item) return ITEMS[IdOf(item)][4] ~= "" end,
     GetDetailedItemLevelInfo = function(item) local d = ITEMS[IdOf(item)]; return d and d[8] end,
+    GetItemCount = function(item) return M.bagCounts[IdOf(item)] or 0 end,
     GetItemInfoInstant = function(item) return type(item) == "string" and item == "Sword" and 1003 or nil end,
 }
 GetInventoryItemLink = function(_, slot) if slot == 16 then return LinkFor(2000) end end

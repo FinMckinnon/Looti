@@ -15,8 +15,8 @@ local frame = CreateFrame("Frame", "LootiAnchorFrame", UIParent, L.Compat.BACKDR
 frame:SetSize(L.Const.FRAME.NOTIFICATION_WIDTH, L.Const.FRAME.NOTIFICATION_HEIGHT + 2)
 frame:SetClampedToScreen(true)
 frame:SetFrameStrata("BACKGROUND")
-frame:SetMovable(true)
-frame:EnableMouse(true)
+frame:SetMovable(false)
+frame:EnableMouse(false)
 L.Compat.SetBackdrop(frame, BACKDROP, 0, 0, 0, 0)
 
 local title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
@@ -123,3 +123,6 @@ doneButton:SetScript("OnClick", function()
     L.Anchor.SavePosition()
     L.Anchor.SetMoveMode(false)
 end)
+
+-- Setting a mouse script turns the mouse on, so switch it back off afterwards.
+frame:EnableMouse(false)

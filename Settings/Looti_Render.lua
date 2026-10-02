@@ -13,10 +13,6 @@ L.Actions = {}
 -- output: nothing
 -- Closes the settings window and puts the anchor into move mode.
 function L.Actions.moveAnchor()
-    if L.Panel then
-        L.Panel.Close()
-    end
-
     L.Anchor.SetMoveMode(true)
 end
 

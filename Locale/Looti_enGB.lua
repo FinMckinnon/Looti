@@ -15,6 +15,7 @@ L.Text = {
     -- Buttons
     BUTTON_SAVE = "Save",
     BUTTON_CANCEL = "Cancel",
+    BUTTON_CLOSE = "Close",
     BUTTON_YES = "Yes",
     BUTTON_TEST = "Test Looti",
     BUTTON_EDIT = "Edit...",
@@ -37,6 +38,7 @@ L.Text = {
 
     -- Notification contents
     ITEM_LEVEL = "(Lvl %d)",
+    BAG_COUNT = "(%d)",
 
     -- Tabs
     TAB_GENERAL = "General",
@@ -55,7 +57,8 @@ L.Text = {
     HINT_RESET = "Reset all settings or notification position.",
     GROUP_EACH_SHOWS = "Each notification shows",
     HINT_EACH_SHOWS = "Turn off anything you do not want in the line.",
-    GROUP_ICON_SIZE = "Icon size",
+    GROUP_ICON = "Icon",
+    GROUP_TEXT = "Text",
     GROUP_POSITION = "Position",
     HINT_POSITION = "Where notifications appear on screen.",
     GROUP_ALIGNMENT = "Alignment",
@@ -65,6 +68,8 @@ L.Text = {
     GROUP_APPEARANCE = "Size and transparency",
     GROUP_ON_SCREEN = "On screen",
     HINT_ON_SCREEN = "How long each notification stays before it fades.",
+    GROUP_MOUSEOVER = "Mouseover",
+    HINT_MOUSEOVER = "When the mouse is over a notification.",
     GROUP_QUEUE = "Queue",
     HINT_QUEUE = "When several items arrive at once.",
 
@@ -81,7 +86,13 @@ L.Text = {
     LABEL_QUANTITY = "Quantity (x2, x3, ...)",
     LABEL_ITEM_LEVEL = "Item level",
     LABEL_UPGRADE_ARROW = "Upgrade arrow when better than equipped",
+    LABEL_BAG_COUNT = "Amount in your bags (Copper Ore (12))",
+    LABEL_CRAFTING_QUALITY = "Crafting quality icon (Retail)",
     LABEL_ICON_SIZE = "Icon size",
+    LABEL_ICON_ZOOM = "Hide Blizzard icon borders",
+    LABEL_TEXT_OUTLINE = "Text outline",
+    LABEL_SHOW_TOOLTIP = "Show the item tooltip on mouseover",
+    LABEL_PAUSE_ON_HOVER = "Freeze all notifications and hold new ones back",
     LABEL_NEW_ALERTS = "New alerts appear",
     LABEL_ICON = "Icon",
     LABEL_TEXT = "Text",
@@ -102,6 +113,9 @@ L.Text = {
     OPTION_LEFT = "Left",
     OPTION_CENTER = "Centre",
     OPTION_RIGHT = "Right",
+    OPTION_NONE = "None",
+    OPTION_OUTLINE = "Outline",
+    OPTION_THICK_OUTLINE = "Thick outline",
     VALUE_NO_LIMIT = "No limit",
     UNIT_PIXELS = " px",
     UNIT_SECONDS = " s",

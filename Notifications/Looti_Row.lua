@@ -12,6 +12,9 @@ local BACKDROP = {
 local free = {}
 local generation = 0
 
+-- Crops the default border off an icon texture.
+local ICON_ZOOM = 0.08
+
 -- input: an item link, its equip location and its item level
 -- output: true when the item beats what is equipped
 -- Compares an item against the slots it could occupy.
@@ -46,6 +49,39 @@ local function QuantityText(quantity)
     return ""
 end
 
+-- input: an item link
+-- output: the bag count suffix, empty when the item is not in the bags
+-- Formats how many of the item the player now carries.
+local function BagCountText(itemLink, previewCount)
+    local count = previewCount or C_Item.GetItemCount(itemLink)
+    if count and count > 0 then
+        return "|cFFAAAAAA" .. L.Text.BAG_COUNT:format(count) .. "|r"
+    end
+
+    return ""
+end
+
+-- input: an item link
+-- output: the crafting quality icon as inline markup, empty when the item has none
+-- Reads the reagent or crafted quality; only Retail and Forever items carry one.
+local function CraftingQualityText(itemLink)
+    local tradeSkill = C_TradeSkillUI
+    if not tradeSkill then
+        return ""
+    end
+
+    local info = tradeSkill.GetItemReagentQualityInfo and tradeSkill.GetItemReagentQualityInfo(itemLink)
+    if not info and tradeSkill.GetItemCraftedQualityInfo then
+        info = tradeSkill.GetItemCraftedQualityInfo(itemLink)
+    end
+
+    if not (info and info.iconChat) then
+        return ""
+    end
+
+    return CreateAtlasMarkupWithAtlasSize(info.iconChat, nil, 1, nil, nil, nil, 0.5)
+end
+
 -- input: nothing
 -- output: a notification frame with its text, icon and upgrade regions attached
 -- Builds one frame and its regions, which are then reused for every notification.
@@ -54,6 +90,8 @@ local function BuildRow()
 
     row.text = row:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     row.icon = row:CreateTexture(nil, "ARTWORK")
+    row.iconBorder = row:CreateTexture(nil, "ARTWORK", nil, -1)
+    row.iconBorder:SetColorTexture(0, 0, 0, 1)
 
     row.upgrade = row:CreateTexture(nil, "ARTWORK")
     row.upgrade:SetTexture(L.Const.UPGRADE_ICON)
@@ -63,6 +101,10 @@ local function BuildRow()
 
     row.highlight = row:CreateTexture(nil, "ARTWORK", nil, -8)
     row.highlight:SetAllPoints(row)
+
+    -- Set before ApplyLayout, which decides whether the mouse is on.
+    row:SetScript("OnEnter", function(self) L.Rows.OnEnter(self) end)
+    row:SetScript("OnLeave", function(self) L.Rows.OnLeave(self) end)
 
     return row
 end
@@ -117,6 +159,13 @@ local function ApplyLayout(row)
 
     row.text:SetShown(config.showText)
     row.icon:SetShown(config.showIcon)
+    row.iconBorder:SetShown(config.showIcon and config.iconZoom)
+
+    -- Only the tooltip reads the mouse, and even then clicks and camera drags
+    -- pass through to the world.
+    row:EnableMouse(config.showTooltip)
+    row:SetMouseClickEnabled(false)
+    row:SetPropagateMouseClicks(true)
     row.upgrade:Hide()
     row.star:Hide()
     row.highlight:Hide()
@@ -131,12 +180,19 @@ local function ApplyLayout(row)
         end
         row.text:SetPoint(config.textDisplay, row, config.textDisplay, textMargin, 0)
         row.text:SetScale(scale)
+
+        local font, size = GameFontHighlight:GetFont()
+        local outline = config.textOutline ~= "NONE" and config.textOutline or ""
+        row.text:SetFont(font, size, outline)
     end
 
     if config.showIcon then
         row.icon:SetSize(iconSize, iconSize)
         row.icon:SetAlpha(config.notificationAlpha)
         row.icon:SetScale(scale)
+
+        local crop = config.iconZoom and ICON_ZOOM or 0
+        row.icon:SetTexCoord(crop, 1 - crop, crop, 1 - crop)
 
         if config.showText then
             local modifier = config.iconDisplay == "LEFT" and -1 or 1
@@ -146,6 +202,12 @@ local function ApplyLayout(row)
             row.icon:SetPoint(config.iconDisplay, row, config.iconDisplay, 0, 0)
         end
     end
+
+    row.iconBorder:ClearAllPoints()
+    row.iconBorder:SetScale(scale)
+    row.iconBorder:SetAlpha(config.notificationAlpha)
+    row.iconBorder:SetPoint("TOPLEFT", row.icon, "TOPLEFT", -1, 1)
+    row.iconBorder:SetPoint("BOTTOMRIGHT", row.icon, "BOTTOMRIGHT", 1, -1)
 
     row.upgrade:SetSize(iconSize / 2, iconSize / 2)
     row.upgrade:SetAlpha(config.notificationAlpha * 0.75)
@@ -204,6 +266,8 @@ end
 function L.Rows.Fill(row, itemData, currencyData)
     local config = LootiConfig
     local text, icon, red, green, blue
+
+    row.itemData, row.currencyData = itemData, currencyData
     local showUpgrade = false
     local watched = itemData and itemData.itemWatched
 
@@ -216,6 +280,11 @@ function L.Rows.Fill(row, itemData, currencyData)
 
         local parts = { itemData.itemName }
 
+        local quality = config.showCraftingQuality and CraftingQualityText(itemData.itemLink) or ""
+        if quality ~= "" then
+            parts[1] = parts[1] .. quality
+        end
+
         local quantity = config.showQuantity and QuantityText(itemData.itemQuantity) or ""
         if quantity ~= "" then
             parts[#parts + 1] = "|cFFFFFFFF" .. quantity .. "|r"
@@ -223,6 +292,11 @@ function L.Rows.Fill(row, itemData, currencyData)
 
         if config.showItemLevel and itemData.itemLevel then
             parts[#parts + 1] = "|cFFFFFFFF" .. L.Text.ITEM_LEVEL:format(itemData.itemLevel) .. "|r"
+        end
+
+        local bagCount = config.showBagCount and BagCountText(itemData.itemLink, itemData.previewBagCount) or ""
+        if bagCount ~= "" then
+            parts[#parts + 1] = bagCount
         end
 
         text = table.concat(parts, " ")
@@ -263,4 +337,24 @@ function L.Rows.Fill(row, itemData, currencyData)
     PlaceBadges(row, badges)
 
     row.highlight:SetShown((watched and config.watchlistHighlight) and true or false)
+end
+
+-- input: a row
+-- output: nothing
+-- Shows the tooltip for the item or currency in a row; money has none.
+function L.Rows.ShowTooltip(row)
+    local itemData, currencyData = row.itemData, row.currencyData
+    local currencyID = currencyData and currencyData.currencyID
+
+    if not (itemData or currencyID) then
+        return
+    end
+
+    GameTooltip:SetOwner(row, "ANCHOR_CURSOR")
+    if itemData then
+        GameTooltip:SetHyperlink(itemData.itemLink)
+    else
+        GameTooltip:SetCurrencyByID(currencyID)
+    end
+    GameTooltip:Show()
 end

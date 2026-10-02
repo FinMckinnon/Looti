@@ -34,6 +34,12 @@ L.Schema = {
       hint = L.Text.HINT_MINIMUM_RARITY,
       label = L.Text.LABEL_MINIMUM_RARITY, min = 0, max = 5, step = 1, rarity = true },
 
+    { key = "showTooltip", type = "toggle", tab = "general",
+      group = L.Text.GROUP_MOUSEOVER, hint = L.Text.HINT_MOUSEOVER,
+      label = L.Text.LABEL_SHOW_TOOLTIP },
+    { key = "pauseOnHover", type = "toggle", tab = "general",
+      group = L.Text.GROUP_MOUSEOVER, label = L.Text.LABEL_PAUSE_ON_HOVER, enabledBy = "showTooltip" },
+
     { type = "action", tab = "general",
       group = L.Text.GROUP_RESET,
       hint = L.Text.HINT_RESET,
@@ -56,10 +62,22 @@ L.Schema = {
       group = L.Text.GROUP_EACH_SHOWS, label = L.Text.LABEL_ITEM_LEVEL },
     { key = "showItemLevelUpgradeIcon", type = "toggle", tab = "content",
       group = L.Text.GROUP_EACH_SHOWS, label = L.Text.LABEL_UPGRADE_ARROW },
+    { key = "showBagCount", type = "toggle", tab = "content",
+      group = L.Text.GROUP_EACH_SHOWS, label = L.Text.LABEL_BAG_COUNT },
+    { key = "showCraftingQuality", type = "toggle", tab = "content",
+      group = L.Text.GROUP_EACH_SHOWS, label = L.Text.LABEL_CRAFTING_QUALITY },
 
     { key = "iconSize", type = "range", tab = "content",
-      group = L.Text.GROUP_ICON_SIZE,
+      group = L.Text.GROUP_ICON,
       label = L.Text.LABEL_ICON_SIZE, min = 12, max = 64, step = 2, unit = L.Text.UNIT_PIXELS },
+    { key = "iconZoom", type = "toggle", tab = "content",
+      group = L.Text.GROUP_ICON, label = L.Text.LABEL_ICON_ZOOM, enabledBy = "showIcon" },
+
+    { key = "textOutline", type = "select", tab = "content",
+      group = L.Text.GROUP_TEXT, label = L.Text.LABEL_TEXT_OUTLINE, enabledBy = "showText",
+      options = { NONE = L.Text.OPTION_NONE, OUTLINE = L.Text.OPTION_OUTLINE,
+                  THICKOUTLINE = L.Text.OPTION_THICK_OUTLINE },
+      order = { "NONE", "OUTLINE", "THICKOUTLINE" } },
 
     { type = "action", tab = "layout",
       group = L.Text.GROUP_POSITION, hint = L.Text.HINT_POSITION,
