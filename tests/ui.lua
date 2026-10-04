@@ -211,7 +211,10 @@ LootiConfig.showCraftingQuality = true
 local realTrade = C_TradeSkillUI
 C_TradeSkillUI = nil
 L.Rows.Fill(tiered, reagent, nil)
-check(tiered.text.text == "Hated But Wanted", "no crafting quality API (Classic): plain name")
+check(tiered.text.text == "Hated But Wanted", "no crafting quality API: plain name")
+C_TradeSkillUI = { GetItemReagentQualityInfo = function() error("rejected") end, GetItemCraftedQualityInfo = function() error("rejected") end }
+local ok = pcall(L.Rows.Fill, tiered, reagent, nil)
+check(ok and tiered.text.text == "Hated But Wanted", "crafting quality call that errors: notification still shows")
 C_TradeSkillUI = realTrade
 
 local previewed = present(1003)

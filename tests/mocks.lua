@@ -53,7 +53,7 @@ UIFrameFadeIn, UIFrameFadeOut, UIFrameFadeRemoveFrame = noop, noop, noop
 GameFontHighlight = { GetFont = function() return "Fonts\\FRIZQT__.TTF", 12, "" end }
 GameTooltip = Region("GameTooltip")
 CreateAtlasMarkupWithAtlasSize = function(atlas) return "|A:" .. atlas .. "|a" end
-C_TradeSkillUI = { GetItemReagentQualityInfo = function(item) if tostring(item):match("item:1005") then return { iconChat = "Tier2" } end end }
+C_TradeSkillUI = { GetItemReagentQualityInfo = function(item) assert(type(item) == "number", "bad argument #1 to 'GetItemReagentQualityInfo'"); if item == 1005 then return { iconChat = "Tier2" } end end }
 function GameTooltip:SetOwner(owner) self.owner = owner end
 function GameTooltip:IsOwned(f) return self.owner == f end
 function GameTooltip:SetHyperlink(l) self.link = l end

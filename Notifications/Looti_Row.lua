@@ -53,7 +53,8 @@ end
 -- output: the bag count suffix, empty when the item is not in the bags
 -- Formats how many of the item the player now carries.
 local function BagCountText(itemLink, previewCount)
-    local count = previewCount or C_Item.GetItemCount(itemLink)
+    local itemID = L.ItemCache.ItemID(itemLink)
+    local count = previewCount or (itemID and C_Item.GetItemCount(itemID))
     if count and count > 0 then
         return "|cFFAAAAAA" .. L.Text.BAG_COUNT:format(count) .. "|r"
     end
@@ -63,16 +64,22 @@ end
 
 -- input: an item link
 -- output: the crafting quality icon as inline markup, empty when the item has none
--- Reads the reagent or crafted quality; only Retail and Forever items carry one.
+-- Reads the reagent or crafted quality by item id. Only Retail and Forever items
+-- carry one; any error from a client that rejects the call is treated as none.
 local function CraftingQualityText(itemLink)
     local tradeSkill = C_TradeSkillUI
-    if not tradeSkill then
+    local itemID = L.ItemCache.ItemID(itemLink)
+    if not (tradeSkill and itemID) then
         return ""
     end
 
-    local info = tradeSkill.GetItemReagentQualityInfo and tradeSkill.GetItemReagentQualityInfo(itemLink)
-    if not info and tradeSkill.GetItemCraftedQualityInfo then
-        info = tradeSkill.GetItemCraftedQualityInfo(itemLink)
+    local info
+    for _, getter in ipairs({ tradeSkill.GetItemReagentQualityInfo, tradeSkill.GetItemCraftedQualityInfo }) do
+        local ok, result = pcall(getter, itemID)
+        if ok and result then
+            info = result
+            break
+        end
     end
 
     if not (info and info.iconChat) then
