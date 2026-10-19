@@ -29,6 +29,8 @@ local function Region(kind, parent)
     function r:SetTexCoord(...) self.texCoord = { ... } end
     function r:SetAlpha(a) self.alpha = a end
     function r:EnableMouse(v) self.mouse = v end
+    -- Blocked in combat for every frame, so Looti must never call it.
+    function r:SetPropagateMouseClicks() error("ADDON_ACTION_BLOCKED: SetPropagateMouseClicks") end
     function r:SetHeight(h) self.h = h end
     function r:SetWidth(w) self.w = w end
     function r:GetHeight() return self.h or 0 end

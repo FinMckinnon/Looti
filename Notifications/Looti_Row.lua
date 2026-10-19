@@ -168,11 +168,10 @@ local function ApplyLayout(row)
     row.icon:SetShown(config.showIcon)
     row.iconBorder:SetShown(config.showIcon and config.iconZoom)
 
-    -- Only the tooltip reads the mouse, and even then clicks and camera drags
-    -- pass through to the world.
+    -- Only the tooltip reads the mouse, and clicks still pass through to the world.
+    -- SetPropagateMouseClicks is blocked in combat, so it is not used here.
     row:EnableMouse(config.showTooltip)
     row:SetMouseClickEnabled(false)
-    row:SetPropagateMouseClicks(true)
     row.upgrade:Hide()
     row.star:Hide()
     row.highlight:Hide()
