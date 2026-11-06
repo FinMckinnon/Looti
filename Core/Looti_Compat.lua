@@ -27,14 +27,15 @@ function L.Compat.QualityColor(rarity)
 end
 
 -- input: an item link
--- output: true when the item can be equipped
--- Reports whether the player could equip the item.
+-- output: true when the item can be equipped by this character
+-- Reports whether the item is equipment the player's class can use.
 function L.Compat.IsEquippableItem(link)
-    if not link then
+    local itemID = L.ItemCache.ItemID(link)
+    if not itemID then
         return false
     end
 
-    return C_Item.IsEquippableItem(link) and true or false
+    return (C_Item.IsEquippableItem(itemID) and C_PlayerInfo.CanUseItem(itemID)) and true or false
 end
 
 -- input: an inventory slot id

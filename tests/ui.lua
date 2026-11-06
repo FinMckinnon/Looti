@@ -145,6 +145,10 @@ local row = L.Rows.Acquire()
 L.Rows.Fill(row, gear, nil)
 check(row.text.text == "Sword |cFFFFFFFF(Lvl 639)|r", "text has no stray spaces: " .. row.text.text)
 check(row.star.shown and row.upgrade.shown and row.highlight.shown, "star, upgrade arrow and highlight shown")
+M.unusable[1003] = true
+local unusable = L.Rows.Acquire(); L.Rows.Fill(unusable, gear, nil)
+check(not unusable.upgrade.shown, "no upgrade arrow on gear this class cannot use")
+M.unusable[1003] = nil
 check(row.star.points[1][2] == row.text and row.star.points[1][3] == "RIGHT", "star sits after the text")
 check(row.upgrade.points[1][2] == row.star, "upgrade arrow sits after the star")
 check(row.highlight.color and row.highlight.color[1] == 1, "highlight tinted gold")

@@ -1,6 +1,6 @@
 -- Mock WoW client and AceGUI, enough to load Looti outside the game.
 -- Returns the addon table, the frames created, the sounds played, and a check helper.
-local M = { failures = 0, allFrames = {}, played = {}, bagCounts = {} }
+local M = { failures = 0, allFrames = {}, played = {}, bagCounts = {}, unusable = {} }
 
 function M.check(cond, msg)
     if cond then print("  ok   " .. msg) else M.failures = M.failures + 1; print("  FAIL " .. msg) end
@@ -93,6 +93,8 @@ C_Item = {
     GetItemCount = function(item) return M.bagCounts[IdOf(item)] or 0 end,
     GetItemInfoInstant = function(item) return type(item) == "string" and item == "Sword" and 1003 or nil end,
 }
+-- Takes an item id only, like the client.
+C_PlayerInfo = { CanUseItem = function(id) assert(type(id) == "number", "bad argument #1 to 'CanUseItem'"); return not M.unusable[id] end }
 GetInventoryItemLink = function(_, slot) if slot == 16 then return LinkFor(2000) end end
 
 -- Fake AceGUI ---------------------------------------------------------------
