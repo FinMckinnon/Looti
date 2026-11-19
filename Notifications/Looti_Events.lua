@@ -5,6 +5,9 @@ L.Events = {}
 
 local DEDUP_WINDOW = 5
 
+-- Seconds a rolled item stays marked after its roll timer, for the slot to clear.
+local ROLL_GRACE = 10
+
 local COIN_ICONS = {
     gold = "Interface\\Icons\\INV_Misc_Coin_01",
     silver = "Interface\\Icons\\INV_Misc_Coin_03",
@@ -15,6 +18,11 @@ local COIN_ICONS = {
 -- their own LOOT_READY handler, so a slot read back later returns nothing.
 local lootCapture = {}
 local lootSessionOpen = false
+
+-- Item ids up for a group roll, and when that marking expires. A rolled item
+-- leaves the loot window for whoever wins it, so its slot says nothing about us;
+-- the player's own win arrives through LOOT_ITEM_ROLL_WON and chat.
+local rolledItems = {}
 
 -- Chat output at ADDON_LOADED is not reliably visible, so an upgrade notice
 -- waits for the player to be in the world.
@@ -132,8 +140,8 @@ local function CaptureLootWindow()
         if not lootCapture[slot] then
             local link = GetLootSlotLink(slot)
             if link then
-                local _, _, quantity = GetLootSlotInfo(slot)
-                lootCapture[slot] = { link = link, quantity = quantity or 1 }
+                local _, _, quantity, _, _, locked = GetLootSlotInfo(slot)
+                lootCapture[slot] = { link = link, quantity = quantity or 1, locked = locked }
             end
         end
     end
@@ -152,15 +160,23 @@ local function HandleSlotCleared(slot)
         data = lootCapture[slot]
     end
 
-    if data then
-        lootCapture[slot] = nil
-        L.Events.NotifyLoot(data.link, data.quantity)
+    if not data then
+        return
     end
+
+    lootCapture[slot] = nil
+
+    local rolledUntil = rolledItems[L.ItemCache.ItemID(data.link)]
+    if data.locked or (rolledUntil and rolledUntil > GetTime()) then
+        return
+    end
+
+    L.Events.NotifyLoot(data.link, data.quantity)
 end
 
 -- input: nothing
 -- output: nothing
--- Clears the captured window and drops spent dedup tokens.
+-- Clears the captured window and drops spent dedup tokens and roll marks.
 local function HandleLootClosed()
     lootSessionOpen = false
     wipe(lootCapture)
@@ -169,6 +185,12 @@ local function HandleLootClosed()
     for key, token in pairs(dedupTokens) do
         if token.expires <= now then
             dedupTokens[key] = nil
+        end
+    end
+
+    for itemID, expires in pairs(rolledItems) do
+        if expires <= now then
+            rolledItems[itemID] = nil
         end
     end
 end
@@ -242,6 +264,7 @@ frame:RegisterEvent("CHAT_MSG_LOOT")
 frame:RegisterEvent("CHAT_MSG_MONEY")
 frame:RegisterEvent("CHAT_MSG_CURRENCY")
 frame:RegisterEvent("LOOT_ITEM_ROLL_WON")
+frame:RegisterEvent("START_LOOT_ROLL")
 frame:RegisterEvent("BAG_UPDATE_DELAYED")
 
 frame:SetScript("OnEvent", function(_, event, ...)
@@ -278,6 +301,12 @@ frame:SetScript("OnEvent", function(_, event, ...)
         -- fires only for the player's own win.
         local itemLink, rollQuantity = ...
         L.Events.NotifyLoot(itemLink, rollQuantity or 1)
+    elseif event == "START_LOOT_ROLL" then
+        local rollID, rollTime = ...
+        local itemID = L.ItemCache.ItemID(GetLootRollItemLink(rollID))
+        if itemID then
+            rolledItems[itemID] = GetTime() + (rollTime or 0) / 1000 + ROLL_GRACE
+        end
     elseif event == "BAG_UPDATE_DELAYED" then
         -- Looted items reach the bags after the chat line, so recount what is on screen.
         L.Queue.RefreshAll()

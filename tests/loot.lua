@@ -14,7 +14,11 @@ GetTime = function() return now end
 local lootSlots = {}
 GetNumLootItems = function() return #lootSlots end
 GetLootSlotLink = function(slot) return lootSlots[slot] and lootSlots[slot].link end
-GetLootSlotInfo = function(slot) return nil, nil, lootSlots[slot] and lootSlots[slot].quantity end
+GetLootSlotInfo = function(slot)
+    local data = lootSlots[slot] or {}
+    return nil, nil, data.quantity, nil, nil, data.locked
+end
+GetLootRollItemLink = function(rollID) return LinkFor(rollID) end
 
 -- input: a client format string and its arguments
 -- output: the text the client would show
@@ -153,6 +157,22 @@ local SCENARIOS = {
     end, quantity = 10 },
 
     -- Unhappy paths: no notification.
+    { name = "group roll won by someone else (slot clears)", expect = 0, run = function(S)
+        OpenLootWindow({ { link = LinkFor(1003), quantity = 1 } })
+        fire("START_LOOT_ROLL", 1003, 60000)
+        TakeSlot(1)
+    end },
+    { name = "locked slot cleared (master loot or roll)", expect = 0, run = function(S)
+        OpenLootWindow({ { link = LinkFor(1003), quantity = 1, locked = true } })
+        TakeSlot(1)
+    end },
+    { name = "group roll you win", expect = 1, run = function(S)
+        OpenLootWindow({ { link = LinkFor(1003), quantity = 1 } })
+        fire("START_LOOT_ROLL", 1003, 60000)
+        TakeSlot(1)
+        fire("LOOT_ITEM_ROLL_WON", LinkFor(1003), 1)
+        Loot(Render(S.LOOT_ITEM_SELF, ChatLink(1003)))
+    end },
     { name = "party member loots", expect = 0, run = function(S)
         Loot(Render(S.LOOT_ITEM, "Bob", ChatLink(1003)))
     end },
